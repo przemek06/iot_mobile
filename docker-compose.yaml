@@ -1,0 +1,18 @@
+version: "3.8"
+
+networks:  
+  iot-backend-network:  
+    name: iot-backend-network  
+    driver: bridge
+
+services:
+  iot-mobile-backend:
+      build:
+        context: ./backend/iot_mobile_backend
+        dockerfile: Dockerfile
+      networks:
+        - iot-backend-network
+      ports:
+        - "8080:8080"
+      expose:
+        - "8080"
