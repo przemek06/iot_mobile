@@ -6,29 +6,60 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
+private const val DEFAULT_FONT_HEIGHT = 24
+private const val DEFAULT_FONT_LETTER_SPACING = 0.5
+
 val Typography = Typography(
+    titleLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 36.sp,
+        lineHeight = DEFAULT_FONT_HEIGHT.sp,
+        letterSpacing = DEFAULT_FONT_LETTER_SPACING.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 28.sp,
+        lineHeight = DEFAULT_FONT_HEIGHT.sp,
+        letterSpacing = DEFAULT_FONT_LETTER_SPACING.sp
+    ),
+    titleSmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        lineHeight = DEFAULT_FONT_HEIGHT.sp,
+        letterSpacing = DEFAULT_FONT_LETTER_SPACING.sp
+    ),
+    // For buttons
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
+        lineHeight = DEFAULT_FONT_HEIGHT.sp,
+        letterSpacing = DEFAULT_FONT_LETTER_SPACING.sp
+    ),
+    // For normal text + top bar
+    bodyMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        fontSize = 14.sp,
+        lineHeight = DEFAULT_FONT_HEIGHT.sp,
+        letterSpacing = DEFAULT_FONT_LETTER_SPACING.sp
     ),
-    labelSmall = TextStyle(
+    // For input field
+    bodySmall = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = DEFAULT_FONT_HEIGHT.sp,
+        letterSpacing = DEFAULT_FONT_LETTER_SPACING.sp
+    ),
+    labelMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 8.sp,
+        lineHeight = DEFAULT_FONT_HEIGHT.sp,
+        letterSpacing = DEFAULT_FONT_LETTER_SPACING.sp
+    ),
 )
