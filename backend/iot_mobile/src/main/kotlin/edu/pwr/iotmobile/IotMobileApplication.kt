@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class IotMobileApplication
 
 fun main(args: Array<String>) {
-	runApplication<IotMobileApplication>(*args)
+    runApplication<IotMobileApplication>(*args)
 }
