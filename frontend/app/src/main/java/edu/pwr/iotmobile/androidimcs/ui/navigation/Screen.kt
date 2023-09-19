@@ -1,5 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.navigation
 
+import edu.pwr.iotmobile.androidimcs.R
+
 sealed class Screen(
     val path: String,
     val icon: Int? = null,
@@ -8,22 +10,22 @@ sealed class Screen(
 ) {
     object Main : Screen(
         path = "main",
-        icon = null,
-        description = null,
+        icon = R.drawable.ic_home,
+        description = R.string.main_screen,
         tag = "main"
     )
 
     object Projects : Screen(
         path = "projects",
-        icon = null,
-        description = null,
+        icon = R.drawable.ic_project,
+        description = R.string.projects_screen,
         tag = "projects"
     )
 
     object Account : Screen(
         path = "account",
-        icon = null,
-        description = null,
+        icon = R.drawable.ic_account,
+        description = R.string.account_screen,
         tag = "account"
     )
 }

@@ -8,6 +8,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsScreen
 
 @Composable
 fun NavGraph(
@@ -21,6 +24,14 @@ fun NavGraph(
     ) {
         composable(Screen.Main.path) {
             MainScreen()
+        }
+
+        composable(Screen.Projects.path) {
+            ProjectsScreen()
+        }
+
+        composable(Screen.Account.path) {
+            AccountScreen()
         }
     }
 }
