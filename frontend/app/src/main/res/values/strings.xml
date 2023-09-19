@@ -3,4 +3,7 @@
     <string name="main_screen">Main screen</string>
     <string name="account_screen">Account screen</string>
     <string name="projects_screen">Projects screen</string>
+    <string name="home">Home</string>
+    <string name="projects">Projects</string>
+    <string name="account">Account</string>
 </resources>
