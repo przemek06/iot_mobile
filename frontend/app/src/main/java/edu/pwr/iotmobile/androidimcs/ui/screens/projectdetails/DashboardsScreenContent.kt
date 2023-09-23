@@ -1,16 +1,11 @@
-package edu.pwr.iotmobile.androidimcs.ui.screens.projects
+package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
@@ -20,28 +15,13 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 
 @Composable
-fun ProjectsScreen() {
-    val uiState = ProjectsUiState.default(projects = listOf(1,2,3))
-    ProjectsScreenContent(uiState)
-}
-
-@Composable
-fun ProjectsScreenContent(
-    uiState: ProjectsUiState
+fun DashboardsScreenContent(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Dimensions.space22)
-    ) {
-        Dimensions.space40.HeightSpacer()
-        Text(
-            text = stringResource(id = R.string.projects),
-            style = MaterialTheme.typography.titleMedium
-        )
-        Dimensions.space40.HeightSpacer()
+    Column {
         ButtonCommon(
-            text = stringResource(id = R.string.add_new_project),
+            text = stringResource(id = R.string.add_new_dashboard),
             type = ButtonCommonType.Secondary
         ) {
             Log.d("button", "button pressed")
@@ -50,7 +30,7 @@ fun ProjectsScreenContent(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(Dimensions.space14),
         ) {
-            items(uiState.projects) {
+            items(uiState.dashboards) {
                 Block(
                     text = "Block",
                     onClick = {}

@@ -6,4 +6,11 @@
     <string name="home">Home</string>
     <string name="projects">Projects</string>
     <string name="account">Account</string>
+    <string name="add_new_project">+ Add new project</string>
+    <string name="add_new_dashboard">+ Add new dashboard</string>
+    <string name="delete_project">Delete project</string>
+    <string name="show_access">Show access</string>
+    <string name="dashboards">dashboards</string>
+    <string name="topics">topics</string>
+    <string name="group">group</string>
 </resources>

@@ -3,9 +3,11 @@ package edu.pwr.iotmobile.androidimcs.app.koin
 import android.content.Context
 import edu.pwr.iotmobile.androidimcs.app.database.AppDatabase
 import edu.pwr.iotmobile.androidimcs.app.retrofit.AppRetrofit
+import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
@@ -26,6 +28,7 @@ object AppKoin {
     }
 
     private val viewModels = module {
+        viewModelOf(::ProjectDetailsViewModel)
     }
 
     private val modules by lazy {
