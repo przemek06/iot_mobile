@@ -20,14 +20,20 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 
 @Composable
-fun ProjectsScreen() {
+fun ProjectsScreen(
+    navigation: ProjectsNavigation
+) {
     val uiState = ProjectsUiState.default(projects = listOf(1,2,3))
-    ProjectsScreenContent(uiState)
+    ProjectsScreenContent(
+        uiState = uiState,
+        navigation = navigation
+    )
 }
 
 @Composable
 fun ProjectsScreenContent(
-    uiState: ProjectsUiState
+    uiState: ProjectsUiState,
+    navigation: ProjectsNavigation
 ) {
     Column(
         modifier = Modifier
@@ -53,7 +59,7 @@ fun ProjectsScreenContent(
             items(uiState.projects) {
                 Block(
                     text = "Block",
-                    onClick = {}
+                    onClick = { navigation.openProjectDetails("1") }
                 )
             }
         }

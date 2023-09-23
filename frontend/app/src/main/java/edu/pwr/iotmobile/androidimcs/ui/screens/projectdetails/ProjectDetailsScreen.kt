@@ -1,6 +1,13 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +18,9 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
@@ -29,12 +39,14 @@ private val TABS = listOf(
 )
 
 @Composable
-fun ProjectDetailsScreen() {
+fun ProjectDetailsScreen(
+    navigation: ProjectDetailsNavigation
+) {
+    Log.d("nav", "project id:")
+    navigation.projectId?.let { Log.d("nav", it) }
     val viewModel = koinViewModel<ProjectDetailsViewModel>()
-    val uiState = ProjectDetailsUiState.default(
-        dashboards = listOf(1,2,3),
-        topics = listOf(1,2,3)
-    )
+    val uiState by viewModel.uiState.collectAsState()
+
     ProjectDetailsScreenContent(
         uiState = uiState,
         uiInteraction = ProjectDetailsUiInteraction.default(viewModel)
@@ -55,9 +67,11 @@ fun ProjectDetailsScreenContent(
             MenuItem(title = stringResource(id = R.string.delete_project), onClick = {}),
             onReturn = { /*TODO*/ }
         )
-        Dimensions.space40.HeightSpacer()
+        Dimensions.space10.HeightSpacer()
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "Project 1",
@@ -70,6 +84,7 @@ fun ProjectDetailsScreenContent(
                 Log.d("button", "button pressed")
             }
         }
+        Dimensions.space10.HeightSpacer()
         TabRow(selectedTabIndex = uiState.selectedTabIndex) {
             TABS.forEachIndexed { index, title ->
                 Tab(text = { Text(
@@ -82,12 +97,40 @@ fun ProjectDetailsScreenContent(
                 )
             }
         }
-        when (uiState.selectedTabIndex) {
-            0 -> DashboardsScreenContent(uiState, uiInteraction)
-            1 -> TopicsScreenContent(uiState, uiInteraction)
-            2 -> GroupScreenContent(uiState, uiInteraction)
-        }
-        Dimensions.space40.HeightSpacer()
-    }
+        Dimensions.space22.HeightSpacer()
 
+        TabContent(uiState = uiState, uiInteraction = uiInteraction)
+    }
+}
+
+@Composable
+private fun TabContent(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 0) {
+            DashboardsScreenContent(uiState, uiInteraction)
+        }
+        AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 1) {
+            TopicsScreenContent(uiState, uiInteraction)
+        }
+        AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 2) {
+            GroupScreenContent(uiState, uiInteraction)
+        }
+    }
+}
+
+@Composable
+private fun AnimatedVisibilityTabContainer(
+    visible: Boolean,
+    content: @Composable () -> Unit
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInHorizontally(),
+        exit = fadeOut() + slideOutHorizontally()
+    ) {
+        content()
+    }
 }
