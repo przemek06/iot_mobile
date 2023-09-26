@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 
 @Entity
 class Message (
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int,
     var topicId: Int,
     var message: String,
     var type: String,
-    var tsSent: LocalDateTime
+    var tsSent: LocalDateTime,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Int?=null
 )

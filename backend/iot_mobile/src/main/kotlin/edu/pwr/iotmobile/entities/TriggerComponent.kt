@@ -8,9 +8,6 @@ import java.time.LocalDateTime
 
 @Entity
 class TriggerComponent (
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int,
     var dashboardId: Int,
     var eventSourceId: Int,
     var actionDestId: Int,
@@ -18,5 +15,8 @@ class TriggerComponent (
     var size: Int,
     var tsLastEvent: LocalDateTime,
     var xCoordinate: Int,
-    var yCoordinate: Int
+    var yCoordinate: Int,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Int?=null
 )

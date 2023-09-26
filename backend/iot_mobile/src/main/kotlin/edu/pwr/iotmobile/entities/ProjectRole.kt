@@ -7,10 +7,10 @@ import jakarta.persistence.Id
 
 @Entity
 class ProjectRole (
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: String,
     var projectId: Int,
     var userId: Int,
-    var role: String
+    var role: String,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Int?=null
 )

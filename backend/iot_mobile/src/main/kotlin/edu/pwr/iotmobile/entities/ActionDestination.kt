@@ -7,9 +7,9 @@ import jakarta.persistence.Id
 
 @Entity
 class ActionDestination (
+    var type: String,
+    var token: String,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int,
-    var type: String,
-    var token: String
+    var id: Int?=null
 )

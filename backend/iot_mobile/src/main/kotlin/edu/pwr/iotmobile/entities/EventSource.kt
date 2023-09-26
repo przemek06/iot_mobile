@@ -5,9 +5,9 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 
 class EventSource (
+    var type: String,
+    var token: String,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int,
-    var type: String,
-    var token: String
+    var id: Int?=null
 )

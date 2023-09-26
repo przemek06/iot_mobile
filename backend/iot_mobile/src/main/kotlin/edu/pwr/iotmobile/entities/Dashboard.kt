@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 
 @Entity
 class Dashboard (
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int,
     var projectId: Int,
     var name: String,
     var createdBy: Int,
-    var createdAt: LocalDateTime
+    var createdAt: LocalDateTime,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Int?=null
 )
