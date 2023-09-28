@@ -34,4 +34,8 @@ sealed class Screen(
         label = R.string.account,
         tag = "account"
     )
+
+    object ProjectDetails : Screen("projectDetails/{arguments}")
 }
+
+

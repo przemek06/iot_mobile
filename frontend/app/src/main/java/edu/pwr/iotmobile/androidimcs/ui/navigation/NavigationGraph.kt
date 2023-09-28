@@ -10,6 +10,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsScreen
 
 @Composable
@@ -27,11 +30,22 @@ fun NavGraph(
         }
 
         composable(Screen.Projects.path) {
-            ProjectsScreen()
+            ProjectsScreen(
+                navigation = ProjectsNavigation.default(navController)
+            )
         }
 
         composable(Screen.Account.path) {
             AccountScreen()
+        }
+
+        composable(Screen.ProjectDetails.path) { navBackStackEntry ->
+            ProjectDetailsScreen(
+                navigation = ProjectDetailsNavigation.default(
+                    navController = navController,
+                    navBackStackEntry = navBackStackEntry
+                )
+            )
         }
     }
 }

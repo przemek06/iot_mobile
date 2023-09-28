@@ -47,7 +47,7 @@ private val LightColorScheme = lightColorScheme(
 fun AndroidIMCSTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // TODO: change to true to enable dynamic color
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
