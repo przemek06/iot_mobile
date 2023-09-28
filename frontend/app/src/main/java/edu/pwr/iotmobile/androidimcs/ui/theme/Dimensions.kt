@@ -36,6 +36,8 @@ object  Dimensions {
         get() = 60.dp
     val topBarHeight: Dp
         get() = 45.dp
+    val optionItemHeight: Dp
+        get() = 50.dp
 }
 
 @Composable

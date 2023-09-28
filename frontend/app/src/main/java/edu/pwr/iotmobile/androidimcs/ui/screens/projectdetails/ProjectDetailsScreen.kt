@@ -18,15 +18,16 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
-import edu.pwr.iotmobile.androidimcs.ui.components.MenuItem
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -47,6 +48,10 @@ fun ProjectDetailsScreen(
     val viewModel = koinViewModel<ProjectDetailsViewModel>()
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.init(navigation)
+    }
+
     ProjectDetailsScreenContent(
         uiState = uiState,
         uiInteraction = ProjectDetailsUiInteraction.default(viewModel)
@@ -54,7 +59,7 @@ fun ProjectDetailsScreen(
 }
 
 @Composable
-fun ProjectDetailsScreenContent(
+private fun ProjectDetailsScreenContent(
     uiState: ProjectDetailsUiState,
     uiInteraction: ProjectDetailsUiInteraction
 ) {
@@ -64,7 +69,7 @@ fun ProjectDetailsScreenContent(
             .padding(horizontal = Dimensions.space22)
     ) {
         TopBar(
-            MenuItem(title = stringResource(id = R.string.delete_project), onClick = {}),
+            menuItems = uiState.menuOptionsList,
             onReturn = { /*TODO*/ }
         )
         Dimensions.space10.HeightSpacer()
@@ -77,11 +82,13 @@ fun ProjectDetailsScreenContent(
                 text = "Project 1",
                 style = MaterialTheme.typography.titleSmall
             )
-            ButtonCommon(
-                text = stringResource(id = R.string.show_access),
-                type = ButtonCommonType.Alternative
-            ) {
-                Log.d("button", "button pressed")
+            if (uiState.user.role != UserRole.View) {
+                ButtonCommon(
+                    text = stringResource(id = R.string.show_access),
+                    type = ButtonCommonType.Alternative
+                ) {
+                    Log.d("button", "button pressed")
+                }
             }
         }
         Dimensions.space10.HeightSpacer()

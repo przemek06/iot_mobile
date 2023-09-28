@@ -7,10 +7,26 @@
     <string name="projects">Projects</string>
     <string name="account">Account</string>
     <string name="add_new_project">+ Add new project</string>
+    <string name="add_new_topic">+ Add new topic</string>
     <string name="add_new_dashboard">+ Add new dashboard</string>
+    <string name="how_to_access">How to access?</string>
     <string name="delete_project">Delete project</string>
     <string name="show_access">Show access</string>
     <string name="dashboards">dashboards</string>
     <string name="topics">topics</string>
     <string name="group">group</string>
+    <string name="your_role">Your role</string>
+    <string name="admin_desc">You have full authorization over this project, and can manage dashboards, topics and users with access.</string>
+    <string name="modify_desc">You can access and edit any dashboards and topics in this group.</string>
+    <string name="view_desc">You can access the dashboards and view the topics.</string>
+    <string name="admin">admin</string>
+    <string name="invite_users">Invite users</string>
+    <string name="edit_roles">Edit roles</string>
+    <string name="revoke_access">Revoke access</string>
+    <string name="add_admin">Add admin</string>
+    <string name="leave_group">Leave group</string>
+    <string name="members_with">Members with access</string>
+    <string name="manage_group">Manage group</string>
+    <string name="expand">Expand</string>
+    <string name="hide">Hide</string>
 </resources>
