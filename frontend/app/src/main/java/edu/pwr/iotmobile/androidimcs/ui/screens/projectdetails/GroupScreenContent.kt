@@ -151,7 +151,7 @@ private fun AdminMember(user: User) {
 @Composable
 private fun UserNameText(user: User) {
     Text(
-        text = user.name + user.surname,
+        text = user.displayName,
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onBackground
     )

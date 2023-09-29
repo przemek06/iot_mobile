@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -26,14 +24,25 @@ import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen() {
-    LoginScreenContent()
+    val viewModel = koinViewModel<LoginViewModel>()
+    val uiState by viewModel.uiState.collectAsState()
+    val uiInteraction = LoginUiInteraction.default(viewModel)
+
+    LoginScreenContent(
+        uiState = uiState,
+        uiInteraction = uiInteraction
+    )
 }
 
 @Composable
-private fun LoginScreenContent() {
+private fun LoginScreenContent(
+    uiState: LoginUiState,
+    uiInteraction: LoginUiInteraction
+) {
     val focusManager = LocalFocusManager.current
     val keyboardFocus = KeyboardFocusController(
         keyboardController = LocalSoftwareKeyboardController.current,
@@ -56,11 +65,16 @@ private fun LoginScreenContent() {
             color = MaterialTheme.colorScheme.onBackground
         )
         Dimensions.space40.HeightSpacer()
-        var text by remember { mutableStateOf("") }
-        InputField(
-            text = text,
-            label = "Name",
-            onValueChange = { text = it }
-        )
+        uiState.inputFields.forEachIndexed { index, inputField ->
+            InputField(
+                text = inputField.text,
+                label = stringResource(id = inputField.label),
+                errorText = stringResource(id = inputField.errorMessage),
+                isError = inputField.isError,
+                onValueChange = { uiInteraction.onTextChange(inputField, it) }
+            )
+            if (index < uiState.inputFields.lastIndex)
+                Dimensions.space18.HeightSpacer()
+        }
     }
 }

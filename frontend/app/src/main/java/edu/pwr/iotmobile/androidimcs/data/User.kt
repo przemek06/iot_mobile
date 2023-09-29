@@ -2,8 +2,7 @@ package edu.pwr.iotmobile.androidimcs.data
 
 data class User(
     val id: String,
-    val name: String,
-    val surname: String,
+    val displayName: String,
     val email: String,
     val role: UserRole
 )

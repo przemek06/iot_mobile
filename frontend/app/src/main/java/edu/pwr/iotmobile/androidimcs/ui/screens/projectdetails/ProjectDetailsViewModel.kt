@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.update
 
 val mockUser = User(
     id = "1",
-    name = "Alan",
-    surname = "Walker",
+    displayName = "Alan Walker",
     email = "alan@walker.com",
     role = UserRole.Modify
 )

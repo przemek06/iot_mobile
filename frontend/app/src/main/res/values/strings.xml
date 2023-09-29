@@ -51,4 +51,5 @@
     <string name="s7">Your account is inactive</string>
     <string name="s8">Account registered successfully</string>
     <string name="s9">Check your email and enter the code below to activate your account</string>
+    <string name="s10">The field cannot be empty</string>
 </resources>
