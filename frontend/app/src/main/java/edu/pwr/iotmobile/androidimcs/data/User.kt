@@ -8,6 +8,11 @@ data class User(
 )
 
 enum class UserRole {
+    Normal,
+    Admin
+}
+
+enum class UserProjectRole {
     View,
     Modify,
     Admin

@@ -2,6 +2,7 @@ package edu.pwr.iotmobile.androidimcs.ui.theme
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -47,6 +48,6 @@ fun Dp.HeightSpacer() {
 
 @Composable
 fun Dp.WidthSpacer() {
-    Spacer(modifier = Modifier.height(this))
+    Spacer(modifier = Modifier.width(this))
 }
 

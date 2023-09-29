@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
@@ -34,7 +34,7 @@ fun TopicsScreenContent(
 ) {
     LazyColumn {
 
-        if (uiState.user.role != UserRole.View) {
+        if (uiState.userProjectRole != UserProjectRole.View) {
             item {
                 ButtonCommon(
                     text = stringResource(id = R.string.how_to_access),
@@ -54,7 +54,7 @@ fun TopicsScreenContent(
         }
 
         items(uiState.topics) {
-            if (uiState.user.role == UserRole.View) {
+            if (uiState.userProjectRole == UserProjectRole.View) {
                 NonErasableBlock(
                     primaryText = "Topic 1",
                     secondaryText = "Float",
