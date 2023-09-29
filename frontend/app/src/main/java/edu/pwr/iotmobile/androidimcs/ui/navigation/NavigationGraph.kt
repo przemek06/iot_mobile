@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNavigation
@@ -50,7 +51,9 @@ fun NavGraph(
         }
 
         composable(Screen.Login.path) {
-            LoginScreen()
+            LoginScreen(
+                navigation = LoginNavigation.default(navController)
+            )
         }
     }
 }
