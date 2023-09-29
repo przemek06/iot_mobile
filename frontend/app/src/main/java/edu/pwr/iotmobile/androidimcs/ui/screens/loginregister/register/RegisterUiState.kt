@@ -1,14 +1,14 @@
-package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login
+package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register
 
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 
-data class LoginUiState(
+data class RegisterUiState(
     val inputFields: List<InputFieldData>
 ) {
     companion object {
         fun default(
             inputFields: List<InputFieldData> = emptyList()
-        ) = LoginUiState(
+        ) = RegisterUiState(
             inputFields = inputFields
         )
     }

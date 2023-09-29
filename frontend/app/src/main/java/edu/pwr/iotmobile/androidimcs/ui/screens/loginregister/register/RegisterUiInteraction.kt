@@ -1,20 +1,20 @@
-package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login
+package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register
 
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 
-interface LoginUiInteraction {
+interface RegisterUiInteraction {
     fun onTextChange(item: InputFieldData, text: String)
-    fun onLogin()
+    fun onRegister()
 
     companion object {
         fun default(
-            viewModel: LoginViewModel
-        ) = object : LoginUiInteraction {
+            viewModel: RegisterViewModel
+        ) = object : RegisterUiInteraction {
             override fun onTextChange(item: InputFieldData, text: String) {
                 viewModel.onTextChange(item, text)
             }
 
-            override fun onLogin() {
+            override fun onRegister() {
                 TODO("Not yet implemented")
             }
 

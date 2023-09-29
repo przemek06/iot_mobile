@@ -1,4 +1,4 @@
-package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login
+package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register
 
 import androidx.lifecycle.ViewModel
 import edu.pwr.iotmobile.androidimcs.R
@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class LoginViewModel : ViewModel() {
+class RegisterViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LoginUiState.default())
+    private val _uiState = MutableStateFlow(RegisterUiState.default())
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -31,17 +31,27 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    // TODO: checking and setting errors on login click
-    // TODO: creating LoginDto on login click
+    // TODO: check email and password regex
 
     private fun generateInputFields() = listOf(
         InputFieldData(
             id = "email",
             label = R.string.email,
+            errorMessage = R.string.s11
+        ),
+        InputFieldData(
+            id = "display_name",
+            label = R.string.display_name,
         ),
         InputFieldData(
             id = "password",
             label = R.string.password,
+            errorMessage = R.string.s6
+        ),
+        InputFieldData(
+            id = "confirm_password",
+            label = R.string.confirm,
+            errorMessage = R.string.s12
         ),
     )
 }

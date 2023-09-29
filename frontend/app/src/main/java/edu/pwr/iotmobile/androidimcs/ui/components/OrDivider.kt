@@ -2,8 +2,8 @@ package edu.pwr.iotmobile.androidimcs.ui.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,7 +18,7 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 @Composable
 fun OrDivider() {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.width(300.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         CustomDivider()
