@@ -75,20 +75,19 @@ private fun LoginScreenContent(
         Dimensions.space30.HeightSpacer()
 
         // Input fields
-        uiState.inputFields.forEachIndexed { index, inputField ->
+        uiState.inputFields.forEach { inputField ->
+            val data = inputField.value
             InputField(
-                text = inputField.text,
-                label = stringResource(id = inputField.label),
-                errorText = stringResource(id = inputField.errorMessage),
-                isError = inputField.isError,
-                onValueChange = { uiInteraction.onTextChange(inputField, it) }
+                text = data.text,
+                label = stringResource(id = data.label),
+                errorText = stringResource(id = data.errorMessage),
+                isError = data.isError,
+                onValueChange = { uiInteraction.onTextChange(inputField.key, it) }
             )
-            if (index < uiState.inputFields.lastIndex)
-                Dimensions.space18.HeightSpacer()
+            Dimensions.space18.HeightSpacer()
         }
 
         // Forgot your password link
-        Dimensions.space10.HeightSpacer()
         TextLink(
             text = stringResource(id = R.string.forgot),
             onClick = { navigation.onForgotPassword() }

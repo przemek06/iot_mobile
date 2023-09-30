@@ -3,11 +3,11 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 
 data class RegisterUiState(
-    val inputFields: List<InputFieldData>
+    val inputFields: Map<RegisterViewModel.InputFieldType, InputFieldData>
 ) {
     companion object {
         fun default(
-            inputFields: List<InputFieldData> = emptyList()
+            inputFields: Map<RegisterViewModel.InputFieldType, InputFieldData> = emptyMap()
         ) = RegisterUiState(
             inputFields = inputFields
         )

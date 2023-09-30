@@ -20,38 +20,39 @@ class RegisterViewModel : ViewModel() {
         }
     }
 
-    fun onTextChange(item: InputFieldData, text: String) {
+    fun onTextChange(type: InputFieldType, text: String) {
         _uiState.update {
-            val newInputFields = it.inputFields.map { inputField ->
-                if (inputField.id == item.id)
-                    inputField.copy(text = text)
-                else inputField
-            }
+            val inputField = it.inputFields[type]?.copy(text = text) ?: return
+            val newInputFields = it.inputFields.toMutableMap()
+            newInputFields.replace(type, inputField)
             it.copy(inputFields = newInputFields)
         }
     }
 
     // TODO: check email and password regex
 
-    private fun generateInputFields() = listOf(
-        InputFieldData(
-            id = "email",
+    private fun generateInputFields() = mapOf(
+        InputFieldType.Email to InputFieldData(
             label = R.string.email,
             errorMessage = R.string.s11
         ),
-        InputFieldData(
-            id = "display_name",
+        InputFieldType.DisplayName to InputFieldData(
             label = R.string.display_name,
         ),
-        InputFieldData(
-            id = "password",
+        InputFieldType.Password to InputFieldData(
             label = R.string.password,
             errorMessage = R.string.s6
         ),
-        InputFieldData(
-            id = "confirm_password",
+        InputFieldType.ConfirmPassword to InputFieldData(
             label = R.string.confirm,
             errorMessage = R.string.s12
         ),
     )
+
+    enum class InputFieldType {
+        Email,
+        DisplayName,
+        Password,
+        ConfirmPassword
+    }
 }
