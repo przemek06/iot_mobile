@@ -6,6 +6,7 @@ import edu.pwr.iotmobile.androidimcs.app.retrofit.AppRetrofit
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterViewModel
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -33,6 +34,7 @@ object AppKoin {
         viewModelOf(::ProjectDetailsViewModel)
         viewModelOf(::LoginViewModel)
         viewModelOf(::RegisterViewModel)
+        viewModelOf(::ForgotPasswordViewModel)
     }
 
     private val modules by lazy {

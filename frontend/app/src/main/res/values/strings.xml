@@ -41,18 +41,19 @@
     <string name="confirm">Confirm</string>
     <string name="activate">Activate</string>
     <string name="code">Code</string>
-    <string name="resend_link">Resend link</string>
+    <string name="resend_link">Resend code</string>
     <string name="forgot">Forgot your password?</string>
     <string name="s1">Enter your email address to reset your password.</string>
     <string name="s2">Enter code from email</string>
     <string name="s3">Enter new password</string>
     <string name="s4">No activation email?</string>
     <string name="s5">The code is incorrect</string>
-    <string name="s6">The password should contain at least 6 characters</string>
+    <string name="s6">The password should contain at least 8 characters</string>
     <string name="s7">Your account is inactive</string>
     <string name="s8">Account registered successfully</string>
     <string name="s9">Check your email and enter the code below to activate your account</string>
     <string name="s10">The field cannot be empty</string>
     <string name="s11">E-mail must be of form: j.kowalski@email.com</string>
     <string name="s12">Passwords don\'t match</string>
+    <string name="s13">Code not received?</string>
 </resources>

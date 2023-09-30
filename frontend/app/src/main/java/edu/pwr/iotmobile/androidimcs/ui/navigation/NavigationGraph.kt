@@ -9,6 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterNavigation
@@ -61,6 +63,12 @@ fun NavGraph(
         composable(Screen.Register.path) {
             RegisterScreen(
                 navigation = RegisterNavigation.default(navController)
+            )
+        }
+
+        composable(Screen.ForgotPassword.path) {
+            ForgotPasswordScreen(
+                navigation = ForgotPasswordNavigation.default(navController)
             )
         }
     }

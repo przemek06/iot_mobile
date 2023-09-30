@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
@@ -28,6 +30,7 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 fun TopBar(
     menuItems: List<MenuOption> = emptyList(),
     text: String? = null,
+    padding: Dp = Dimensions.none,
     onReturn: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -35,6 +38,7 @@ fun TopBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = padding)
             .height(Dimensions.topBarHeight)
     ) {
         IconButton(onClick = onReturn) {
