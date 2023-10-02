@@ -19,16 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 
-data class MenuItem(
-    val title: String,
-    val onClick: () -> Unit
-)
 @Composable
 fun TopBar(
-    vararg menuItems: MenuItem,
+    menuItems: List<MenuOption> = emptyList(),
     text: String? = null,
     onReturn: () -> Unit,
 ) {
@@ -81,7 +79,7 @@ fun TopBar(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = it.title,
+                                    text = stringResource(id = it.titleId),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSecondary
                                 )
