@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
@@ -20,7 +20,7 @@ fun DashboardsScreenContent(
 ) {
     LazyColumn {
 
-        if (uiState.user.role != UserRole.View) {
+        if (uiState.userProjectRole != UserProjectRole.View) {
             item {
                 ButtonCommon(
                     text = stringResource(id = R.string.add_new_dashboard),
