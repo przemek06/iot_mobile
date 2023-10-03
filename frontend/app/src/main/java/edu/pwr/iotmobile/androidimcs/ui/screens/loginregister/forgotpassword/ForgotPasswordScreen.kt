@@ -5,6 +5,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -27,7 +28,7 @@ import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
-import edu.pwr.iotmobile.androidimcs.ui.helpers.KeyboardFocusController
+import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
@@ -58,8 +59,9 @@ private fun ForgotPasswordScreenContent(
         focusManager = focusManager
     )
 
-    Column {
+    Box(modifier = Modifier.fillMaxSize()) {
         TopBar(
+            modifier = Modifier.align(Alignment.TopStart),
             padding = Dimensions.space22,
             onReturn = { navigation.onReturn() }
         )
@@ -69,14 +71,15 @@ private fun ForgotPasswordScreenContent(
                 .clickable(interactionSource = MutableInteractionSource(), indication = null) {
                     keyboardFocus.clear()
                 }
-                .padding(horizontal = Dimensions.space40),
+                .padding(horizontal = Dimensions.space40)
+                .align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             // Title
             Text(
                 text = stringResource(id = R.string.forgot),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
                 lineHeight = 34.sp

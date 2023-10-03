@@ -1,4 +1,4 @@
-package edu.pwr.iotmobile.androidimcs.ui.extensions
+package edu.pwr.iotmobile.androidimcs.extensions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

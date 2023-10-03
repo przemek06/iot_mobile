@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalComposeUiApi::class)
 
-package edu.pwr.iotmobile.androidimcs.ui.helpers
+package edu.pwr.iotmobile.androidimcs.helpers
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusManager

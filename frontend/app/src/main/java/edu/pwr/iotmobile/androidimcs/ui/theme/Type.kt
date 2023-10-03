@@ -47,7 +47,7 @@ val Typography = Typography(
     // For buttons
     bodyLarge = TextStyle(
         fontFamily = DEFAULT_FONT_FAMILY,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Light,
         fontSize = 16.sp,
         lineHeight = DEFAULT_FONT_HEIGHT.sp,
         letterSpacing = DEFAULT_FONT_LETTER_SPACING.sp
@@ -55,7 +55,7 @@ val Typography = Typography(
     // For normal text + top bar
     bodyMedium = TextStyle(
         fontFamily = DEFAULT_FONT_FAMILY,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Light,
         fontSize = 14.sp,
         lineHeight = DEFAULT_FONT_HEIGHT.sp,
         letterSpacing = DEFAULT_FONT_LETTER_SPACING.sp

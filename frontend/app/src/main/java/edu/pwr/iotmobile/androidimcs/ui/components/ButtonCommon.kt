@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
-import edu.pwr.iotmobile.androidimcs.ui.extensions.conditional
+import edu.pwr.iotmobile.androidimcs.extensions.conditional
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 
 enum class ButtonCommonType {
