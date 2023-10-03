@@ -9,6 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginNavigation
@@ -69,6 +71,15 @@ fun NavGraph(
         composable(Screen.ForgotPassword.path) {
             ForgotPasswordScreen(
                 navigation = ForgotPasswordNavigation.default(navController)
+            )
+        }
+
+        composable(Screen.ActivateAccount.path) {
+            ActivateAccountScreen(
+                navigation = ActivateAccountNavigation.default(
+                    navController = navController,
+                    navBackStackEntry = it
+                )
             )
         }
     }

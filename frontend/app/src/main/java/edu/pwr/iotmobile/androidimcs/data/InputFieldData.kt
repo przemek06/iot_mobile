@@ -5,7 +5,7 @@ import edu.pwr.iotmobile.androidimcs.R
 
 data class InputFieldData(
     val text: String = "",
-    @StringRes val label: Int,
+    @StringRes val label: Int = R.string.name,
     @StringRes val errorMessage: Int = R.string.s10,
     val isError: Boolean = false
 )

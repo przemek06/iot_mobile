@@ -27,7 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 private val SCREENS_WITHOUT_BOTTOM_BAR = listOf(
     Screen.Login.path,
     Screen.Register.path,
-    Screen.InactiveAccount.path,
+    Screen.ActivateAccount.path,
     Screen.RegisterConfirmation.path,
     Screen.ForgotPassword.path
 )
