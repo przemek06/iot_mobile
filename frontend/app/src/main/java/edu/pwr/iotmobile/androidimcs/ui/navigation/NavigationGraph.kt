@@ -9,6 +9,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsScreen
@@ -22,7 +28,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Main.path,
+        startDestination = Screen.Login.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -45,6 +51,24 @@ fun NavGraph(
                     navController = navController,
                     navBackStackEntry = navBackStackEntry
                 )
+            )
+        }
+
+        composable(Screen.Login.path) {
+            LoginScreen(
+                navigation = LoginNavigation.default(navController)
+            )
+        }
+
+        composable(Screen.Register.path) {
+            RegisterScreen(
+                navigation = RegisterNavigation.default(navController)
+            )
+        }
+
+        composable(Screen.ForgotPassword.path) {
+            ForgotPasswordScreen(
+                navigation = ForgotPasswordNavigation.default(navController)
             )
         }
     }

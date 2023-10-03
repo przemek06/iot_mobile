@@ -25,7 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
+import edu.pwr.iotmobile.androidimcs.ui.components.Popup
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
@@ -46,12 +48,19 @@ fun AccountScreenContent(
     uiState: AccountUiState,
     uiInteraction: AccountUiInteraction
 ) {
+    Popup(
+        title = "test",
+        buttonText1 = "b1",
+        buttonText2 = "b2",
+        buttonFunction1 = {},
+        buttonFunction2 = {}
+    )
 
     LazyColumn {
 
         item {
             Text(
-                text = stringResource(id = R.string.username),
+                text = stringResource(id = R.string.email),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -101,42 +110,13 @@ fun AccountScreenContent(
 }
 
 @Composable
-fun Popup(input: String, onDismiss: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .clickable(onClick = onDismiss),
-        contentAlignment = Alignment.Center
-    ) {
-        // Popup content
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-            ) {
-                Text("Popup Content")
-                Dimensions.space22.HeightSpacer()
-                Input()
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Input() {
-    var text by remember { mutableStateOf("") }
-
-    OutlinedTextField(
-        value = text,
-        onValueChange = { text = it },
-        label = { Text("Label") }
+fun DisplayNameInputField(
+    uiState: AccountUiState,
+    uiInteraction: AccountUiInteraction
+) {
+    InputField(
+        text = uiState.inputField.text,
+        label = stringResource(id = uiState.inputField.label),
+        onValueChange = { uiInteraction.onTextChange(it) }
     )
 }

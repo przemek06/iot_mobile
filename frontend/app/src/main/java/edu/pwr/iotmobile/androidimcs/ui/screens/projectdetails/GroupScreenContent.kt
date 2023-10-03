@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.User
-import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.Label
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
@@ -59,7 +59,10 @@ fun GroupScreenContent(
         }
 
         itemsIndexed(memberList) { index, user ->
-            Member(user = user)
+            Member(
+                user = user,
+                role = uiState.userProjectRole
+            )
             if (index < memberList.lastIndex)
                 Dimensions.space10.HeightSpacer()
         }
@@ -104,7 +107,7 @@ fun GroupScreenContent(
 
 @Composable
 private fun Role(uiState: ProjectDetailsUiState) {
-    val userRole = uiState.user.role
+    val userRole = uiState.userProjectRole
     Column {
         Text(
             text = stringResource(id = R.string.your_role),
@@ -130,8 +133,11 @@ private fun Role(uiState: ProjectDetailsUiState) {
 }
 
 @Composable
-private fun LazyItemScope.Member(user: User) {
-    if (user.role == UserRole.Admin)
+private fun LazyItemScope.Member(
+    user: User,
+    role: UserProjectRole,
+) {
+    if (role == UserProjectRole.Admin)
         AdminMember(user = user)
     else
         UserNameText(user = user)
@@ -143,7 +149,7 @@ private fun AdminMember(user: User) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         UserNameText(user)
-        Dimensions.space14.WidthSpacer()
+        Dimensions.space10.WidthSpacer()
         Label(text = stringResource(id = R.string.admin))
     }
 }
@@ -151,7 +157,7 @@ private fun AdminMember(user: User) {
 @Composable
 private fun UserNameText(user: User) {
     Text(
-        text = user.name + user.surname,
+        text = user.displayName,
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onBackground
     )

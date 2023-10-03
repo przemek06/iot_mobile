@@ -36,6 +36,12 @@ sealed class Screen(
     )
 
     object ProjectDetails : Screen("projectDetails/{arguments}")
+
+    object Login : Screen("login")
+    object Register : Screen("register")
+    object ForgotPassword : Screen("forgotPassword")
+    object RegisterConfirmation : Screen("registerConfirmation")
+    object InactiveAccount : Screen("inactiveAccount")
 }
 
 

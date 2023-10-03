@@ -31,7 +31,6 @@
     <string name="hide">Hide</string>
 
     <string name="username">Username</string>
-    <string name="display_name">Display name</string>
     <string name="stats">Stats</string>
     <string name="dashboards_total">Dashboards in total</string>
     <string name="accessed_dashboards">Accessed dashboards</string>
@@ -41,5 +40,33 @@
     <string name="u_sure_logout">Are you sure to log out</string>
     <string name="u_sure_delete_account">Are you sure you want to delete your account</string>
     <string name="delete_account_desc">This will delete all your topics and dashboards as well</string>
+    <string name="not_empty">The field cannot be empty</string>
 
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="name">Name</string>
+    <string name="display_name">Display name</string>
+    <string name="password">Password</string>
+    <string name="email">E-mail</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="or">or</string>
+    <string name="create_an_account">Create an account</string>
+    <string name="confirm">Confirm</string>
+    <string name="activate">Activate</string>
+    <string name="code">Code</string>
+    <string name="resend_link">Resend code</string>
+    <string name="forgot">Forgot your password?</string>
+    <string name="s1">Enter your email address to reset your password.</string>
+    <string name="s2">Enter code from email</string>
+    <string name="s3">Enter new password</string>
+    <string name="s4">No activation email?</string>
+    <string name="s5">The code is incorrect</string>
+    <string name="s6">The password should contain at least 8 characters</string>
+    <string name="s7">Your account is inactive</string>
+    <string name="s8">Account registered successfully</string>
+    <string name="s9">Check your email and enter the code below to activate your account</string>
+    <string name="s10">The field cannot be empty</string>
+    <string name="s11">E-mail must be of form: j.kowalski@email.com</string>
+    <string name="s12">Passwords don\'t match</string>
+    <string name="s13">Code not received?</string>
 </resources>

@@ -25,7 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
@@ -82,7 +82,7 @@ private fun ProjectDetailsScreenContent(
                 text = "Project 1",
                 style = MaterialTheme.typography.titleSmall
             )
-            if (uiState.user.role != UserRole.View) {
+            if (uiState.userProjectRole != UserProjectRole.View) {
                 ButtonCommon(
                     text = stringResource(id = R.string.show_access),
                     type = ButtonCommonType.Alternative
