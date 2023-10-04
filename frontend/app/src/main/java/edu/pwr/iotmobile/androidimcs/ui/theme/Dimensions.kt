@@ -39,6 +39,9 @@ object  Dimensions {
         get() = 45.dp
     val optionItemHeight: Dp
         get() = 50.dp
+
+    val buttonWidth: Dp
+        get() = 280.dp
 }
 
 @Composable

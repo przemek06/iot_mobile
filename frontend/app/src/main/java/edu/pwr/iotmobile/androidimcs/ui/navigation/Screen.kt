@@ -41,7 +41,7 @@ sealed class Screen(
     object Register : Screen("register")
     object ForgotPassword : Screen("forgotPassword")
     object RegisterConfirmation : Screen("registerConfirmation")
-    object InactiveAccount : Screen("inactiveAccount")
+    object ActivateAccount : Screen("activateAccount")
 }
 
 

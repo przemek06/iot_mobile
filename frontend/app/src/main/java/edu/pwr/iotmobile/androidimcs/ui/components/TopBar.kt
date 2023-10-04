@@ -28,6 +28,7 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 
 @Composable
 fun TopBar(
+    modifier: Modifier = Modifier,
     menuItems: List<MenuOption> = emptyList(),
     text: String? = null,
     padding: Dp = Dimensions.none,
@@ -36,7 +37,7 @@ fun TopBar(
     var expanded by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = padding)
             .height(Dimensions.topBarHeight)
