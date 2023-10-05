@@ -3,6 +3,8 @@ package edu.pwr.iotmobile.androidimcs.app.koin
 import android.content.Context
 import edu.pwr.iotmobile.androidimcs.app.database.AppDatabase
 import edu.pwr.iotmobile.androidimcs.app.retrofit.AppRetrofit
+import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountViewModel
+import edu.pwr.iotmobile.androidimcs.ui.screens.account.ChangePassword
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginViewModel
@@ -37,6 +39,7 @@ object AppKoin {
         viewModelOf(::RegisterViewModel)
         viewModelOf(::ForgotPasswordViewModel)
         viewModelOf(::ActivateAccountViewModel)
+        viewModelOf(::AccountViewModel)
     }
 
     private val modules by lazy {
