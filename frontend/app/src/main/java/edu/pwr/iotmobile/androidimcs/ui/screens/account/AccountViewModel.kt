@@ -3,6 +3,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.account
 import androidx.lifecycle.ViewModel
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
+import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -23,6 +24,25 @@ class AccountViewModel : ViewModel() {
                     isError = false
                 )
             )
+        }
+    }
+
+    fun init(navigation: AccountNavigation) {
+
+        var options = listOf(
+            MenuOption(
+                titleId = R.string.change_password,
+                onClick = { navigation.openChangePassword() }
+            ),
+            MenuOption(titleId = R.string.name),
+            MenuOption(titleId = R.string.name),
+            MenuOption(titleId = R.string.name),
+            MenuOption(titleId = R.string.name),
+            MenuOption(titleId = R.string.name)
+        )
+
+        _uiState.update {
+            it.copy(userOptionList = options)
         }
     }
 
