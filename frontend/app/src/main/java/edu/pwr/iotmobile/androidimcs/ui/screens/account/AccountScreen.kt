@@ -1,20 +1,13 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.account
 
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,13 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
 import edu.pwr.iotmobile.androidimcs.ui.components.SimplePopup
-import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import edu.pwr.iotmobile.androidimcs.ui.theme.WidthSpacer
@@ -75,7 +65,10 @@ fun AccountScreenContent(
             buttonText1 = "Cancel",
             buttonText2 = "Confirm",
             buttonFunction1 = { isDisplayNamePopupVisible.value = false },
-            buttonFunction2 = { isDisplayNamePopupVisible.value = false },
+            buttonFunction2 = {
+                uiInteraction.setDisplayName(uiState.inputField.text)
+                isDisplayNamePopupVisible.value = false
+            },
             content = { DisplayNameInputField(uiState = uiState, uiInteraction = uiInteraction) }
         )
     }
@@ -84,8 +77,8 @@ fun AccountScreenContent(
             title = stringResource(id = R.string.u_sure_logout),
             buttonText1 = "No",
             buttonText2 = "Yes",
-            buttonFunction1 = { /*TODO*/ },
-            buttonFunction2 = { /*TODO*/ }
+            buttonFunction1 = { isLogOutPopupVisible.value = false },
+            buttonFunction2 = { isLogOutPopupVisible.value = false }
         )
     }
     if (isDeleteAccountPopupVisible.value) {
@@ -93,8 +86,8 @@ fun AccountScreenContent(
             title = stringResource(id = R.string.u_sure_delete_account),
             buttonText1 = "No",
             buttonText2 = "Yes",
-            buttonFunction1 = { /*TODO*/ },
-            buttonFunction2 = { /*TODO*/ },
+            buttonFunction1 = { isDeleteAccountPopupVisible.value = false },
+            buttonFunction2 = { isDeleteAccountPopupVisible.value = false },
             content = { AccountDeletionContent() }
         )
     }
@@ -120,7 +113,7 @@ fun AccountScreenContent(
                 Dimensions.space22.HeightSpacer()
 
                 Text(
-                    text = uiState.username,
+                    text = uiState.email,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -129,7 +122,7 @@ fun AccountScreenContent(
 
             item {
                 Row(
-                    // horizontalArrangement = Alignment.SpaceBetween        dont work
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = stringResource(id = R.string.display_name),
@@ -187,11 +180,23 @@ fun AccountScreenContent(
                 Dimensions.space22.HeightSpacer()
             }
 
-            items(uiState.userOptionList) {
+            item {
                 Option(
-                    text = stringResource(id = it.titleId),
-                    isBold = it.isBold,
-                    onClick = it.onClick
+                    text = stringResource(id = uiState.changePasswordOption.titleId),
+                    isBold = uiState.changePasswordOption.isBold,
+                    onClick = uiState.changePasswordOption.onClick
+                )
+            }
+            item {
+                Option(
+                    text = stringResource(id = R.string.log_out),
+                    onClick = { isLogOutPopupVisible.value = true }
+                )
+            }
+            item {
+                Option(
+                    text = stringResource(id = R.string.delete_account),
+                    onClick = { isDeleteAccountPopupVisible.value = true }
                 )
             }
         }
@@ -203,7 +208,8 @@ fun Stat(text: String, value: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = text,

@@ -8,6 +8,8 @@ interface AccountUiInteraction {
 
     fun setDisplayName(displayName: String)
     fun onTextChange(text: String)
+    fun onTextChangePassword(text: String)
+    fun onTextChangePasswordNew(text: String)
 
     companion object {
         fun default(
@@ -19,6 +21,12 @@ interface AccountUiInteraction {
 
             override fun onTextChange(text: String) {
                 viewModel.onTextChange(text = text)
+            }
+            override fun onTextChangePassword(text: String) {
+                viewModel.onTextChangePassword(text = text)
+            }
+            override fun onTextChangePasswordNew(text: String) {
+                viewModel.onTextChangePasswordNew(text = text)
             }
         }
     }

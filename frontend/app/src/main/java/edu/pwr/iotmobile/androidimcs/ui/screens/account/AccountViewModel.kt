@@ -29,20 +29,13 @@ class AccountViewModel : ViewModel() {
 
     fun init(navigation: AccountNavigation) {
 
-        var options = listOf(
-            MenuOption(
-                titleId = R.string.change_password,
-                onClick = { navigation.openChangePassword() }
-            ),
-            MenuOption(titleId = R.string.name),
-            MenuOption(titleId = R.string.name),
-            MenuOption(titleId = R.string.name),
-            MenuOption(titleId = R.string.name),
-            MenuOption(titleId = R.string.name)
+        var changePasswordOption = MenuOption(
+            titleId = R.string.change_password,
+            onClick = { navigation.openChangePassword() }
         )
 
         _uiState.update {
-            it.copy(userOptionList = options)
+            it.copy(changePasswordOption = changePasswordOption)
         }
     }
 
@@ -55,6 +48,17 @@ class AccountViewModel : ViewModel() {
     fun onTextChange(text: String) {
         _uiState.update {
             it.copy(inputField = it.inputField.copy(text = text))
+        }
+    }
+
+    fun onTextChangePassword(text: String) {
+        _uiState.update {
+            it.copy(inputFieldPassword = it.inputFieldPassword.copy(text = text))
+        }
+    }
+    fun onTextChangePasswordNew(text: String) {
+        _uiState.update {
+            it.copy(inputFieldPasswordNew = it.inputFieldPasswordNew.copy(text = text))
         }
     }
 }

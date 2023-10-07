@@ -44,6 +44,8 @@
     <string name="delete_account_desc2">You cannot undo this action</string>
     <string name="not_empty">The field cannot be empty</string>
     <string name="change_password">Change password</string>
+    <string name="log_out">Log out</string>
+    <string name="delete_account">Delete account</string>
 
     <string name="change_password_1">Enter current password</string>
     <string name="change_password_2">Enter new password</string>
@@ -57,6 +59,7 @@
     <string name="name">Name</string>
     <string name="display_name">Display name</string>
     <string name="password">Password</string>
+    <string name="new_password">New password</string>
     <string name="email">E-mail</string>
     <string name="confirm_password">Confirm password</string>
     <string name="or">or</string>
