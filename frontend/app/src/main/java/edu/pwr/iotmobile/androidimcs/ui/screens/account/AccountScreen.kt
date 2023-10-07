@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
-import edu.pwr.iotmobile.androidimcs.ui.components.SimplePopup
+import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import edu.pwr.iotmobile.androidimcs.ui.theme.WidthSpacer
@@ -55,39 +55,39 @@ fun AccountScreenContent(
     uiState: AccountUiState,
     uiInteraction: AccountUiInteraction
 ) {
-    var isDisplayNamePopupVisible = remember { mutableStateOf(false) }
-    var isLogOutPopupVisible = remember { mutableStateOf(false) }
-    var isDeleteAccountPopupVisible = remember { mutableStateOf(false) }
+    var isDisplayNameDialogVisible = remember { mutableStateOf(false) }
+    var isLogOutDialogVisible = remember { mutableStateOf(false) }
+    var isDeleteAccountDialogVisible = remember { mutableStateOf(false) }
 
-    if (isDisplayNamePopupVisible.value) {
-        SimplePopup(
+    if (isDisplayNameDialogVisible.value) {
+        SimpleDialog(
             title = stringResource(id = R.string.enter_new_display_name),
             buttonText1 = "Cancel",
             buttonText2 = "Confirm",
-            buttonFunction1 = { isDisplayNamePopupVisible.value = false },
+            buttonFunction1 = { isDisplayNameDialogVisible.value = false },
             buttonFunction2 = {
                 uiInteraction.setDisplayName(uiState.inputField.text)
-                isDisplayNamePopupVisible.value = false
+                isDisplayNameDialogVisible.value = false
             },
             content = { DisplayNameInputField(uiState = uiState, uiInteraction = uiInteraction) }
         )
     }
-    if (isLogOutPopupVisible.value) {
-        SimplePopup(
+    if (isLogOutDialogVisible.value) {
+        SimpleDialog(
             title = stringResource(id = R.string.u_sure_logout),
             buttonText1 = "No",
             buttonText2 = "Yes",
-            buttonFunction1 = { isLogOutPopupVisible.value = false },
-            buttonFunction2 = { isLogOutPopupVisible.value = false }
+            buttonFunction1 = { isLogOutDialogVisible.value = false },
+            buttonFunction2 = { isLogOutDialogVisible.value = false }
         )
     }
-    if (isDeleteAccountPopupVisible.value) {
-        SimplePopup(
+    if (isDeleteAccountDialogVisible.value) {
+        SimpleDialog(
             title = stringResource(id = R.string.u_sure_delete_account),
             buttonText1 = "No",
             buttonText2 = "Yes",
-            buttonFunction1 = { isDeleteAccountPopupVisible.value = false },
-            buttonFunction2 = { isDeleteAccountPopupVisible.value = false },
+            buttonFunction1 = { isDeleteAccountDialogVisible.value = false },
+            buttonFunction2 = { isDeleteAccountDialogVisible.value = false },
             content = { AccountDeletionContent() }
         )
     }
@@ -129,7 +129,7 @@ fun AccountScreenContent(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onBackground
                     )
-                    IconButton(onClick = { isDisplayNamePopupVisible.value = true }) {
+                    IconButton(onClick = { isDisplayNameDialogVisible.value = true }) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_edit),
                             contentDescription = "Edit display name",
@@ -190,13 +190,13 @@ fun AccountScreenContent(
             item {
                 Option(
                     text = stringResource(id = R.string.log_out),
-                    onClick = { isLogOutPopupVisible.value = true }
+                    onClick = { isLogOutDialogVisible.value = true }
                 )
             }
             item {
                 Option(
                     text = stringResource(id = R.string.delete_account),
-                    onClick = { isDeleteAccountPopupVisible.value = true }
+                    onClick = { isDeleteAccountDialogVisible.value = true }
                 )
             }
         }

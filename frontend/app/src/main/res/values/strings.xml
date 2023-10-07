@@ -9,6 +9,7 @@
     <string name="add_new_project">+ Add new project</string>
     <string name="add_new_topic">+ Add new topic</string>
     <string name="add_new_dashboard">+ Add new dashboard</string>
+    <string name="add_new_group">+ Add new group</string>
     <string name="how_to_access">How to access?</string>
     <string name="delete_project">Delete project</string>
     <string name="show_access">Show access</string>
@@ -30,6 +31,10 @@
     <string name="expand">Expand</string>
     <string name="hide">Hide</string>
     <string name="nothing"> </string>
+
+    <string name="main_screen_1">Welcome ,</string>
+    <string name="main_screen_2">Last used dashboards</string>
+    <string name="main_screen_3">Recent active topics</string>
 
     <string name="username">Username</string>
     <string name="stats">Stats</string>

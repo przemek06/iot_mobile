@@ -2,8 +2,6 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.account
 
 import androidx.navigation.NavHostController
 import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
-import edu.pwr.iotmobile.androidimcs.ui.navigation.appendArguments
-import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsNavigation
 
 interface AccountNavigation {
 
@@ -18,9 +16,8 @@ interface AccountNavigation {
             }
 
             override fun openAccount() {
-                navController.navigate(Screen.Account.path)
+                navController.popBackStack()
             }
         }
     }
-
 }
