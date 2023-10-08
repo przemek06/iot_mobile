@@ -19,10 +19,14 @@ class User (
     var isBlocked: Boolean = false,
     @Column(nullable = false)
     var isActive: Boolean = false,
+    ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int?=null
-    ) {
+    val id: Int?=null
+
+    @OneToMany(cascade = [(CascadeType.ALL)], fetch = FetchType.LAZY, mappedBy = "user")
+    private val projectRole = mutableListOf<ProjectRole>()
+
     constructor() : this("", "", Role.USER_ROLE, "", false, false)
 
     fun toUserDTO() : UserDTO {

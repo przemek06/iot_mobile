@@ -14,4 +14,6 @@ class Topic (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?=null
-)
+){
+    constructor():this(0, "", "", false)
+}

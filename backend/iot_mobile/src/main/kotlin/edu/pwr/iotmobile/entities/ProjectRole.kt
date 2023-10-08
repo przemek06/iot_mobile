@@ -1,16 +1,19 @@
 package edu.pwr.iotmobile.entities
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 
 @Entity
 class ProjectRole (
-    var projectId: Int,
-    var userId: Int,
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    var project: Project,
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    var user: User,
     var role: String,
+)
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int?=null
-)
+    val id: Int?=null
+
+    constructor() : this(Project(), User(), "")
+}
