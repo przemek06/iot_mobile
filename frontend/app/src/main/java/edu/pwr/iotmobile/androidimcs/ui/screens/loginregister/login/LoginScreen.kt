@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -35,6 +36,12 @@ fun LoginScreen(navigation: LoginNavigation) {
     val viewModel = koinViewModel<LoginViewModel>()
     val uiState by viewModel.uiState.collectAsState()
     val uiInteraction = LoginUiInteraction.default(viewModel)
+
+    val context = LocalContext.current
+    viewModel.event.CollectEvent(context) {
+        // TODO: navigate to main screen based on event type.
+    }
+    viewModel.toast.CollectToast(context)
 
     LoginScreenContent(
         uiState = uiState,

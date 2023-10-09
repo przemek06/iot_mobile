@@ -1,7 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login
 
-import edu.pwr.iotmobile.androidimcs.data.InputFieldData
-
 interface LoginUiInteraction {
     fun onTextChange(type: LoginViewModel.InputFieldType, text: String)
     fun onLogin()
@@ -15,7 +13,7 @@ interface LoginUiInteraction {
             }
 
             override fun onLogin() {
-                TODO("Not yet implemented")
+                viewModel.onLoginClick()
             }
 
         }
