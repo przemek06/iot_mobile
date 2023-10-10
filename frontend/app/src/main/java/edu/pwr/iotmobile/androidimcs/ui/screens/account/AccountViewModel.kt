@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
+import edu.pwr.iotmobile.androidimcs.data.StatData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -34,6 +35,14 @@ class AccountViewModel : ViewModel() {
             onClick = { navigation.openChangePassword() }
         )
 
+        val options = listOf(
+            MenuOption(
+                titleId = R.string.change_password,
+                onClick = { navigation.openChangePassword() }
+            ),
+
+        )
+
         _uiState.update {
             it.copy(changePasswordOption = changePasswordOption)
         }
@@ -51,14 +60,10 @@ class AccountViewModel : ViewModel() {
         }
     }
 
-    fun onTextChangePassword(text: String) {
+    fun setStats(statList: List<StatData>) {
         _uiState.update {
-            it.copy(inputFieldPassword = it.inputFieldPassword.copy(text = text))
+            it.copy(statList = statList)
         }
     }
-    fun onTextChangePasswordNew(text: String) {
-        _uiState.update {
-            it.copy(inputFieldPasswordNew = it.inputFieldPasswordNew.copy(text = text))
-        }
-    }
+
 }

@@ -59,6 +59,12 @@
     <string name="change_password_5">The password should contain at least 8 characters</string>
     <string name="change_password_6">Provided passwords are not the same</string>
 
+    <string name="admin_1">Admin panel</string>
+    <string name="admin_2">Manage users</string>
+    <string name="admin_3">Ban users</string>
+    <string name="admin_4">Show banned users</string>
+    <string name="admin_5">Add admin</string>
+
     <string name="login">Login</string>
     <string name="register">Register</string>
     <string name="name">Name</string>

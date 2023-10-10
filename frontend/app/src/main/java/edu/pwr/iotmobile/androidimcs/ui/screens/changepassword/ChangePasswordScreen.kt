@@ -1,4 +1,4 @@
-package edu.pwr.iotmobile.androidimcs.ui.screens.account
+package edu.pwr.iotmobile.androidimcs.ui.screens.changepassword
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
@@ -22,34 +23,34 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ChangePassword(navigation: AccountNavigation) {
-    //    Log.d("nav", "project id:")
-//    navigation.projectId?.let { Log.d("nav", it) }
-    val viewModel = koinViewModel<AccountViewModel>()
+fun ChangePasswordScreen(navigation: ChangePasswordNavigation) {
+
+    val viewModel = koinViewModel<ChangePasswordViewModel>()
     val uiState by viewModel.uiState.collectAsState()
 
-    ChangePasswordContent(
+    ChangePasswordScreenContent(
         navigation = navigation,
         uiState = uiState,
-        uiInteraction = AccountUiInteraction.default(viewModel)
+        uiInteraction = ChangePasswordUiInteraction.default(viewModel)
     )
 }
 
 @Composable
-fun ChangePasswordContent(
-    navigation: AccountNavigation,
-    uiState: AccountUiState,
-    uiInteraction: AccountUiInteraction
+private fun ChangePasswordScreenContent(
+    navigation: ChangePasswordNavigation,
+    uiState: ChangePasswordUiState,
+    uiInteraction: ChangePasswordUiInteraction
 ) {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = Dimensions.space22)
+            .padding(horizontal = Dimensions.space22),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TopBar(
-            onReturn = { navigation.openAccount() }
-        )
+        TopBar(text = stringResource(id = R.string.change_password)) {
+            navigation.goBack()
+        }
         Column(
             modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.Center,
@@ -80,6 +81,10 @@ fun ChangePasswordContent(
                 label = stringResource(id = uiState.inputFieldPasswordNew.label),
                 onValueChange = { uiInteraction.onTextChangePasswordNew(it) }
             )
+            Dimensions.space40.HeightSpacer()
+            ButtonCommon(text = stringResource(id = R.string.confirm)) {
+                navigation.goBack()
+            }
         }
     }
 }

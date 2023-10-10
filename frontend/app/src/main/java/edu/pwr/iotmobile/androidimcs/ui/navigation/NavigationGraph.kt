@@ -8,11 +8,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
-import edu.pwr.iotmobile.androidimcs.ui.screens.account.ChangePassword
-import edu.pwr.iotmobile.androidimcs.ui.screens.account.ChangePasswordContent
+import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
@@ -54,8 +53,8 @@ fun NavGraph(
         }
 
         composable(Screen.ChangePassword.path) {
-            ChangePassword(
-                navigation = AccountNavigation.default(navController)
+            ChangePasswordScreen(
+                navigation = ChangePasswordNavigation.default(navController)
             )
         }
 

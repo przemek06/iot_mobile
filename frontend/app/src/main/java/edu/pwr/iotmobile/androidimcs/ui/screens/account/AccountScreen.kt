@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,6 +24,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.StatData
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
@@ -32,11 +34,8 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.WidthSpacer
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AccountScreen(
-    navigation: AccountNavigation
-) {
-//    Log.d("nav", "project id:")
-//    navigation.projectId?.let { Log.d("nav", it) }
+fun AccountScreen(navigation: AccountNavigation) {
+
     val viewModel = koinViewModel<AccountViewModel>()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -51,7 +50,7 @@ fun AccountScreen(
 }
 
 @Composable
-fun AccountScreenContent(
+private fun AccountScreenContent(
     uiState: AccountUiState,
     uiInteraction: AccountUiInteraction
 ) {
@@ -97,6 +96,7 @@ fun AccountScreenContent(
             .fillMaxSize()
             .padding(horizontal = Dimensions.space22)
     ) {
+        Dimensions.space40.HeightSpacer()
         Text(
             text = stringResource(id = R.string.account),
             style = MaterialTheme.typography.titleMedium
@@ -110,14 +110,13 @@ fun AccountScreenContent(
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                Dimensions.space22.HeightSpacer()
 
                 Text(
                     text = uiState.email,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                Dimensions.space40.HeightSpacer()
+                Dimensions.space22.HeightSpacer()
             }
 
             item {
@@ -137,7 +136,6 @@ fun AccountScreenContent(
                         )
                     }
                 }
-                Dimensions.space22.HeightSpacer()
 
                 Text(
                     text = uiState.displayName,
@@ -153,31 +151,21 @@ fun AccountScreenContent(
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                Dimensions.space22.HeightSpacer()
+                Dimensions.space10.HeightSpacer()
+            }
 
-                Stat(text = stringResource(
-                    id = R.string.dashboards_total),
-                    value = uiState.dashboardsTotal
-                )
-                Stat(text = stringResource(
-                    id = R.string.accessed_dashboards),
-                    value = uiState.accessedDashboards
-                )
-                Stat(text = stringResource(
-                    id = R.string.created_topics_groups),
-                    value = uiState.createdTopicGroups
-                )
-
-                Dimensions.space40.HeightSpacer()
+            items(uiState.statList) {
+                Stat(it)
             }
 
             item {
+                Dimensions.space40.HeightSpacer()
                 Text(
                     text = stringResource(id = R.string.manage_account),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                Dimensions.space22.HeightSpacer()
+                Dimensions.space10.HeightSpacer()
             }
 
             item {
@@ -204,7 +192,7 @@ fun AccountScreenContent(
 }
 
 @Composable
-fun Stat(text: String, value: Int) {
+fun Stat(statData: StatData) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -212,13 +200,13 @@ fun Stat(text: String, value: Int) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = text,
+            text = stringResource(id =statData.label),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
         Dimensions.space10.WidthSpacer()
         Text(
-            text = value.toString(),
+            text = statData.value,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
