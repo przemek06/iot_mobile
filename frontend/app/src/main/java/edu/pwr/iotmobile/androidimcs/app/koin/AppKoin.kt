@@ -3,6 +3,10 @@ package edu.pwr.iotmobile.androidimcs.app.koin
 import android.content.Context
 import edu.pwr.iotmobile.androidimcs.app.database.AppDatabase
 import edu.pwr.iotmobile.androidimcs.app.retrofit.AppRetrofit
+import edu.pwr.iotmobile.androidimcs.helpers.event.Event
+import edu.pwr.iotmobile.androidimcs.helpers.event.EventImpl
+import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
+import edu.pwr.iotmobile.androidimcs.helpers.toast.ToastImpl
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsViewModel
@@ -15,6 +19,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.context.startKoin
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 object AppKoin {
@@ -33,6 +38,7 @@ object AppKoin {
     private val repositories = module {
     }
 
+    // Module for view models
     private val viewModels = module {
         viewModelOf(::ProjectDetailsViewModel)
         viewModelOf(::LoginViewModel)
@@ -43,12 +49,19 @@ object AppKoin {
         viewModelOf(::ChangePasswordViewModel)
     }
 
+    // Module for other singular classes
+    private val misc = module {
+        single { EventImpl() } bind Event::class
+        single { ToastImpl() } bind Toast::class
+    }
+
     private val modules by lazy {
         listOf(
             environments,
             dataSources,
             repositories,
-            viewModels
+            viewModels,
+            misc
         )
     }
 
