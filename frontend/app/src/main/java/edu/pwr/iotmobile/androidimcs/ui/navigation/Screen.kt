@@ -42,6 +42,8 @@ sealed class Screen(
     object ForgotPassword : Screen("forgotPassword")
     object RegisterConfirmation : Screen("registerConfirmation")
     object ActivateAccount : Screen("activateAccount")
+
+    object ChangePassword : Screen("changePassword")
 }
 
 

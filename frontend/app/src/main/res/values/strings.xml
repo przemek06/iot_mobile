@@ -9,6 +9,7 @@
     <string name="add_new_project">+ Add new project</string>
     <string name="add_new_topic">+ Add new topic</string>
     <string name="add_new_dashboard">+ Add new dashboard</string>
+    <string name="add_new_group">+ Add new group</string>
     <string name="how_to_access">How to access?</string>
     <string name="delete_project">Delete project</string>
     <string name="show_access">Show access</string>
@@ -29,11 +30,47 @@
     <string name="manage_group">Manage group</string>
     <string name="expand">Expand</string>
     <string name="hide">Hide</string>
+    <string name="nothing"> </string>
+
+    <string name="main_screen_1">Welcome ,</string>
+    <string name="main_screen_2">Last used dashboards</string>
+    <string name="main_screen_3">Recent active topics</string>
+
+    <string name="username">Username</string>
+    <string name="stats">Stats</string>
+    <string name="dashboards_total">Dashboards in total</string>
+    <string name="accessed_dashboards">Accessed dashboards</string>
+    <string name="created_topics_groups">Created topics groups</string>
+    <string name="manage_account">Manage account</string>
+    <string name="enter_new_display_name">Enter new display name</string>
+    <string name="u_sure_logout">Are you sure to log out</string>
+    <string name="u_sure_delete_account">Are you sure you want to delete your account</string>
+    <string name="delete_account_desc">This will delete all your topics and dashboards as well</string>
+    <string name="delete_account_desc2">You cannot undo this action</string>
+    <string name="not_empty">The field cannot be empty</string>
+    <string name="change_password">Change password</string>
+    <string name="log_out">Log out</string>
+    <string name="delete_account">Delete account</string>
+
+    <string name="change_password_1">Enter current password</string>
+    <string name="change_password_2">Enter new password</string>
+    <string name="change_password_3">Confirm new password</string>
+    <string name="change_password_4">Password is incorrect</string>
+    <string name="change_password_5">The password should contain at least 8 characters</string>
+    <string name="change_password_6">Provided passwords are not the same</string>
+
+    <string name="admin_1">Admin panel</string>
+    <string name="admin_2">Manage users</string>
+    <string name="admin_3">Ban users</string>
+    <string name="admin_4">Show banned users</string>
+    <string name="admin_5">Add admin</string>
+
     <string name="login">Login</string>
     <string name="register">Register</string>
     <string name="name">Name</string>
     <string name="display_name">Display name</string>
     <string name="password">Password</string>
+    <string name="new_password">New password</string>
     <string name="email">E-mail</string>
     <string name="confirm_password">Confirm password</string>
     <string name="or">or</string>
