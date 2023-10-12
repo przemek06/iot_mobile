@@ -45,8 +45,8 @@ fun AdminScreenContent(uiState: AdminUiState) {
     if (isLogOutDialogVisible.value) {
         SimpleDialog(
             title = stringResource(id = R.string.u_sure_logout),
-            buttonText1 = "No",
-            buttonText2 = "Yes",
+            buttonText1 = stringResource(id = R.string.no),
+            buttonText2 = stringResource(id = R.string.yes),
             buttonFunction1 = { isLogOutDialogVisible.value = false },
             buttonFunction2 = { isLogOutDialogVisible.value = false }
         )
@@ -54,8 +54,8 @@ fun AdminScreenContent(uiState: AdminUiState) {
     if (isDeleteAccountDialogVisible.value) {
         SimpleDialog(
             title = stringResource(id = R.string.u_sure_delete_account),
-            buttonText1 = "No",
-            buttonText2 = "Yes",
+            buttonText1 = stringResource(id = R.string.no),
+            buttonText2 = stringResource(id = R.string.yes),
             buttonFunction1 = { isDeleteAccountDialogVisible.value = false },
             buttonFunction2 = { isDeleteAccountDialogVisible.value = false },
             content = { AccountDeletionContent() }
