@@ -6,7 +6,7 @@ import edu.pwr.iotmobile.security.Role
 import jakarta.persistence.*
 
 @Entity(name = "_user")
-open class User (
+class User (
     @Column(nullable = false)
     var email: String,
     @Column(nullable = false)
