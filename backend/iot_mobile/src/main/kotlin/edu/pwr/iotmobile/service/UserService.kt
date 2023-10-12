@@ -76,11 +76,11 @@ class UserService(
         return SecurityContextHolder.getContext().authentication
     }
 
-    private fun getActiveUserId() : Int? {
+    fun getActiveUserId() : Int {
         val authentication: Authentication = getAuthentication()
 
         if (authentication.principal is UserDetailsImpl) {
-            return (authentication.principal as UserDetailsImpl).getId()
+            return (authentication.principal as UserDetailsImpl).getId() ?: throw UserNotFoundException()
         }
 
         throw UserNotFoundException()
@@ -117,17 +117,17 @@ class UserService(
     }
 
     fun updateActiveUserPassword(passwordDTO: PasswordDTO) : UserDTO {
-        val id = getActiveUserId() ?: throw UserNotFoundException()
+        val id = getActiveUserId()
         return updateUserPassword(id, passwordDTO)
     }
 
     fun updateActiveUser(user: UserDTO) : UserDTO {
-        val id = getActiveUserId() ?: throw UserNotFoundException()
+        val id = getActiveUserId()
         return updateUser(id, user)
     }
 
     fun deleteActiveUser() {
-        val id = getActiveUserId() ?: throw UserNotFoundException()
+        val id = getActiveUserId()
         userRepository.deleteById(id)
     }
 
@@ -143,7 +143,7 @@ class UserService(
     }
 
     fun getActiveUserInfo() : UserInfoDTO {
-        val id = getActiveUserId() ?: throw UserNotFoundException()
+        val id = getActiveUserId()
         return getUserInfoById(id)
     }
 
