@@ -6,7 +6,7 @@ import edu.pwr.iotmobile.security.Role
 import jakarta.persistence.*
 
 @Entity(name = "_user")
-class User (
+open class User (
     @Column(nullable = false)
     var email: String,
     @Column(nullable = false)
@@ -32,4 +32,5 @@ class User (
     fun toUserInfoDTO() : UserInfoDTO {
         return UserInfoDTO(id!!, email, role, name, isBlocked, isActive)
     }
+
 }
