@@ -54,14 +54,16 @@ fun ProjectDetailsScreen(
 
     ProjectDetailsScreenContent(
         uiState = uiState,
-        uiInteraction = ProjectDetailsUiInteraction.default(viewModel)
+        uiInteraction = ProjectDetailsUiInteraction.default(viewModel),
+        navigation = navigation
     )
 }
 
 @Composable
 private fun ProjectDetailsScreenContent(
     uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiInteraction: ProjectDetailsUiInteraction,
+    navigation: ProjectDetailsNavigation
 ) {
     Column(
         modifier = Modifier
@@ -106,18 +108,19 @@ private fun ProjectDetailsScreenContent(
         }
         Dimensions.space22.HeightSpacer()
 
-        TabContent(uiState = uiState, uiInteraction = uiInteraction)
+        TabContent(uiState, uiInteraction, navigation)
     }
 }
 
 @Composable
 private fun TabContent(
     uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiInteraction: ProjectDetailsUiInteraction,
+    navigation: ProjectDetailsNavigation
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 0) {
-            DashboardsScreenContent(uiState, uiInteraction)
+            DashboardsScreenContent(uiState, uiInteraction, navigation)
         }
         AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 1) {
             TopicsScreenContent(uiState, uiInteraction)
