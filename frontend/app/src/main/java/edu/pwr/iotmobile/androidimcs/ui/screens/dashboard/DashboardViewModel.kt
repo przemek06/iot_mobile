@@ -1,6 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
-import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
@@ -23,8 +22,8 @@ class DashboardViewModel : ViewModel() {
 
     fun setAbsolutePosition(offset: Offset, index: Int) {
         _uiState.update {
-            val newList = it.components.mapIndexed { i, item ->
-                if (i == index)
+            val newList = it.components.map { item ->
+                if (item.id == index)
                     item.copy(absolutePosition = offset)
                 else item
             }
@@ -32,62 +31,73 @@ class DashboardViewModel : ViewModel() {
         }
     }
 
-    fun setDraggedComponentIndex(index: Int?) {
+    fun setDraggedComponentId(id: Int?) {
         _uiState.update {
-            it.copy(draggedComponentIndex = index)
+            it.copy(draggedComponentId = id)
         }
     }
 
-    fun onComponentClick(index: Int) {
+    fun onComponentClick(id: Int) {
         // TODO: implement
     }
 
     fun onPlaceDraggedComponent(visibleItems: List<LazyStaggeredGridItemInfo>) {
         viewModelScope.launch {
             val currentUiState = uiState.value
-            val draggedComponentIndex = currentUiState.draggedComponentIndex ?: return@launch
+            val draggedComponentId = currentUiState.draggedComponentId ?: return@launch
 
             val closestIndex = getClosestItemIndex(
                 visibleItems = visibleItems,
                 components = currentUiState.components,
-                draggedComponentIndex = draggedComponentIndex
+                draggedComponentId = draggedComponentId
             ) ?: return@launch
 
+            val item = currentUiState.components.firstOrNull { it.id == draggedComponentId } ?: return@launch
+            val itemIndex = currentUiState.components.indexOf(item)
+
             val newOrderedList = currentUiState.components.toMutableList()
-            newOrderedList.removeAt(draggedComponentIndex)
-            newOrderedList.add(closestIndex, currentUiState.components[draggedComponentIndex])
+            newOrderedList.removeAt(itemIndex)
+            newOrderedList.add(closestIndex, item)
 
             _uiState.update {
                 it.copy(
-                    draggedComponentIndex = null,
+                    draggedComponentId = null,
                     components = newOrderedList
                 )
             }
         }
     }
 
+    /**
+     * Get the index of item closes to the current position of the dragged item by calculating
+     * the smallest distance squared with each visible item in the lazy grid.
+     * Inputs:
+     * - [visibleItems] -> the visible items on the screen from the LazyGrid.
+     * - [components] -> all of the components in the LazyGrid.
+     * - [draggedComponentId] -> the id of the currently dragged component.
+     * Output: the index of the item closest to the currently dragged component.
+     */
     private fun getClosestItemIndex(
         visibleItems: List<LazyStaggeredGridItemInfo>,
         components: List<ComponentData>,
-        draggedComponentIndex: Int
+        draggedComponentId: Int
     ): Int? {
         var closestIndex = 0
         var diff: Float = Float.MAX_VALUE
 
-        Log.d("pos", "visibleItems: $visibleItems")
+        val draggedComponent = components.firstOrNull { it.id == draggedComponentId } ?: return null
+        val itemIndex = components.indexOf(draggedComponent)
 
-        val draggedComponent = components.getOrNull(draggedComponentIndex) ?: return null
-        Log.d("pos", "draggedComponent: ${draggedComponent.absolutePosition}")
         for (it in visibleItems) {
-            if (it.index == draggedComponentIndex) continue
+            // Do not consider the original position of the currently dragged item.
+            if (it.index == itemIndex) continue
 
-            Log.d("pos", "it.index: ${it.index}")
-            Log.d("pos", "components: $components")
+            // Calculate the current distance squared.
             val currComponent = components.getOrNull(it.index) ?: return null
-            Log.d("pos", "currComponent: ${currComponent.absolutePosition}")
-
             val currDiff = (draggedComponent.absolutePosition - currComponent.absolutePosition).getDistanceSquared()
-            Log.d("pos", "currDiff: $currDiff")
+
+            // If the new distance is smaller than currently saved, assign it together with
+            // the closest index.
             if (currDiff < diff) {
                 diff = currDiff
                 closestIndex = it.index
@@ -121,6 +131,38 @@ class DashboardViewModel : ViewModel() {
         ComponentData(
             id = 5,
             text = "e",
+            height = 80.dp
+        ),
+        ComponentData(
+            id = 6,
+            text = "f",
+            height = 300.dp,
+            isFullLine = true
+        ),
+        ComponentData(
+            id = 7,
+            text = "g",
+            height = 80.dp
+        ),
+        ComponentData(
+            id = 8,
+            text = "h",
+            height = 80.dp
+        ),
+        ComponentData(
+            id = 9,
+            text = "i",
+            height = 300.dp,
+            isFullLine = true
+        ),
+        ComponentData(
+            id = 10,
+            text = "j",
+            height = 80.dp
+        ),
+        ComponentData(
+            id = 11,
+            text = "k",
             height = 80.dp
         ),
     )
