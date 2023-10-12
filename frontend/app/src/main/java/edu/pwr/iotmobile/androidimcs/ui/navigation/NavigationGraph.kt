@@ -11,6 +11,8 @@ import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
@@ -33,7 +35,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Account.path,
+        startDestination = Screen.Admin.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -92,6 +94,10 @@ fun NavGraph(
                     navBackStackEntry = it
                 )
             )
+        }
+
+        composable(Screen.Admin.path) {
+            AdminScreen(navigation = AdminNavigation.default(navController))
         }
     }
 }
