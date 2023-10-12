@@ -5,10 +5,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
@@ -30,7 +31,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.path,
+        startDestination = Screen.Dashboard.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -81,6 +82,10 @@ fun NavGraph(
                     navBackStackEntry = it
                 )
             )
+        }
+
+        composable(Screen.Dashboard.path) {
+            DashboardScreen()
         }
     }
 }
