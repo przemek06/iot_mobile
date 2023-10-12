@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,30 +30,46 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.LightPurple
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import kotlin.math.roundToInt
 
 @Composable
 fun DashboardScreen() {
-    DashboardScreenContent()
+    val viewModel = koinViewModel<DashboardViewModel>()
+    val uiState by viewModel.uiState.collectAsState()
+    val uiInteraction = DashboardUiInteraction.default(viewModel)
+
+    DashboardScreenContent(
+        uiState =  uiState,
+        uiInteraction = uiInteraction
+    )
 }
 
 @Composable
-private fun DashboardScreenContent() {
-    ComponentsList()
+private fun DashboardScreenContent(
+    uiState: DashboardUiState,
+    uiInteraction: DashboardUiInteraction
+) {
+    ComponentsList(
+        uiState =  uiState,
+        uiInteraction = uiInteraction
+    )
 }
 
 @Composable
-private fun ComponentsList() {
-    val l = listOf("a", "b", "c", "d", "e")
-    var list by remember { mutableStateOf(l) }
-
+private fun ComponentsList(
+    uiState: DashboardUiState,
+    uiInteraction: DashboardUiInteraction
+) {
+    val list = uiState.components
     val gridState = rememberLazyStaggeredGridState()
 
     // TODO: get visible items, get position of point of dragged component, calculate the index of item below it
@@ -65,28 +82,30 @@ private fun ComponentsList() {
         horizontalArrangement = Arrangement.spacedBy(Dimensions.space8),
         verticalItemSpacing = Dimensions.space8
     ) {
-
         for (i in 0..list.lastIndex) {
+            val item = list.getOrNull(i) ?: break
+            val itemSpan =
+                if (item.isFullLine) StaggeredGridItemSpan.FullLine
+                else StaggeredGridItemSpan.SingleLane
 
-            if (i == 4)
-                item(span = StaggeredGridItemSpan.FullLine) {
-                    Component(list[i], width = 300.dp)
-                }
-            else
-                item {
-                    Component(list[i], width = 80.dp + (i * 20).dp)
-                }
+            item(span = itemSpan) {
+                Component(
+                    item = list[i],
+                    index = i,
+                    uiInteraction = uiInteraction,
+                    onPlaceItem = { uiInteraction.onPlaceDraggedComponent(gridState.layoutInfo.visibleItemsInfo) }
+                )
+            }
         }
-
     }
-
 }
 
 @Composable
 private fun Component(
-    text: String,
-    width: Dp,
-    onClick: () -> Unit = {}
+    item: ComponentData,
+    index: Int,
+    uiInteraction: DashboardUiInteraction,
+    onPlaceItem: () -> Unit
 ) {
     var offset by remember { mutableStateOf(Offset.Zero) }
     var isDragged by remember { mutableStateOf(false) }
@@ -101,12 +120,17 @@ private fun Component(
             when (interaction) {
                 is DragInteraction.Start -> {
                     isDragged = true
+                    uiInteraction.setDraggedComponentIndex(index)
                 }
                 is DragInteraction.Stop -> {
                     isDragged = false
+                    onPlaceItem()
+                    offset = Offset.Zero
                 }
                 is DragInteraction.Cancel -> {
                     isDragged = false
+                    uiInteraction.setDraggedComponentIndex(null)
+                    offset = Offset.Zero
                 }
             }
         }
@@ -114,7 +138,7 @@ private fun Component(
 
     Box(modifier = Modifier
         .zIndex(zIndex)
-        .height(width)
+        .height(item.height)
         .offset { IntOffset(offset.x.roundToInt(), offset.y.roundToInt()) }
         .pointerInput(Unit) {
             var interaction: DragInteraction.Start? = null
@@ -147,16 +171,22 @@ private fun Component(
                 }
             )
         }
+        .onGloballyPositioned {
+            uiInteraction.setAbsolutePosition(
+                offset = it.positionInWindow(),
+                index = index
+            )
+        }
     ) {
         Box(modifier = Modifier
             .fillMaxSize()
             .background(color = LightPurple)
             .clip(MaterialTheme.shapes.large)
-            .clickable { onClick() }
+            .clickable { uiInteraction.onComponentClick(index) }
         ) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
-                text = text,
+                text = item.text,
                 style = MaterialTheme.typography.bodyLarge
             )
         }
