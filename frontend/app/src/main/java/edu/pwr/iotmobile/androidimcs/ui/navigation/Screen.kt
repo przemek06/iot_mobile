@@ -44,6 +44,8 @@ sealed class Screen(
     object ActivateAccount : Screen("activateAccount")
 
     object ChangePassword : Screen("changePassword")
+
+    object Admin : Screen("admin")
 }
 
 
