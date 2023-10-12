@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
@@ -72,8 +76,7 @@ private fun ComponentsList(
     val list = uiState.components
     val gridState = rememberLazyStaggeredGridState()
 
-    // TODO: get visible items, get position of point of dragged component, calculate the index of item below it
-    // TODO: drag - make items darker (?), duplicate selected item, move around after finger
+    // TODO: autoscroll + on cancel drag animation  -> scroll to first visible item if it changes
 
     LazyVerticalStaggeredGrid(
         modifier = Modifier.fillMaxSize(),
@@ -88,10 +91,12 @@ private fun ComponentsList(
                 if (item.isFullLine) StaggeredGridItemSpan.FullLine
                 else StaggeredGridItemSpan.SingleLane
 
-            item(span = itemSpan) {
+            item(
+                key = item.id,
+                span = itemSpan
+            ) {
                 Component(
                     item = list[i],
-                    index = i,
                     uiInteraction = uiInteraction,
                     onPlaceItem = { uiInteraction.onPlaceDraggedComponent(gridState.layoutInfo.visibleItemsInfo) }
                 )
@@ -101,9 +106,8 @@ private fun ComponentsList(
 }
 
 @Composable
-private fun Component(
+private fun LazyStaggeredGridItemScope.Component(
     item: ComponentData,
-    index: Int,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit
 ) {
@@ -120,7 +124,7 @@ private fun Component(
             when (interaction) {
                 is DragInteraction.Start -> {
                     isDragged = true
-                    uiInteraction.setDraggedComponentIndex(index)
+                    uiInteraction.setDraggedComponentId(item.id)
                 }
                 is DragInteraction.Stop -> {
                     isDragged = false
@@ -129,7 +133,7 @@ private fun Component(
                 }
                 is DragInteraction.Cancel -> {
                     isDragged = false
-                    uiInteraction.setDraggedComponentIndex(null)
+                    uiInteraction.setDraggedComponentId(null)
                     offset = Offset.Zero
                 }
             }
@@ -137,6 +141,7 @@ private fun Component(
     }
 
     Box(modifier = Modifier
+        .animateItemPlacement()
         .zIndex(zIndex)
         .height(item.height)
         .offset { IntOffset(offset.x.roundToInt(), offset.y.roundToInt()) }
@@ -174,7 +179,7 @@ private fun Component(
         .onGloballyPositioned {
             uiInteraction.setAbsolutePosition(
                 offset = it.positionInWindow(),
-                index = index
+                id = item.id
             )
         }
     ) {
@@ -182,7 +187,7 @@ private fun Component(
             .fillMaxSize()
             .background(color = LightPurple)
             .clip(MaterialTheme.shapes.large)
-            .clickable { uiInteraction.onComponentClick(index) }
+            .clickable { uiInteraction.onComponentClick(item.id) }
         ) {
             Text(
                 modifier = Modifier.align(Alignment.Center),

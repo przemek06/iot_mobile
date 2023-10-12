@@ -4,7 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Dp
 
 data class DashboardUiState(
-    val draggedComponentIndex: Int? = null,
+    val draggedComponentId: Int? = null,
     val components: List<ComponentData> = emptyList()
 )
 
