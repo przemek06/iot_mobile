@@ -22,7 +22,6 @@ class MailService(private val templateEngine: TemplateEngine, private val mailSe
     private fun sendHtmlMail(subject: String, address: String, html: String) {
         val simpleMailMessage: MimeMessage = mailSender.createMimeMessage()
         simpleMailMessage.subject = subject
-        simpleMailMessage
         val helper = MimeMessageHelper(simpleMailMessage, false)
         helper.setTo(address)
         helper.setText(html, true)

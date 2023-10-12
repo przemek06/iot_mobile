@@ -6,6 +6,8 @@ import edu.pwr.iotmobile.dto.UserInfoDTO
 import edu.pwr.iotmobile.security.Role
 import edu.pwr.iotmobile.service.UserService
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -32,7 +34,8 @@ class UserController(val userService: UserService) {
 
     @PostMapping("/anon/users/verify/{code}")
     fun verifyUser(@PathVariable code: String) : ResponseEntity<Unit> {
-        return ResponseEntity.ok(userService.verifyUser(code))
+        return if (userService.verifyUser(code)) ResponseEntity.ok().build()
+        else ResponseEntity.noContent().build()
     }
 
     @PostMapping("/anon/users/reset/{email}")

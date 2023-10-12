@@ -5,18 +5,20 @@ import edu.pwr.iotmobile.entities.User
 import edu.pwr.iotmobile.error.exception.TokenNotFoundException
 import edu.pwr.iotmobile.repositories.ResetPasswordTokenRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-private val EXPIRATION = 1L
+private const val EXPIRATION = 1L
+private const val TOKEN_SIZE = 6
+
 
 @Service
 class ResetPasswordTokenService(val resetPasswordTokenRepository: ResetPasswordTokenRepository) {
 
     private fun generateRandomCode() : String {
-        val random = Random()
-        return (1..6).map { random.nextInt(10) }.joinToString("")
+        return (1..TOKEN_SIZE).map { kotlin.random.Random.nextInt(10) }.joinToString("")
     }
 
     private fun calculateExpiryDate() : Date {
@@ -29,20 +31,25 @@ class ResetPasswordTokenService(val resetPasswordTokenRepository: ResetPasswordT
     }
 
     fun isCodeCorrect(userId: Int, code: String) : Boolean {
-        val resetPasswordToken = findByCode(code)
-        return isTokenActive(resetPasswordToken) and (resetPasswordToken.user.id == userId)
+        return try {
+            val resetPasswordToken = findByCode(code)
+            isTokenActive(resetPasswordToken) and (resetPasswordToken.user.id == userId)
+        } catch (e: TokenNotFoundException) {
+            false
+        }
     }
 
     private fun findByCode(token: String): ResetPasswordToken {
         return resetPasswordTokenRepository.findByCode(token) ?: throw TokenNotFoundException()
     }
 
-    fun deactivateUserTokens(userId: Int) {
+    @Transactional
+    fun deactivateUserTokens(userId: Int) : List<ResetPasswordToken> {
         val userResetTokenList = resetPasswordTokenRepository.findAllByUserId(userId)
         userResetTokenList.forEach {
             it.active = false
         }
-        resetPasswordTokenRepository.saveAll(userResetTokenList)
+        return resetPasswordTokenRepository.saveAll(userResetTokenList)
     }
 
     private fun isTokenActive(token: ResetPasswordToken) : Boolean {

@@ -31,6 +31,10 @@ class UserService(
     }
 
     fun createUser(userDTO: UserDTO, role: Role) : UserDTO {
+        if (userExists(userDTO.email)) {
+            throw UserAlreadyExistsException()
+        }
+
         val toSave = userDTO.toEntity(role = role)
         toSave.password = passwordEncoder.encode(toSave.password)
         toSave.isActive = true
@@ -55,14 +59,17 @@ class UserService(
         return saved.toUserDTO()
     }
 
-    fun verifyUser(token: String) {
+    fun verifyUser(token: String) : Boolean {
         val verificationToken = verificationTokenService.findActiveByCode(token)
         val user = verificationToken.user
 
         if (!user.isActive) {
             user.isActive = true
             userRepository.save(user)
+            return true
         }
+
+        return false
     }
 
     private fun getAuthentication(): Authentication {

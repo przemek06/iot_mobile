@@ -32,4 +32,5 @@ class User (
     fun toUserInfoDTO() : UserInfoDTO {
         return UserInfoDTO(id!!, email, role, name, isBlocked, isActive)
     }
+
 }
