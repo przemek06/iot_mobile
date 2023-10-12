@@ -34,4 +34,18 @@ sealed class Screen(
         label = R.string.account,
         tag = "account"
     )
+
+    object ProjectDetails : Screen("projectDetails/{arguments}")
+
+    object Login : Screen("login")
+    object Register : Screen("register")
+    object ForgotPassword : Screen("forgotPassword")
+    object RegisterConfirmation : Screen("registerConfirmation")
+    object ActivateAccount : Screen("activateAccount")
+
+    object ChangePassword : Screen("changePassword")
+
+    object Admin : Screen("admin")
 }
+
+

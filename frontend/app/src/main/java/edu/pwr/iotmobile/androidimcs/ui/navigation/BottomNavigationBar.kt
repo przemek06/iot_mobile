@@ -15,9 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
@@ -27,11 +24,19 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
+private val SCREENS_WITHOUT_BOTTOM_BAR = listOf(
+    Screen.Login.path,
+    Screen.Register.path,
+    Screen.ActivateAccount.path,
+    Screen.RegisterConfirmation.path,
+    Screen.ForgotPassword.path,
+    Screen.ChangePassword.path
+)
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController,
 ) {
-    var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
+//    var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
     val bottomNavItems = listOf(
         Screen.Main,
         Screen.Projects,
@@ -44,8 +49,8 @@ fun BottomNavigationBar(
 
     Log.d("route", currentDestination?.route ?: "no route")
 
-    bottomBarState = when (currentDestination?.route) {
-        "flashcard_game/{groupId}" -> false
+    val bottomBarState = when (currentDestination?.route) {
+        in SCREENS_WITHOUT_BOTTOM_BAR -> false
         else -> true
     }
 

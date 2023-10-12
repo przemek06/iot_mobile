@@ -8,8 +8,24 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsScreen
 
 @Composable
@@ -19,7 +35,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Main.path,
+        startDestination = Screen.Admin.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -27,11 +43,61 @@ fun NavGraph(
         }
 
         composable(Screen.Projects.path) {
-            ProjectsScreen()
+            ProjectsScreen(
+                navigation = ProjectsNavigation.default(navController)
+            )
         }
 
         composable(Screen.Account.path) {
-            AccountScreen()
+            AccountScreen(
+                navigation = AccountNavigation.default(navController)
+            )
+        }
+
+        composable(Screen.ChangePassword.path) {
+            ChangePasswordScreen(
+                navigation = ChangePasswordNavigation.default(navController)
+            )
+        }
+
+        composable(Screen.ProjectDetails.path) { navBackStackEntry ->
+            ProjectDetailsScreen(
+                navigation = ProjectDetailsNavigation.default(
+                    navController = navController,
+                    navBackStackEntry = navBackStackEntry
+                )
+            )
+        }
+
+        composable(Screen.Login.path) {
+            LoginScreen(
+                navigation = LoginNavigation.default(navController)
+            )
+        }
+
+        composable(Screen.Register.path) {
+            RegisterScreen(
+                navigation = RegisterNavigation.default(navController)
+            )
+        }
+
+        composable(Screen.ForgotPassword.path) {
+            ForgotPasswordScreen(
+                navigation = ForgotPasswordNavigation.default(navController)
+            )
+        }
+
+        composable(Screen.ActivateAccount.path) {
+            ActivateAccountScreen(
+                navigation = ActivateAccountNavigation.default(
+                    navController = navController,
+                    navBackStackEntry = it
+                )
+            )
+        }
+
+        composable(Screen.Admin.path) {
+            AdminScreen(navigation = AdminNavigation.default(navController))
         }
     }
 }

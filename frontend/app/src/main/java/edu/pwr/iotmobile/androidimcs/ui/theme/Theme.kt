@@ -26,7 +26,8 @@ private val DarkColorScheme = darkColorScheme(
     onTertiary = GrizzlyWhite,
     onBackground = GrizzlyWhite,
     onSurface = GrizzlyWhite,
-    outline = GrizzlyWhite
+    outline = GrizzlyWhite,
+    error = Red
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -40,14 +41,15 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = GrizzlyWhite,
     onBackground = DarkGray,
     onSurface = DarkGray,
-    outline = DarkGray
+    outline = DarkGray,
+    error = Red
 )
 
 @Composable
 fun AndroidIMCSTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // TODO: change to true to enable dynamic color
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
