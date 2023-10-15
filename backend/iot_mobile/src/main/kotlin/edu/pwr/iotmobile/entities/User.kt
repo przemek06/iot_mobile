@@ -22,7 +22,7 @@ class User (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?=null
-    ) {
+) {
     constructor() : this("", "", Role.USER_ROLE, "", false, false)
 
     fun toUserDTO() : UserDTO {

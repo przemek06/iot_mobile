@@ -17,7 +17,7 @@ data class UserDTO(
     @field:Size(min = 3, max = 64)
     val name: String,
 
-) {
+    ) {
     fun toEntity(role: Role = Role.USER_ROLE) : User {
         return User(email, password, role, name)
     }
