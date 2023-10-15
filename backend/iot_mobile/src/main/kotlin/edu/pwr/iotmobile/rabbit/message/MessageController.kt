@@ -11,6 +11,9 @@ class MessageController(
     val messageService: MessageService
 ) {
 
+    /**
+     * send message to default DIRECT exchange using Message entity
+     */
     @PostMapping
     fun sendMessage(@RequestBody message: Message):ResponseEntity<String>{
         messageService.sendMessage(message)

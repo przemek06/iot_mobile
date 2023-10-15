@@ -19,10 +19,12 @@ class QueueService(
         rabbitTemplate.convertAndSend("", queueName, message)
     }
 
-
+    /**
+     * add new queue with binding to default exchange
+     */
     fun addQueue(queueName: String){
-        val queue: Queue = Queue(queueName, true, false, false)
-        val binging: Binding = Binding(queueName, Binding.DestinationType.QUEUE, "", "", null)
+        val queue = Queue(queueName, true, false, false)
+        val binging = Binding(queueName, Binding.DestinationType.QUEUE, "", queueName, null)
         rabbitAdmin.declareQueue(queue)
         rabbitAdmin.declareBinding(binging)
     }

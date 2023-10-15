@@ -14,13 +14,19 @@ class QueueController(
 
 ) {
 
+    /**
+     * add new queue with binding to default exchange
+     */
+    @PostMapping
+    fun registerQueue(@RequestBody queueName: String): ResponseEntity<String> {
+        queueService.addQueue(queueName)
+        return ResponseEntity.ok(queueName)
+    }
 
-//    @PostMapping
-//    fun registerQueue(@RequestBody queueName: String): ResponseEntity<String> {
-//        queueService.addQueue(queueName)
-//        return ResponseEntity.ok(queueName)
-//    }
-
+    /**
+     * send message to default DIRECT exchange using explicit
+     * queueName and message value
+     */
     @PostMapping("/{queueName}")
     fun sendMessage(@RequestBody message: String, @PathVariable queueName: String):ResponseEntity<String>{
         queueService.sendMessage(queueName, message)
