@@ -34,10 +34,16 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
+    <string name="search">Search</string>
 
     <string name="main_screen_1">Welcome ,</string>
     <string name="main_screen_2">Last used dashboards</string>
     <string name="main_screen_3">Recent active topics</string>
+
+    <string name="search_screen_1">Search for users</string>
+    <string name="search_screen_2">Add as admin</string>
+    <string name="search_screen_3">Block</string>
+    <string name="search_screen_4">Unblock</string>
 
     <string name="username">Username</string>
     <string name="stats">Stats</string>

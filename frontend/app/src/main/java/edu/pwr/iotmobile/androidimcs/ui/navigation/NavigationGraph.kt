@@ -27,6 +27,8 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNav
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchScreen
 
 @Composable
 fun NavGraph(
@@ -35,7 +37,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Admin.path,
+        startDestination = Screen.Search.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -98,6 +100,15 @@ fun NavGraph(
 
         composable(Screen.Admin.path) {
             AdminScreen(navigation = AdminNavigation.default(navController))
+        }
+
+        composable(Screen.Search.path) {
+            SearchScreen(
+                navigation = SearchNavigation.default(
+                    navController = navController,
+                    navBackStackEntry = it
+                )
+            )
         }
     }
 }

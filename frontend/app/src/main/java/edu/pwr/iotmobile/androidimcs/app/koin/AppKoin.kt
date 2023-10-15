@@ -15,6 +15,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginViewMod
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminViewModel
+import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -49,6 +50,7 @@ object AppKoin {
         viewModelOf(::AccountViewModel)
         viewModelOf(::ChangePasswordViewModel)
         viewModelOf(::AdminViewModel)
+        viewModelOf(::SearchViewModel)
     }
 
     // Module for other singular classes
