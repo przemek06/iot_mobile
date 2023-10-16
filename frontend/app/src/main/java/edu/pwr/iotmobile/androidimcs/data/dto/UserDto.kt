@@ -1,8 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.data.dto
 
-data class RegisterDto(
+data class UserDto(
     val email: String,
-    val displayName: String,
     val password: String,
-    val confirmPassword: String
+    val name: String,
 )
