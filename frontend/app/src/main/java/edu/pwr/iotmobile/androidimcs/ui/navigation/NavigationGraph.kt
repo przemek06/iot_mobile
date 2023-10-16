@@ -5,15 +5,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
@@ -35,7 +36,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Admin.path,
+        startDestination = Screen.Login.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -98,6 +99,10 @@ fun NavGraph(
 
         composable(Screen.Admin.path) {
             AdminScreen(navigation = AdminNavigation.default(navController))
+        }
+
+        composable(Screen.Dashboard.path) {
+            DashboardScreen()
         }
     }
 }
