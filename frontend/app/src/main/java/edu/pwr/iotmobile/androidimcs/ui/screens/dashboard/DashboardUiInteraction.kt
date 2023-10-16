@@ -7,7 +7,7 @@ interface DashboardUiInteraction {
     fun setAbsolutePosition(offset: Offset, id: Int)
     fun onComponentClick(id: Int)
     fun setDraggedComponentId(id: Int?)
-    fun onPlaceDraggedComponent(visibleItems: List<LazyStaggeredGridItemInfo>)
+    fun onPlaceDraggedComponent(visibleItems: List<LazyStaggeredGridItemInfo>, windowWidth: Float)
 
     companion object {
         fun default(
@@ -25,8 +25,8 @@ interface DashboardUiInteraction {
                 viewModel.setDraggedComponentId(id)
             }
 
-            override fun onPlaceDraggedComponent(visibleItems: List<LazyStaggeredGridItemInfo>) {
-                viewModel.onPlaceDraggedComponent(visibleItems)
+            override fun onPlaceDraggedComponent(visibleItems: List<LazyStaggeredGridItemInfo>, windowWidth: Float) {
+                viewModel.onPlaceDraggedComponent(visibleItems, windowWidth)
             }
 
         }

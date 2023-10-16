@@ -41,7 +41,10 @@ class DashboardViewModel : ViewModel() {
         // TODO: implement
     }
 
-    fun onPlaceDraggedComponent(visibleItems: List<LazyStaggeredGridItemInfo>) {
+    fun onPlaceDraggedComponent(
+        visibleItems: List<LazyStaggeredGridItemInfo>,
+        windowWidth: Float
+    ) {
         viewModelScope.launch {
             val currentUiState = uiState.value
             val draggedComponentId = currentUiState.draggedComponentId ?: return@launch
@@ -49,7 +52,8 @@ class DashboardViewModel : ViewModel() {
             val closestIndex = getClosestItemIndex(
                 visibleItems = visibleItems,
                 components = currentUiState.components,
-                draggedComponentId = draggedComponentId
+                draggedComponentId = draggedComponentId,
+                windowWidth = windowWidth
             ) ?: return@launch
 
             val item = currentUiState.components.firstOrNull { it.id == draggedComponentId } ?: return@launch
@@ -80,7 +84,8 @@ class DashboardViewModel : ViewModel() {
     private fun getClosestItemIndex(
         visibleItems: List<LazyStaggeredGridItemInfo>,
         components: List<ComponentData>,
-        draggedComponentId: Int
+        draggedComponentId: Int,
+        windowWidth: Float
     ): Int? {
         var closestIndex = 0
         var diff: Float = Float.MAX_VALUE
@@ -94,7 +99,10 @@ class DashboardViewModel : ViewModel() {
 
             // Calculate the current distance squared.
             val currComponent = components.getOrNull(it.index) ?: return null
-            val currDiff = (draggedComponent.absolutePosition - currComponent.absolutePosition).getDistanceSquared()
+            val width = if (draggedComponent.isFullLine) windowWidth else windowWidth/2
+            val draggedCenterPos = draggedComponent.absolutePosition + Offset(width/2, draggedComponent.height.value/2)
+            val currCenterPos = currComponent.absolutePosition + Offset(width/2, currComponent.height.value/2)
+            val currDiff = (draggedCenterPos - currCenterPos).getDistanceSquared()
 
             // If the new distance is smaller than currently saved, assign it together with
             // the closest index.
