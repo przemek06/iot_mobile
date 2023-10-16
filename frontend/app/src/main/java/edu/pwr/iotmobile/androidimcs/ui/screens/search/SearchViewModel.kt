@@ -20,14 +20,26 @@ class SearchViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     init {
+        val users = listOf(mockUser, mockUser, mockUser, mockUser)
         _uiState.update {
-            it.copy(users = listOf(mockUser, mockUser, mockUser, mockUser))
+            it.copy(
+                users = users,
+                searchedUsers = users
+            )
         }
     }
 
     fun onTextChange(text: String) {
+
+        val searchedUsers = uiState.value.users.filter {
+            it.displayName.contains(other = text, ignoreCase = true)
+        }
+
         _uiState.update {
-            it.copy(searchInputFieldData = text)
+            it.copy(
+                searchInputFieldData = text,
+                searchedUsers = searchedUsers
+            )
         }
     }
     fun addAdmin(user: User) {

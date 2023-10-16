@@ -17,7 +17,7 @@ fun BlockUsers(
     uiInteraction: SearchUiInteraction
 ) {
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-        items(uiState.users) {
+        items(uiState.searchedUsers) {
             if (true /*TODO*/ ) {
                 ActionOption(
                     user = it,

@@ -17,7 +17,7 @@ fun AddAdmin(
     uiInteraction: SearchUiInteraction
 ) {
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-        items(uiState.users) {
+        items(uiState.searchedUsers) {
             ActionOption(
                 user = it,
                 userProjectRole = UserProjectRole.View,
