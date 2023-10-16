@@ -5,6 +5,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -36,11 +37,13 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.LightPurple
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.roundToInt
@@ -75,8 +78,25 @@ private fun ComponentsList(
 ) {
     val list = uiState.components
     val gridState = rememberLazyStaggeredGridState()
+    val coroutineScope = rememberCoroutineScope()
 
-    // TODO: autoscroll + on cancel drag animation  -> scroll to first visible item if it changes
+    val windowWidth = LocalConfiguration.current.screenWidthDp.toFloat()
+    val windowHeight = LocalConfiguration.current.screenHeightDp.toFloat()
+
+    val itm = uiState.components.firstOrNull { it.id == uiState.draggedComponentId }
+
+    // TODO: fix autoscroll
+    LaunchedEffect(key1 = itm) {
+        coroutineScope.launch {
+            if (itm == null) return@launch
+            val targetAnimationValue =
+                if (itm.absolutePosition.y <= 100) -100f
+                else if (itm.absolutePosition.y >= windowHeight - 10) 100f
+                else 0f
+
+            gridState.animateScrollBy(value = targetAnimationValue)
+        }
+    }
 
     LazyVerticalStaggeredGrid(
         modifier = Modifier.fillMaxSize(),
@@ -96,9 +116,13 @@ private fun ComponentsList(
                 span = itemSpan
             ) {
                 Component(
-                    item = list[i],
+                    item = item,
                     uiInteraction = uiInteraction,
-                    onPlaceItem = { uiInteraction.onPlaceDraggedComponent(gridState.layoutInfo.visibleItemsInfo) }
+                    onPlaceItem = { uiInteraction.onPlaceDraggedComponent(
+                        visibleItems = gridState.layoutInfo.visibleItemsInfo,
+                        windowWidth = windowWidth
+                    ) },
+                    coroutineScope = coroutineScope
                 )
             }
         }
@@ -109,12 +133,12 @@ private fun ComponentsList(
 private fun LazyStaggeredGridItemScope.Component(
     item: ComponentData,
     uiInteraction: DashboardUiInteraction,
-    onPlaceItem: () -> Unit
+    onPlaceItem: () -> Unit,
+    coroutineScope: CoroutineScope
 ) {
     var offset by remember { mutableStateOf(Offset.Zero) }
     var isDragged by remember { mutableStateOf(false) }
 
-    val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
 
     val zIndex = if (isDragged) 3f else 1f
