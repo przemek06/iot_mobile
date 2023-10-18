@@ -7,6 +7,8 @@ import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.FieldMap
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -17,7 +19,10 @@ interface UserRemoteDataSource {
     // Login/register endpoints
 
     @POST("/login")
-    suspend fun loginUser(): Response<ResponseBody> // nie zwraca usera
+    @FormUrlEncoded
+    suspend fun loginUser(
+        @FieldMap params: Map<String,String>
+    ): Response<ResponseBody> // nie zwraca usera
 
     @POST("/anon/users")
     suspend fun registerUser(
@@ -30,7 +35,7 @@ interface UserRemoteDataSource {
     ): Response<UserInfoDto>
 
     @GET("/anon/users/info")
-    suspend fun getAllUserInfo(): Response<UserInfoDto>
+    suspend fun getAllUserInfo(): Response<List<UserInfoDto>>
 
     @POST("/anon/users/verify/{code}")
     suspend fun verifyUser(
