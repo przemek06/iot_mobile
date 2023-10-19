@@ -1,4 +1,4 @@
-package edu.pwr.iotmobile.security
+package edu.pwr.iotmobile.enums
 
 enum class EProjectRole {
     ADMIN, EDITOR, VIEWER

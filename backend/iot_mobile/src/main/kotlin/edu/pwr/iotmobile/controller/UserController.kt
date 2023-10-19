@@ -3,11 +3,9 @@ package edu.pwr.iotmobile.controller
 import edu.pwr.iotmobile.dto.PasswordDTO
 import edu.pwr.iotmobile.dto.UserDTO
 import edu.pwr.iotmobile.dto.UserInfoDTO
-import edu.pwr.iotmobile.security.Role
+import edu.pwr.iotmobile.enums.ERole
 import edu.pwr.iotmobile.service.UserService
 import jakarta.validation.Valid
-import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -80,7 +78,7 @@ class UserController(val userService: UserService) {
     }
 
     @PutMapping("/admin/users/role/{id}/{role}")
-    fun updateUserRole(@PathVariable id: Int, @PathVariable role: Role) : ResponseEntity<UserInfoDTO> {
+    fun updateUserRole(@PathVariable id: Int, @PathVariable role: ERole) : ResponseEntity<UserInfoDTO> {
         return ResponseEntity.ok(userService.changeUserRole(id, role))
     }
 

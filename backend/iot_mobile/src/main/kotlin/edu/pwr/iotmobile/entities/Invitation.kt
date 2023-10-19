@@ -1,17 +1,13 @@
 package edu.pwr.iotmobile.entities
 
-import edu.pwr.iotmobile.dto.ProjectDTO
-import edu.pwr.iotmobile.dto.ProjectRoleDTO
-import edu.pwr.iotmobile.enums.EProjectRole
+import edu.pwr.iotmobile.dto.InvitationDTO
+import edu.pwr.iotmobile.enums.EInvitationStatus
 import jakarta.persistence.*
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
 @Entity
-@Table(
-    uniqueConstraints = [UniqueConstraint(columnNames = ["project_id", "user_id"])]
-)
-class ProjectRole (
+class Invitation (
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -21,15 +17,14 @@ class ProjectRole (
     @OnDelete(action = OnDeleteAction.CASCADE)
     var user: User,
     @Column(nullable = false)
-    var role: EProjectRole,
+    var status: EInvitationStatus,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?=null
 ) {
-    constructor() : this(Project(), User(), EProjectRole.VIEWER)
+    constructor() : this(Project(), User(), EInvitationStatus.PENDING)
 
-    fun toDTO() : ProjectRoleDTO {
-        return ProjectRoleDTO(id, project.id!!, user.toUserInfoDTO(), role)
+    fun toDTO() : InvitationDTO {
+        return InvitationDTO(id, project.toDTO(), user.toUserInfoDTO(), status)
     }
-
 }

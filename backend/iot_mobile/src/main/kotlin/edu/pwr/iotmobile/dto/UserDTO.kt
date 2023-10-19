@@ -1,7 +1,7 @@
 package edu.pwr.iotmobile.dto
 
 import edu.pwr.iotmobile.entities.User
-import edu.pwr.iotmobile.security.Role
+import edu.pwr.iotmobile.enums.ERole
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
@@ -18,7 +18,7 @@ data class UserDTO(
     val name: String,
 
 ) {
-    fun toEntity(role: Role = Role.USER_ROLE) : User {
+    fun toEntity(role: ERole = ERole.USER_ROLE) : User {
         return User(email, password, role, name)
     }
 }

@@ -7,7 +7,7 @@ import edu.pwr.iotmobile.error.exception.TokenCodeIncorrectException
 import edu.pwr.iotmobile.error.exception.UserAlreadyExistsException
 import edu.pwr.iotmobile.error.exception.UserNotFoundException
 import edu.pwr.iotmobile.repositories.UserRepository
-import edu.pwr.iotmobile.security.Role
+import edu.pwr.iotmobile.enums.ERole
 import edu.pwr.iotmobile.security.UserDetailsImpl
 import org.springframework.beans.BeanUtils
 import org.springframework.security.core.Authentication
@@ -30,7 +30,7 @@ class UserService(
         return userRepository.existsByEmail(email)
     }
 
-    fun createUser(userDTO: UserDTO, role: Role) : UserDTO {
+    fun createUser(userDTO: UserDTO, role: ERole) : UserDTO {
         if (userExists(userDTO.email)) {
             throw UserAlreadyExistsException()
         }
@@ -96,7 +96,7 @@ class UserService(
         return userRepository.save(user).toUserInfoDTO()
     }
 
-    fun changeUserRole(id: Int, role: Role) : UserInfoDTO {
+    fun changeUserRole(id: Int, role: ERole) : UserInfoDTO {
         val user = userRepository.findUserById(id) ?: throw UserNotFoundException()
         user.role = role
         return userRepository.save(user).toUserInfoDTO()
