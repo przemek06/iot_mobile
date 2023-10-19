@@ -1,8 +1,10 @@
 package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
+import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.dto.PasswordBody
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
+import edu.pwr.iotmobile.androidimcs.data.result.ForgotPasswordResult
 import edu.pwr.iotmobile.androidimcs.data.result.LoginUserResult
 import edu.pwr.iotmobile.androidimcs.data.result.RegisterUserResult
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
@@ -28,7 +30,7 @@ class UserRepositoryImpl(
         val response = remoteDataSource.registerUser(userDto)
         return when (response.code()) {
             200 -> RegisterUserResult.Success
-            404 -> RegisterUserResult.AccountExists
+            400 -> RegisterUserResult.AccountExists
             else -> RegisterUserResult.Failure
         }
     }
@@ -71,13 +73,15 @@ class UserRepositoryImpl(
         email: String,
         code: String,
         passwordBody: PasswordBody
-    ): Result<UserDto> {
+    ): ForgotPasswordResult {
         val response = remoteDataSource.resetPassword(email, code, passwordBody)
-        val body = response.body()
-        return if (response.isSuccessful && body != null)
-            Result.success(body)
-        else
-            Result.failure(Exception("Reset password failed"))
+        val resultCode = response.code()
+        Log.d("forgot-password", "result code: $resultCode")
+        return when (resultCode) {
+            200 -> ForgotPasswordResult.Success
+            400 -> ForgotPasswordResult.CodeIncorrect
+            else -> ForgotPasswordResult.Failure
+        }
     }
 
     override suspend fun getActiveUserInfo(): Result<UserInfoDto> {
