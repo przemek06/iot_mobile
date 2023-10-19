@@ -1,10 +1,9 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register
 
-import edu.pwr.iotmobile.androidimcs.data.InputFieldData
-
 interface RegisterUiInteraction {
     fun onTextChange(type: RegisterViewModel.InputFieldType, text: String)
     fun onRegister()
+    fun checkData()
 
     companion object {
         fun default(
@@ -15,7 +14,11 @@ interface RegisterUiInteraction {
             }
 
             override fun onRegister() {
-                TODO("Not yet implemented")
+                viewModel.onRegisterClick()
+            }
+
+            override fun checkData() {
+                viewModel.checkData()
             }
 
         }
