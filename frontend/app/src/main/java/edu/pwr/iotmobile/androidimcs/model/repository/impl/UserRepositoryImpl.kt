@@ -4,11 +4,14 @@ import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.dto.PasswordBody
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
+import edu.pwr.iotmobile.androidimcs.data.result.ActivateAccountResult
 import edu.pwr.iotmobile.androidimcs.data.result.ForgotPasswordResult
 import edu.pwr.iotmobile.androidimcs.data.result.LoginUserResult
 import edu.pwr.iotmobile.androidimcs.data.result.RegisterUserResult
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+
+private const val TAG = "UserRepo"
 
 class UserRepositoryImpl(
     private val remoteDataSource: UserRemoteDataSource
@@ -19,7 +22,9 @@ class UserRepositoryImpl(
             "password" to password
         )
         val response = remoteDataSource.loginUser(params)
-        return when (response.code()) {
+        val resultCode = response.code()
+        Log.d(TAG, "login result code: $resultCode")
+        return when (resultCode) {
             200 -> LoginUserResult.Success
             204 -> LoginUserResult.AccountInactive
             else -> LoginUserResult.Failure
@@ -28,7 +33,9 @@ class UserRepositoryImpl(
 
     override suspend fun register(userDto: UserDto): RegisterUserResult {
         val response = remoteDataSource.registerUser(userDto)
-        return when (response.code()) {
+        val resultCode = response.code()
+        Log.d(TAG, "register result code: $resultCode")
+        return when (resultCode) {
             200 -> RegisterUserResult.Success
             400 -> RegisterUserResult.AccountExists
             else -> RegisterUserResult.Failure
@@ -53,12 +60,15 @@ class UserRepositoryImpl(
             Result.failure(Exception("Get all user info failed"))
     }
 
-    override suspend fun verifyUser(code: String): Result<Unit> {
+    override suspend fun verifyUser(code: String): ActivateAccountResult {
         val response = remoteDataSource.verifyUser(code)
-        return if (response.isSuccessful)
-            Result.success(Unit)
-        else
-            Result.failure(Exception("Verify user failed"))
+        val resultCode = response.code()
+        Log.d(TAG, "activate account result code: $resultCode")
+        return when (resultCode) {
+            200 -> ActivateAccountResult.Success
+            400 -> ActivateAccountResult.IncorrectCode
+            else -> ActivateAccountResult.Failure
+        }
     }
 
     override suspend fun sendResetPasswordEmail(email: String): Result<Unit> {
@@ -76,7 +86,7 @@ class UserRepositoryImpl(
     ): ForgotPasswordResult {
         val response = remoteDataSource.resetPassword(email, code, passwordBody)
         val resultCode = response.code()
-        Log.d("forgot-password", "result code: $resultCode")
+        Log.d(TAG, "forgot password result code: $resultCode")
         return when (resultCode) {
             200 -> ForgotPasswordResult.Success
             400 -> ForgotPasswordResult.CodeIncorrect
