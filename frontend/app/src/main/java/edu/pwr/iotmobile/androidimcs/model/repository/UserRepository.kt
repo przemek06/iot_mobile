@@ -3,10 +3,12 @@ package edu.pwr.iotmobile.androidimcs.model.repository
 import edu.pwr.iotmobile.androidimcs.data.dto.PasswordBody
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
+import edu.pwr.iotmobile.androidimcs.data.result.LoginUserResult
+import edu.pwr.iotmobile.androidimcs.data.result.RegisterUserResult
 
 interface UserRepository {
-    suspend fun login(email: String, password: String): Result<Unit>
-    suspend fun register(userDto: UserDto): Result<UserDto>
+    suspend fun login(email: String, password: String): LoginUserResult
+    suspend fun register(userDto: UserDto): RegisterUserResult
     suspend fun getUserInfoById(id: Int): Result<UserInfoDto>
     suspend fun getAllUserInfo(): Result<List<UserInfoDto>>
     suspend fun verifyUser(code: String): Result<Unit>

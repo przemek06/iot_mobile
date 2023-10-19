@@ -3,32 +3,34 @@ package edu.pwr.iotmobile.androidimcs.model.repository.impl
 import edu.pwr.iotmobile.androidimcs.data.dto.PasswordBody
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
+import edu.pwr.iotmobile.androidimcs.data.result.LoginUserResult
+import edu.pwr.iotmobile.androidimcs.data.result.RegisterUserResult
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 
 class UserRepositoryImpl(
     private val remoteDataSource: UserRemoteDataSource
 ) : UserRepository {
-    override suspend fun login(email: String, password: String): Result<Unit> {
+    override suspend fun login(email: String, password: String): LoginUserResult {
         val params = mapOf(
             "email" to email,
             "password" to password
         )
         val response = remoteDataSource.loginUser(params)
-        return if (response.isSuccessful)
-            Result.success(Unit)
-        else
-            Result.failure(Exception("Login failed"))
+        return when (response.code()) {
+            200 -> LoginUserResult.Success
+            204 -> LoginUserResult.AccountInactive
+            else -> LoginUserResult.Failure
+        }
     }
 
-    override suspend fun register(userDto: UserDto): Result<UserDto> {
+    override suspend fun register(userDto: UserDto): RegisterUserResult {
         val response = remoteDataSource.registerUser(userDto)
-        val body = response.body()
-        return if (response.isSuccessful && body != null)
-            Result.success(body)
-        else
-            Result.failure(Exception("Registration failed"))
-
+        return when (response.code()) {
+            200 -> RegisterUserResult.Success
+            404 -> RegisterUserResult.AccountExists
+            else -> RegisterUserResult.Failure
+        }
     }
 
     override suspend fun getUserInfoById(id: Int): Result<UserInfoDto> {
