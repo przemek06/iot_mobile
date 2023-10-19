@@ -17,18 +17,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
-import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
@@ -38,6 +39,12 @@ fun ForgotPasswordScreen(navigation: ForgotPasswordNavigation) {
     val viewModel = koinViewModel<ForgotPasswordViewModel>()
     val uiState by viewModel.uiState.collectAsState()
     val uiInteraction = ForgotPasswordUiInteraction.default(viewModel)
+
+    val context = LocalContext.current
+    viewModel.event.CollectEvent(context) {
+        // TODO: navigate to main screen based on event type.
+    }
+    viewModel.toast.CollectToast(context)
 
     ForgotPasswordScreenContent(
         uiState = uiState,
@@ -70,6 +77,7 @@ private fun ForgotPasswordScreenContent(
                 .fillMaxSize()
                 .clickable(interactionSource = MutableInteractionSource(), indication = null) {
                     keyboardFocus.clear()
+                    uiInteraction.checkData()
                 }
                 .padding(horizontal = Dimensions.space40)
                 .align(Alignment.Center),
