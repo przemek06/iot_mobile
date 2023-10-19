@@ -24,7 +24,7 @@ class DashboardController(val dashboardService: DashboardService) {
         else ResponseEntity.noContent().build()
     }
 
-    @GetMapping("/user/dashboard")
+    @GetMapping("/user/dashboard/{projectId}")
     fun findAllDashboardInProject(@PathVariable projectId: Int) : ResponseEntity<List<DashboardDTO>> {
         return ResponseEntity.ok(dashboardService.findAllDashboardInProject(projectId))
     }

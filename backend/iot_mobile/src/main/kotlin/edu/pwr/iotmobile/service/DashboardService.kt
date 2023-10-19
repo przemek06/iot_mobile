@@ -3,7 +3,6 @@ package edu.pwr.iotmobile.service
 import edu.pwr.iotmobile.dto.DashboardDTO
 import edu.pwr.iotmobile.error.exception.NotAllowedException
 import edu.pwr.iotmobile.repositories.DashboardRepository
-import jakarta.persistence.Id
 import org.springframework.stereotype.Service
 
 @Service
