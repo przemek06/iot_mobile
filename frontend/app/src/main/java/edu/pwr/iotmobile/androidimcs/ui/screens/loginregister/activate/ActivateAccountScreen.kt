@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,15 +43,44 @@ fun ActivateAccountScreen(navigation: ActivateAccountNavigation) {
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        // TODO: navigate to main screen based on event type.
+        navigation.onReturn()
     }
     viewModel.toast.CollectToast(context)
 
-    ActivateAccountScreenContent(
-        uiState = uiState,
-        uiInteraction = uiInteraction,
-        navigation = navigation
-    )
+    if (uiState.isAccountActivated) {
+        ActivateAccountSuccessScreenContent()
+    } else {
+        ActivateAccountScreenContent(
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            navigation = navigation
+        )
+    }
+}
+
+@Composable
+private fun ActivateAccountSuccessScreenContent() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(id = R.string.s14),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                lineHeight = 34.sp
+            )
+            Dimensions.space10.HeightSpacer()
+            Text(
+                text = stringResource(id = R.string.s15),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                lineHeight = 34.sp
+            )
+            Dimensions.space22.HeightSpacer()
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
+        }
+    }
 }
 
 @Composable

@@ -96,4 +96,6 @@
     <string name="s11">E-mail must be of form: j.kowalski@email.com</string>
     <string name="s12">Passwords don\'t match</string>
     <string name="s13">Code not received?</string>
+    <string name="s14">Account activated successfully!</string>
+    <string name="s15">Returning to previous screen</string>
 </resources>
