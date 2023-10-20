@@ -39,7 +39,9 @@ fun RegisterScreen(navigation: RegisterNavigation) {
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        // TODO: navigate
+        uiState.inputFields[RegisterViewModel.InputFieldType.Email]?.text?.let {
+            navigation.openAccountInactiveScreen(it)
+        }
     }
     viewModel.toast.CollectToast(context)
 

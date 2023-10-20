@@ -22,11 +22,11 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
 import edu.pwr.iotmobile.androidimcs.ui.components.TextLink
-import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
@@ -39,7 +39,14 @@ fun LoginScreen(navigation: LoginNavigation) {
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        // TODO: navigate to main screen based on event type.
+        when (it) {
+            LoginViewModel.LOGIN_SUCCESS_EVENT -> navigation.openMainScreen()
+            LoginViewModel.LOGIN_ACCOUNT_INACTIVE_EVENT ->
+                uiState.inputFields[LoginViewModel.InputFieldType.Email]?.text?.let {e ->
+                    navigation.openAccountInactiveScreen(e)
+                }
+        }
+
     }
     viewModel.toast.CollectToast(context)
 

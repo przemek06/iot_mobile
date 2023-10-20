@@ -41,16 +41,40 @@ fun ForgotPasswordScreen(navigation: ForgotPasswordNavigation) {
     val uiInteraction = ForgotPasswordUiInteraction.default(viewModel)
 
     val context = LocalContext.current
-    viewModel.event.CollectEvent(context) {
-        // TODO: navigate to main screen based on event type.
-    }
     viewModel.toast.CollectToast(context)
 
-    ForgotPasswordScreenContent(
-        uiState = uiState,
-        uiInteraction = uiInteraction,
-        navigation = navigation
-    )
+    if (uiState.isSuccess) {
+        ForgotPasswordSuccess(navigation)
+    } else {
+        ForgotPasswordScreenContent(
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            navigation = navigation
+        )
+    }
+}
+
+@Composable
+private fun ForgotPasswordSuccess(
+    navigation: ForgotPasswordNavigation
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(id = R.string.s16),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+            lineHeight = 34.sp
+        )
+        Dimensions.space30.HeightSpacer()
+        ButtonCommon(text = stringResource(id = R.string.return_text)) {
+            navigation.onReturn()
+        }
+    }
 }
 
 @Composable

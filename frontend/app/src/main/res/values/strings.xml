@@ -34,6 +34,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
+    <string name="return_text">Return</string>
 
     <string name="main_screen_1">Welcome ,</string>
     <string name="main_screen_2">Last used dashboards</string>
@@ -98,4 +99,6 @@
     <string name="s13">Code not received?</string>
     <string name="s14">Account activated successfully!</string>
     <string name="s15">Returning to previous screen</string>
+    <string name="s16">Password successfully changed!</string>
+    <string name="s17">Account registered successfully!</string>
 </resources>

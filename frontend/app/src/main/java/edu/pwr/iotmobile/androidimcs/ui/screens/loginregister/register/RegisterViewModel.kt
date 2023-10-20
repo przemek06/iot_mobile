@@ -70,7 +70,7 @@ class RegisterViewModel(
             Log.d("register", "result: ${result.name}")
             when (result) {
                 RegisterUserResult.Success -> event.event(REGISTER_SUCCESS_EVENT)
-                RegisterUserResult.AccountExists -> event.event(REGISTER_ACCOUNT_EXISTS_EVENT)
+                RegisterUserResult.AccountExists -> toast.toast("Account with this email already exists.")
                 RegisterUserResult.Failure -> toast.toast("Error - could not register.")
             }
         }
@@ -111,6 +111,5 @@ class RegisterViewModel(
 
     companion object {
         const val REGISTER_SUCCESS_EVENT = "register_success"
-        const val REGISTER_ACCOUNT_EXISTS_EVENT = "register_account_exists"
     }
 }

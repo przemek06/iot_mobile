@@ -18,7 +18,7 @@ class UserRepositoryImpl(
 ) : UserRepository {
     override suspend fun login(email: String, password: String): LoginUserResult {
         val params = mapOf(
-            "email" to email,
+            "username" to email,
             "password" to password
         )
         val response = remoteDataSource.loginUser(params)

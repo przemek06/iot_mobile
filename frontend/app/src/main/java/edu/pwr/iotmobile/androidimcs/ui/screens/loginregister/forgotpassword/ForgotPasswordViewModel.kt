@@ -99,7 +99,7 @@ class ForgotPasswordViewModel(
                 passwordBody = password.toPasswordBody()
             )
             when (response) {
-                ForgotPasswordResult.Success -> event.event(RESET_PASSWORD_SUCCESS_EVENT)
+                ForgotPasswordResult.Success -> _uiState.update { it.copy(isSuccess = true) }
                 ForgotPasswordResult.CodeIncorrect -> _uiState.update {
                     val newInputFields = it.inputFields.toMutableMap()
                     val newCodeInputField = it.inputFields[InputFieldType.Code]?.copy(isError = true) ?: return@launch
@@ -140,9 +140,5 @@ class ForgotPasswordViewModel(
         Email,
         Code,
         NewPassword
-    }
-
-    companion object {
-        const val RESET_PASSWORD_SUCCESS_EVENT = "reset_password_success"
     }
 }

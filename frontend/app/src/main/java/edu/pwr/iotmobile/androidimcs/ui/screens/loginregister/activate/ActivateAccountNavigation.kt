@@ -2,6 +2,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate
 
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import edu.pwr.iotmobile.androidimcs.data.ActivateAccountType
 import edu.pwr.iotmobile.androidimcs.extensions.asEnum
 import edu.pwr.iotmobile.androidimcs.ui.navigation.getArguments
 
@@ -23,9 +24,4 @@ interface ActivateAccountNavigation {
 
         }
     }
-}
-
-enum class ActivateAccountType {
-    AfterLogin,
-    AfterRegister
 }
