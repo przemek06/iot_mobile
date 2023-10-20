@@ -7,6 +7,8 @@ import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.event.EventImpl
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.helpers.toast.ToastImpl
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.UserRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.UserRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountViewModel
@@ -36,6 +38,7 @@ object AppKoin {
 
     // Module for local and remote data sources
     private val dataSources = module {
+        singleOf(::UserRemoteDataSourceImpl) bind UserRemoteDataSource::class
     }
 
     // Module for repositories accessing data sources
