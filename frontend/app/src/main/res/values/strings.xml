@@ -60,6 +60,9 @@
     <string name="change_password">Change password</string>
     <string name="log_out">Log out</string>
     <string name="delete_account">Delete account</string>
+    <string name="block_users">Block users</string>
+    <string name="block">Block</string>
+    <string name="unblock">Unblock</string>
 
     <string name="change_password_1">Enter current password</string>
     <string name="change_password_2">Enter new password</string>
@@ -73,6 +76,10 @@
     <string name="admin_3">Ban users</string>
     <string name="admin_4">Show banned users</string>
     <string name="admin_5">Add admin</string>
+
+    <string name="search_admin_1">Are you sure you want to add user %s as Admin?</string>
+    <string name="search_block_1">Are you sure you want ban user %s</string>
+    <string name="search_block_2">Are you sure you want unban user %s</string>
 
     <string name="login">Login</string>
     <string name="register">Register</string>

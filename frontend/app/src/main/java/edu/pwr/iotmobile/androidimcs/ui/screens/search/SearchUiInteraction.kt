@@ -5,6 +5,9 @@ import edu.pwr.iotmobile.androidimcs.data.User
 interface SearchUiInteraction {
 
     fun onTextChange(text: String)
+    fun setSelectedUser(user: User)
+    fun setDialogVisible()
+    fun setDialogInvisible()
     fun addAdmin(user: User)
     fun blockUser(user: User)
     fun unblockUser(user: User)
@@ -14,6 +17,17 @@ interface SearchUiInteraction {
 
             override fun onTextChange(text: String) {
                 viewModel.onTextChange(text)
+            }
+
+            override fun setSelectedUser(user: User) {
+                viewModel.setSelectedUser(user)
+            }
+
+            override fun setDialogVisible() {
+                viewModel.setDialogVisible()
+            }
+            override fun setDialogInvisible() {
+                viewModel.setDialogInvisible()
             }
 
             override fun addAdmin(user: User) {
