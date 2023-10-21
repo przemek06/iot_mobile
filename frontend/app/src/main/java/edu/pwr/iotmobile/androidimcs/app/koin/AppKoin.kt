@@ -10,6 +10,7 @@ import edu.pwr.iotmobile.androidimcs.helpers.toast.ToastImpl
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsViewModel
+import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterViewModel
@@ -42,6 +43,7 @@ object AppKoin {
 
     // Module for view models
     private val viewModels = module {
+        viewModelOf(::ProjectsViewModel)
         viewModelOf(::ProjectDetailsViewModel)
         viewModelOf(::LoginViewModel)
         viewModelOf(::RegisterViewModel)
