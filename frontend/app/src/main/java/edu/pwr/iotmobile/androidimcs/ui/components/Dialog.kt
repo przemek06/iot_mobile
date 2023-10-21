@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
+import edu.pwr.iotmobile.androidimcs.ui.theme.WidthSpacer
 
 @Composable
 fun SimpleDialog(
@@ -31,6 +32,7 @@ fun SimpleDialog(
         Card(
             modifier = Modifier
                 .padding(16.dp)
+                .fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier
@@ -55,11 +57,14 @@ fun SimpleDialog(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     ButtonCommon(
+                        modifier = Modifier.weight(1f),
                         text = buttonText1,
                         onClick = buttonFunction1,
                         type = ButtonCommonType.Alternative
                     )
+                    Dimensions.space22.WidthSpacer()
                     ButtonCommon(
+                        modifier = Modifier.weight(1f),
                         text = buttonText2,
                         onClick = buttonFunction2
                     )

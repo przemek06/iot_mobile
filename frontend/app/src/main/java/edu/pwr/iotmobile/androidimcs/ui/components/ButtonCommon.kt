@@ -25,6 +25,7 @@ enum class ButtonCommonType {
 
 @Composable
 fun ButtonCommon(
+    modifier: Modifier = Modifier,
     text: String,
     type: ButtonCommonType = ButtonCommonType.Primary,
     width: Dp? = null,
@@ -53,7 +54,7 @@ fun ButtonCommon(
     ) else null
 
     Button(
-        modifier = Modifier
+        modifier = modifier
             .conditional(width != null) { width?.let { width(it) } ?: run { Modifier } },
         shape = MaterialTheme.shapes.small,
         colors = colors,
