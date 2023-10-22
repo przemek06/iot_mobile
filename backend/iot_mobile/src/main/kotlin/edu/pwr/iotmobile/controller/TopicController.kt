@@ -19,7 +19,7 @@ class TopicController(val topicService: TopicService) {
         else ResponseEntity.noContent().build()
     }
 
-    @GetMapping("/user/dashboard/{projectId}")
+    @GetMapping("/user/topic/{projectId}")
     fun findAllTopicsInProject(@PathVariable projectId: Int) : ResponseEntity<List<TopicDTO>> {
         return ResponseEntity.ok(topicService.findAllTopicsInProject(projectId))
     }

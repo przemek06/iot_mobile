@@ -1,6 +1,5 @@
 package edu.pwr.iotmobile.entities
 
-import edu.pwr.iotmobile.dto.ProjectDTO
 import edu.pwr.iotmobile.dto.ProjectRoleDTO
 import edu.pwr.iotmobile.enums.EProjectRole
 import jakarta.persistence.*

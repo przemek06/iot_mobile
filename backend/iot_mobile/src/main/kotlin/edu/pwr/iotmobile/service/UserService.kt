@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.service
 
+import edu.pwr.iotmobile.dto.EmailDTO
 import edu.pwr.iotmobile.dto.PasswordDTO
 import edu.pwr.iotmobile.dto.UserDTO
 import edu.pwr.iotmobile.dto.UserInfoDTO
@@ -59,9 +60,18 @@ class UserService(
         return saved.toUserDTO()
     }
 
+    @Transactional
+    fun resendVerificationCode(email: EmailDTO) {
+        val user = userRepository.findUserByEmail(email.address) ?: throw UserNotFoundException()
+        val token = verificationTokenService.createVerificationToken(user)
+        mailService.sendUserVerificationMail(user, token.code)
+    }
+
+    @Transactional
     fun verifyUser(token: String) : Boolean {
         val verificationToken = verificationTokenService.findActiveByCode(token)
         val user = verificationToken.user
+        verificationTokenService.deleteAllByUserId(user.id ?: throw UserNotFoundException())
 
         if (!user.isActive) {
             user.isActive = true

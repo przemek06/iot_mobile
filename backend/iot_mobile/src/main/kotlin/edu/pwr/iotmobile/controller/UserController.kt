@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.controller
 
+import edu.pwr.iotmobile.dto.EmailDTO
 import edu.pwr.iotmobile.dto.PasswordDTO
 import edu.pwr.iotmobile.dto.UserDTO
 import edu.pwr.iotmobile.dto.UserInfoDTO
@@ -18,6 +19,11 @@ class UserController(val userService: UserService) {
     @PostMapping("/anon/users")
     fun registerUser(@Valid @RequestBody user: UserDTO): ResponseEntity<UserDTO> {
         return ResponseEntity.ok(userService.registerUser(user))
+    }
+
+    @PostMapping("/anon/users/verification/resend")
+    fun resendVerificationCode(@RequestBody email: EmailDTO) : ResponseEntity<Unit> {
+        return ResponseEntity.ok(userService.resendVerificationCode(email))
     }
 
     @GetMapping("/anon/users/info/{id}")

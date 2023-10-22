@@ -2,12 +2,13 @@ package edu.pwr.iotmobile.dto
 
 import edu.pwr.iotmobile.entities.Project
 import edu.pwr.iotmobile.entities.Topic
+import edu.pwr.iotmobile.enums.EValueType
 
 data class TopicDTO(
     val id: Int? = null,
     val projectId: Int,
     val name: String,
-    val valueType: String,
+    val valueType: EValueType,
     val isHistoric: Boolean
 ) {
     fun toEntity() : Topic {

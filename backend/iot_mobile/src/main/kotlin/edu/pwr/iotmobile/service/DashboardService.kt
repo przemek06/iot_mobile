@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.service
 
 import edu.pwr.iotmobile.dto.DashboardDTO
+import edu.pwr.iotmobile.error.exception.DashboardAlreadyExistsException
 import edu.pwr.iotmobile.error.exception.NotAllowedException
 import edu.pwr.iotmobile.repositories.DashboardRepository
 import org.springframework.stereotype.Service
@@ -16,6 +17,9 @@ class DashboardService(
         val userId = userService.getActiveUserId()
         if (!projectService.isEditor(userId, dashboard.projectId))
             throw NotAllowedException()
+
+        if (dashboardRepository.existsByNameAndProjectId(dashboard.name, dashboard.projectId))
+            throw DashboardAlreadyExistsException()
 
         val toSave = dashboard.toEntity()
         return dashboardRepository.save(toSave).toDTO()
@@ -39,6 +43,11 @@ class DashboardService(
     }
 
     fun findAllDashboardInProject(projectId: Int) : List<DashboardDTO> {
+        val userId = userService.getActiveUserId()
+
+        if (!projectService.isInProject(userId, projectId))
+            throw NotAllowedException()
+
         return dashboardRepository
             .findAllByProjectId(projectId)
             .map { it.toDTO() }

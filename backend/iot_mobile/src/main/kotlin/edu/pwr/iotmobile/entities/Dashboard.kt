@@ -4,7 +4,6 @@ import edu.pwr.iotmobile.dto.DashboardDTO
 import jakarta.persistence.*
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
-import java.time.LocalDateTime
 
 @Entity
 @Table(
@@ -20,6 +19,8 @@ class Dashboard (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?=null
 ) {
+    constructor() : this(Project(), "")
+
     fun toDTO() : DashboardDTO {
         return DashboardDTO(
             id,  name, project.id!!

@@ -1,5 +1,5 @@
 package edu.pwr.iotmobile.error.exception
 
-class ProjectNotFoundException : Exception("Specified Project does not exist.")
+class ProjectNotFoundException : Exception("Specified Project does not exist in given context.")
 
 

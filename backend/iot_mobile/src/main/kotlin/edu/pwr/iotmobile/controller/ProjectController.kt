@@ -48,7 +48,7 @@ class ProjectController(val projectService: ProjectService) {
     }
 
     @DeleteMapping("/user/project/users/{projectId}/{userId}")
-    fun findAllUsersByProjectId(@PathVariable projectId: Int, @PathVariable userId: Int): ResponseEntity<Unit> {
+    fun revokeAccess(@PathVariable projectId: Int, @PathVariable userId: Int): ResponseEntity<Unit> {
         return if (projectService.revokeAccess(projectId, userId)) ResponseEntity.ok().build()
         else ResponseEntity.noContent().build()
     }
@@ -68,12 +68,12 @@ class ProjectController(val projectService: ProjectService) {
         return ResponseEntity.ok(projectService.findAllPendingInvitationsForActiveUser())
     }
 
-    @PostMapping("/user/project/invitation/reject/{invitationId}")
+    @PutMapping("/user/project/invitation/reject/{invitationId}")
     fun rejectInvitation(@PathVariable invitationId: Int): ResponseEntity<InvitationDTO> {
         return ResponseEntity.ok(projectService.rejectInvitation(invitationId))
     }
 
-    @PostMapping("/user/project/invitation/accept/{invitationId}")
+    @PutMapping("/user/project/invitation/accept/{invitationId}")
     fun acceptInvitation(@PathVariable invitationId: Int): ResponseEntity<InvitationDTO> {
         return ResponseEntity.ok(projectService.acceptInvitation(invitationId))
     }

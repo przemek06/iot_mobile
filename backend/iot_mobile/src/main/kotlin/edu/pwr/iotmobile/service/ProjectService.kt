@@ -36,7 +36,7 @@ class ProjectService(
         return findAllProjectsByUserId(userId)
     }
 
-    private fun generateConnectionKey() : String {
+    private fun generateConnectionKey(): String {
         val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
         return (1..10)
             .map { Random.nextInt(0, charPool.size) }
@@ -44,27 +44,28 @@ class ProjectService(
             .joinToString("")
     }
 
-    private fun saveCreatorProjectRole(project: Project) : ProjectRole {
+    private fun saveCreatorProjectRole(project: Project): ProjectRole {
         val projectRole = ProjectRole(project, project.createdBy, EProjectRole.ADMIN)
         return projectRoleRepository.save(projectRole)
     }
 
     @Transactional
-    fun createProject(projectDTO: ProjectDTO) : ProjectDTO {
+    fun createProject(projectDTO: ProjectDTO): ProjectDTO {
         val userId = userService.getActiveUserId()
 
         if (projectDTO.createdBy != userId) {
             throw NotAllowedException()
-       }
+        }
 
         val project = projectDTO.toEntity()
         project.connectionKey = generateConnectionKey()
-        saveCreatorProjectRole(project)
+        val saved = projectRepository.save(project)
+        saveCreatorProjectRole(saved)
 
-        return projectRepository.save(project).toDTO()
+        return saved.toDTO()
     }
 
-    fun regenerateConnectionKey(projectId: Int) : ProjectDTO {
+    fun regenerateConnectionKey(projectId: Int): ProjectDTO {
         if (!isActiveUserProjectAdmin(projectId))
             throw NotAllowedException()
 
@@ -74,7 +75,7 @@ class ProjectService(
         return projectRepository.save(project).toDTO()
     }
 
-    fun findAllUsersByProjectId(projectId: Int) : List<UserInfoDTO> {
+    fun findAllUsersByProjectId(projectId: Int): List<UserInfoDTO> {
         val projectUserList = projectRoleRepository.findAllByProjectId(projectId)
         val userIdList = projectUserList.map { it.user.id }
         val activeUserId = userService.getActiveUserId()
@@ -86,12 +87,12 @@ class ProjectService(
         return projectUserList.map { it.user.toUserInfoDTO() }
     }
 
-    fun findAllProjectRolesByProjectId(projectId: Int) : List<ProjectRoleDTO> {
+    fun findAllProjectRolesByProjectId(projectId: Int): List<ProjectRoleDTO> {
         val projectUserList = projectRoleRepository.findAllByProjectId(projectId)
         return projectUserList.map { it.toDTO() }
     }
 
-    fun revokeAccess(projectId: Int, userId: Int) : Boolean {
+    fun revokeAccess(projectId: Int, userId: Int): Boolean {
         val activeUserId = userService.getActiveUserId()
         if ((!isActiveUserProjectAdmin(projectId)) and (userId != activeUserId))
             throw NotAllowedException()
@@ -103,7 +104,7 @@ class ProjectService(
         return true
     }
 
-    fun editRole(projectRole: ProjectRoleDTO) : ProjectRoleDTO {
+    fun editRole(projectRole: ProjectRoleDTO): ProjectRoleDTO {
         if (projectRole.role == null)
             throw InvalidDataException()
 
@@ -117,26 +118,26 @@ class ProjectService(
         return projectRoleRepository.save(existing).toDTO()
     }
 
-    fun addAdmin(userId: Int, projectId: Int) : ProjectRoleDTO {
+    fun addAdmin(userId: Int, projectId: Int): ProjectRoleDTO {
         if (!isActiveUserProjectAdmin(projectId))
             throw NotAllowedException()
 
-        val existing = projectRoleRepository.findByUserIdAndProjectId(projectId, userId)
+        val existing = projectRoleRepository.findByUserIdAndProjectId(userId, projectId)
             ?: throw UserNotFoundException()
 
         existing.role = EProjectRole.ADMIN
         return projectRoleRepository.save(existing).toDTO()
     }
 
-    private fun pendingInvitationExists(userId: Int, projectId: Int) : Boolean {
+    private fun pendingInvitationExists(userId: Int, projectId: Int): Boolean {
         return invitationRepository.existsByUserIdAndProjectIdAndStatus(userId, projectId, EInvitationStatus.PENDING)
     }
 
-    private fun userAlreadyInProject(userId: Int, projectId: Int) : Boolean {
+    private fun userAlreadyInProject(userId: Int, projectId: Int): Boolean {
         return projectRoleRepository.existsByUserIdAndProjectId(userId, projectId)
     }
 
-    fun isActiveUserProjectAdmin(projectId: Int) : Boolean {
+    fun isActiveUserProjectAdmin(projectId: Int): Boolean {
         val activeUserId = userService.getActiveUserId()
         val projectRole = projectRoleRepository.findByUserIdAndProjectId(activeUserId, projectId)
             ?: return false
@@ -144,24 +145,21 @@ class ProjectService(
         return projectRole.role == EProjectRole.ADMIN
     }
 
-    fun createInvitation(invitation: InvitationDTO) : InvitationDTO {
-        if (invitation.project.id == null)
-            throw InvalidDataException()
-
-        if (!isActiveUserProjectAdmin(invitation.project.id))
+    fun createInvitation(invitation: InvitationDTO): InvitationDTO {
+        if (!isActiveUserProjectAdmin(invitation.projectId))
             throw NotAllowedException()
 
-        if (pendingInvitationExists(invitation.user.id, invitation.project.id))
+        if (pendingInvitationExists(invitation.userId, invitation.projectId))
             throw InvitationAlreadyExistsException()
 
-        if (userAlreadyInProject(invitation.user.id, invitation.project.id))
+        if (userAlreadyInProject(invitation.userId, invitation.projectId))
             throw UserAlreadyInProjectException()
 
         val toSave = invitation.toEntity()
         return invitationRepository.save(toSave).toDTO()
     }
 
-    fun findAllInvitationsByUserId(userId: Int) : List<InvitationDTO> {
+    fun findAllInvitationsByUserId(userId: Int): List<InvitationDTO> {
         return invitationRepository.findAllByUserId(userId).map { it.toDTO() }
     }
 
@@ -170,7 +168,7 @@ class ProjectService(
         return findAllInvitationsByUserId(userId)
     }
 
-    fun findAllPendingInvitationsByUserId(userId: Int) : List<InvitationDTO> {
+    fun findAllPendingInvitationsByUserId(userId: Int): List<InvitationDTO> {
         return invitationRepository.findAllByUserIdAndStatus(userId, EInvitationStatus.PENDING).map { it.toDTO() }
     }
 
@@ -179,7 +177,7 @@ class ProjectService(
         return findAllPendingInvitationsByUserId(userId)
     }
 
-    private fun getInvitationIfAllowed(invitationId: Int) : Invitation {
+    private fun getInvitationIfAllowed(invitationId: Int): Invitation {
         val invitation = invitationRepository
             .findById(invitationId)
             .orElseThrow { InvitationNotFoundException() }
@@ -192,31 +190,51 @@ class ProjectService(
         return invitation
     }
 
-    fun rejectInvitation(invitationId: Int) : InvitationDTO {
+    fun rejectInvitation(invitationId: Int): InvitationDTO {
         val invitation = getInvitationIfAllowed(invitationId)
+
+        if (invitation.status != EInvitationStatus.PENDING)
+            throw InvitationNotPendingException()
 
         invitation.status = EInvitationStatus.REJECTED
         return invitationRepository.save(invitation).toDTO()
     }
 
-    private fun addNewUserToProject(user: User, project: Project) : ProjectRole {
+    private fun addNewUserToProject(user: User, project: Project): ProjectRole {
         val projectRole = ProjectRole(project, user, EProjectRole.VIEWER)
         return projectRoleRepository.save(projectRole)
     }
 
     @Transactional
-    fun acceptInvitation(invitationId: Int) : InvitationDTO {
+    fun acceptInvitation(invitationId: Int): InvitationDTO {
         val invitation = getInvitationIfAllowed(invitationId)
+
+        if (userAlreadyInProject(
+                invitation.user.id ?: throw InvalidStateException(),
+                invitation.project.id ?: throw InvalidStateException()
+            )
+        )
+            throw UserAlreadyInProjectException()
+
+        if (invitation.status != EInvitationStatus.PENDING)
+            throw InvitationNotPendingException()
 
         invitation.status = EInvitationStatus.ACCEPTED
         addNewUserToProject(invitation.user, invitation.project)
         return invitationRepository.save(invitation).toDTO()
     }
 
-    fun isEditor(userId: Int, projectId: Int) : Boolean {
+    fun isEditor(userId: Int, projectId: Int): Boolean {
         val projectRole = projectRoleRepository.findByUserIdAndProjectId(userId, projectId)
             ?: return false
 
         return (projectRole.role in listOf(EProjectRole.ADMIN, EProjectRole.EDITOR))
+    }
+
+    fun isInProject(userId: Int, projectId: Int): Boolean {
+        projectRoleRepository.findByUserIdAndProjectId(userId, projectId)
+            ?: return false
+
+        return true
     }
 }
