@@ -19,7 +19,7 @@ interface RegisterNavigation {
 
             override fun openAccountInactiveScreen(email: String) {
                 navController.navigate(
-                    Screen.ActivateAccount.path.appendArguments(email, ActivateAccountType.AfterRegistration)
+                    Screen.ActivateAccount.path.appendArguments(ActivateAccountType.AfterRegistration, email)
                 )
             }
 

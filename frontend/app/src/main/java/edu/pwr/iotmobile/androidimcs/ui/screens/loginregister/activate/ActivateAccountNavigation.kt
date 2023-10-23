@@ -8,6 +8,7 @@ import edu.pwr.iotmobile.androidimcs.ui.navigation.getArguments
 
 interface ActivateAccountNavigation {
     val type: ActivateAccountType?
+    val email: String?
     fun onReturn()
 
     companion object {
@@ -17,6 +18,8 @@ interface ActivateAccountNavigation {
         ) = object : ActivateAccountNavigation {
             override val type: ActivateAccountType?
                 get() = navBackStackEntry.getArguments().getOrNull(0)?.asEnum<ActivateAccountType>()
+            override val email: String?
+                get() = navBackStackEntry.getArguments().getOrNull(1)
 
             override fun onReturn() {
                 navController.popBackStack()

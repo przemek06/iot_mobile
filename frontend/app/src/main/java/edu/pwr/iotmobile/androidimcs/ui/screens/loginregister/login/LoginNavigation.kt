@@ -29,7 +29,7 @@ interface LoginNavigation {
 
             override fun openAccountInactiveScreen(email: String) {
                 navController.navigate(
-                    Screen.ActivateAccount.path.appendArguments(email, ActivateAccountType.AfterLogin)
+                    Screen.ActivateAccount.path.appendArguments(ActivateAccountType.AfterLogin, email)
                 )
             }
 

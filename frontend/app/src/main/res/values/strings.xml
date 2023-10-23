@@ -101,4 +101,6 @@
     <string name="s15">Returning to previous screen</string>
     <string name="s16">Password successfully changed!</string>
     <string name="s17">Account registered successfully!</string>
+    <string name="s18">Show password</string>
+    <string name="s19">Hide password</string>
 </resources>

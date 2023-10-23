@@ -26,6 +26,7 @@ import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
+import edu.pwr.iotmobile.androidimcs.ui.components.PasswordInputField
 import edu.pwr.iotmobile.androidimcs.ui.components.TextLink
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -91,13 +92,23 @@ private fun LoginScreenContent(
         // Input fields
         uiState.inputFields.forEach { inputField ->
             val data = inputField.value
-            InputField(
-                text = data.text,
-                label = stringResource(id = data.label),
-                errorText = stringResource(id = data.errorMessage),
-                isError = data.isError,
-                onValueChange = { uiInteraction.onTextChange(inputField.key, it) }
-            )
+
+            if (inputField.key == LoginViewModel.InputFieldType.Password) {
+                PasswordInputField(
+                    text = data.text,
+                    label = stringResource(id = data.label),
+                    errorText = stringResource(id = data.errorMessage),
+                    isError = data.isError,
+                    onValueChange = { uiInteraction.onTextChange(inputField.key, it) })
+            } else {
+                InputField(
+                    text = data.text,
+                    label = stringResource(id = data.label),
+                    errorText = stringResource(id = data.errorMessage),
+                    isError = data.isError,
+                    onValueChange = { uiInteraction.onTextChange(inputField.key, it) }
+                )
+            }
             Dimensions.space18.HeightSpacer()
         }
 

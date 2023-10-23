@@ -62,7 +62,7 @@ class ForgotPasswordViewModel(
             newInputFields.replace(it.key, inputField)
         }
         _uiState.update {
-            it.copy(inputFields = inputFields)
+            it.copy(inputFields = newInputFields)
         }
     }
 
