@@ -10,6 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNavigation
@@ -28,6 +30,8 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNav
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchScreen
 
 @Composable
 fun NavGraph(
@@ -70,6 +74,10 @@ fun NavGraph(
             )
         }
 
+        composable(Screen.AddTopic.path) {
+            AddTopicScreen(navigation = AddTopicNavigation.default(navController))
+        }
+
         composable(Screen.Login.path) {
             LoginScreen(
                 navigation = LoginNavigation.default(navController)
@@ -99,6 +107,15 @@ fun NavGraph(
 
         composable(Screen.Admin.path) {
             AdminScreen(navigation = AdminNavigation.default(navController))
+        }
+
+        composable(Screen.Search.path) {
+            SearchScreen(
+                navigation = SearchNavigation.default(
+                    navController = navController,
+                    navBackStackEntry = it
+                )
+            )
         }
 
         composable(Screen.Dashboard.path) {
