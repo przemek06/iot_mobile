@@ -16,7 +16,8 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 @Composable
 fun DashboardsScreenContent(
     uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiInteraction: ProjectDetailsUiInteraction,
+    navigation: ProjectDetailsNavigation
 ) {
     LazyColumn {
 
@@ -35,7 +36,7 @@ fun DashboardsScreenContent(
         items(uiState.dashboards) {
             Block(
                 text = "Block",
-                onClick = {}
+                onClick = { navigation.openDashboardScreen(1) }
             )
             Dimensions.space14.HeightSpacer()
         }
