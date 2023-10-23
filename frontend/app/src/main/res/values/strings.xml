@@ -36,7 +36,11 @@
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
     <string name="search">Search</string>
+    <string name="close">Close</string>
     <string name="enter_project_name">Enter project name below</string>
+    <string name="add_topic">Add topic</string>
+    <string name="enter_topic_name">Enter topic name</string>
+    <string name="select_data_type">Select data type</string>
 
     <string name="main_screen_1">Welcome ,</string>
     <string name="main_screen_2">Last used dashboards</string>

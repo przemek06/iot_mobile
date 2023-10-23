@@ -11,6 +11,8 @@ import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordScreen
@@ -37,7 +39,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Search.path,
+        startDestination = Screen.AddTopic.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -69,6 +71,10 @@ fun NavGraph(
                     navBackStackEntry = navBackStackEntry
                 )
             )
+        }
+
+        composable(Screen.AddTopic.path) {
+            AddTopicScreen(navigation = AddTopicNavigation.default(navController))
         }
 
         composable(Screen.Login.path) {

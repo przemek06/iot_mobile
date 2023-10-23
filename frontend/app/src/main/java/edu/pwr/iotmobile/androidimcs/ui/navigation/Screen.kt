@@ -36,6 +36,7 @@ sealed class Screen(
     )
 
     object ProjectDetails : Screen("projectDetails/{arguments}")
+    object AddTopic : Screen("addTopic")
 
     object Login : Screen("login")
     object Register : Screen("register")
