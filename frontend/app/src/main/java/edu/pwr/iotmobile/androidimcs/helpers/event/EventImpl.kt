@@ -13,10 +13,10 @@ class EventImpl : Event {
     }
 
     @Composable
-    override fun CollectEvent(context: Context, callback: () -> Unit) {
+    override fun CollectEvent(context: Context, callback: (it: Any) -> Unit) {
         LaunchedEffect(Unit) {
             _event.collect {
-                callback()
+                callback(it)
             }
         }
     }

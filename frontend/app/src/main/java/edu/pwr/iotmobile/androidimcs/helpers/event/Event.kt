@@ -7,5 +7,5 @@ interface Event {
     suspend fun event(message: Any)
 
     @Composable
-    fun CollectEvent(context: Context, callback: () -> Unit)
+    fun CollectEvent(context: Context, callback: (it: Any) -> Unit)
 }

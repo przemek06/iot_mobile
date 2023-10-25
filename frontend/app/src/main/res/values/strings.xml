@@ -35,6 +35,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
+    <string name="return_text">Return</string>
     <string name="search">Search</string>
     <string name="close">Close</string>
     <string name="enter_project_name">Enter project name below</string>
@@ -115,4 +116,10 @@
     <string name="s11">E-mail must be of form: j.kowalski@email.com</string>
     <string name="s12">Passwords don\'t match</string>
     <string name="s13">Code not received?</string>
+    <string name="s14">Account activated successfully!</string>
+    <string name="s15">Returning to previous screen</string>
+    <string name="s16">Password successfully changed!</string>
+    <string name="s17">Account registered successfully!</string>
+    <string name="s18">Show password</string>
+    <string name="s19">Hide password</string>
 </resources>
