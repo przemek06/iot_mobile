@@ -35,6 +35,8 @@ object  Dimensions {
         get() = 40.dp
     val space60: Dp
         get() = 60.dp
+    val space85: Dp
+        get() = 85.dp
     val topBarHeight: Dp
         get() = 45.dp
     val optionItemHeight: Dp

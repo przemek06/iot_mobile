@@ -38,4 +38,8 @@ class VerificationTokenService(val verificationTokenRepository: VerificationToke
     private fun isTokenActive(token: VerificationToken) : Boolean {
         return token.expiryDate.after(Date.from(Instant.now()))
     }
+
+    fun deleteAllByUserId(userId: Int) {
+        verificationTokenRepository.deleteAllByUserId(userId)
+    }
 }

@@ -7,6 +7,7 @@
     <string name="projects">Projects</string>
     <string name="account">Account</string>
     <string name="add_new_project">+ Add new project</string>
+    <string name="add_new_project_dialog">Add new project</string>
     <string name="add_new_topic">+ Add new topic</string>
     <string name="add_new_dashboard">+ Add new dashboard</string>
     <string name="add_new_group">+ Add new group</string>
@@ -35,10 +36,21 @@
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
     <string name="return_text">Return</string>
+    <string name="search">Search</string>
+    <string name="close">Close</string>
+    <string name="enter_project_name">Enter project name below</string>
+    <string name="add_topic">Add topic</string>
+    <string name="enter_topic_name">Enter topic name</string>
+    <string name="select_data_type">Select data type</string>
 
     <string name="main_screen_1">Welcome ,</string>
     <string name="main_screen_2">Last used dashboards</string>
     <string name="main_screen_3">Recent active topics</string>
+
+    <string name="search_screen_1">Search for users</string>
+    <string name="search_screen_2">Add as admin</string>
+    <string name="search_screen_3">Block</string>
+    <string name="search_screen_4">Unblock</string>
 
     <string name="username">Username</string>
     <string name="stats">Stats</string>
@@ -55,6 +67,9 @@
     <string name="change_password">Change password</string>
     <string name="log_out">Log out</string>
     <string name="delete_account">Delete account</string>
+    <string name="block_users">Block users</string>
+    <string name="block">Block</string>
+    <string name="unblock">Unblock</string>
 
     <string name="change_password_1">Enter current password</string>
     <string name="change_password_2">Enter new password</string>
@@ -68,6 +83,10 @@
     <string name="admin_3">Ban users</string>
     <string name="admin_4">Show banned users</string>
     <string name="admin_5">Add admin</string>
+
+    <string name="search_admin_1">Are you sure you want to add user %s as Admin?</string>
+    <string name="search_block_1">Are you sure you want ban user %s</string>
+    <string name="search_block_2">Are you sure you want unban user %s</string>
 
     <string name="login">Login</string>
     <string name="register">Register</string>
