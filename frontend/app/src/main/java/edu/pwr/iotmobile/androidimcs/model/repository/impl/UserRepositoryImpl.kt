@@ -26,7 +26,7 @@ class UserRepositoryImpl(
         Log.d(TAG, "login result code: $resultCode")
         return when (resultCode) {
             200 -> LoginUserResult.Success
-            204 -> LoginUserResult.AccountInactive
+            401 -> LoginUserResult.AccountInactive
             else -> LoginUserResult.Failure
         }
     }

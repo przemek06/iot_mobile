@@ -44,7 +44,8 @@ fun InputField(
             trailingIcon = trailingIcon,
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions
+            keyboardActions = keyboardActions,
+            isError = isError
         )
         ErrorText(
             text = errorText,

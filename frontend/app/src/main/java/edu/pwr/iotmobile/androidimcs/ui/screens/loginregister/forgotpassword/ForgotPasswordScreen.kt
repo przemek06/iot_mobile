@@ -224,7 +224,7 @@ private fun EnterCodeContent(
         )
         Dimensions.space18.HeightSpacer()
         ButtonCommon(
-            text = stringResource(id = R.string.confirm),
+            text = stringResource(id = R.string.resend_link),
             type = ButtonCommonType.Alternative,
             onClick = { uiInteraction.onResendCode() }
         )

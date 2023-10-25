@@ -127,7 +127,7 @@ class ForgotPasswordViewModel(
             errorMessage = R.string.s11
         ),
         InputFieldType.Code to InputFieldData(
-            label = R.string.password,
+            label = R.string.code,
             errorMessage = R.string.s5
         ),
         InputFieldType.NewPassword to InputFieldData(
