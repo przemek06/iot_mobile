@@ -97,4 +97,42 @@ class ProjectDetailsViewModel : ViewModel() {
         )
         else -> emptyList()
     }
+
+    fun setDialogVisible() {
+        _uiState.update {
+            it.copy(isDialogVisible = true)
+        }
+    }
+    fun setDialogInvisible() {
+        _uiState.update {
+            it.copy(isDialogVisible = false)
+        }
+    }
+    fun setInfoVisible() {
+        _uiState.update {
+            it.copy(isInfoVisible = true)
+        }
+    }
+    fun setInfoInvisible() {
+        _uiState.update {
+            it.copy(isInfoVisible = false)
+        }
+    }
+    fun onTextChangeDashboard(text: String) {
+        _uiState.update {
+            it.copy(inputFieldDashboard = it.inputFieldDashboard.copy(text = text))
+        }
+    }
+    fun onTextChangeTopic(text: String) {
+        _uiState.update {
+            it.copy(inputFieldTopic = it.inputFieldTopic.copy(text = text))
+        }
+    }
+
+    fun addNewDashboard(name: String) {
+
+    }
+    fun addNewTopic(name: String) {
+
+    }
 }

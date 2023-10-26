@@ -9,9 +9,14 @@
     <string name="add_new_project">+ Add new project</string>
     <string name="add_new_project_dialog">Add new project</string>
     <string name="add_new_topic">+ Add new topic</string>
+    <string name="add_new_topic_dialog">Add new topic</string>
     <string name="add_new_dashboard">+ Add new dashboard</string>
+    <string name="add_new_dashboard_dialog">Add new dashboard</string>
     <string name="add_new_group">+ Add new group</string>
     <string name="how_to_access">How to access?</string>
+    <string name="how_to_access_1">How to access topic?</string>
+    <string name="how_to_access_2">To access a topic from your IoT device, append the topic name to the connection link of the project. Gain authorization by providing the connection string in your setup code.</string>
+    <string name="how_to_access_3">Connection string and link can be found by clicking the info icon next to the project name.</string>
     <string name="delete_project">Delete project</string>
     <string name="show_access">Show access</string>
     <string name="dashboards">dashboards</string>
@@ -39,6 +44,8 @@
     <string name="search">Search</string>
     <string name="close">Close</string>
     <string name="enter_project_name">Enter project name below</string>
+    <string name="enter_dashboard_name_below">Enter dashboard name below</string>
+    <string name="enter_topic_name_below">Enter topic name below</string>
     <string name="add_topic">Add topic</string>
     <string name="enter_topic_name">Enter topic name</string>
     <string name="select_data_type">Select data type</string>

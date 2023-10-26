@@ -24,6 +24,9 @@ import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.components.Info
+import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 
@@ -32,6 +35,48 @@ fun TopicsScreenContent(
     uiState: ProjectDetailsUiState,
     uiInteraction: ProjectDetailsUiInteraction
 ) {
+    if (uiState.isDialogVisible) {
+        SimpleDialog(
+            title = stringResource(R.string.add_new_topic_dialog),
+            buttonText1 = stringResource(id = R.string.cancel),
+            buttonText2 = stringResource(id = R.string.confirm),
+            buttonFunction1 = { uiInteraction.setDialogInvisible() },
+            buttonFunction2 = {
+                uiInteraction.addNewDashboard(uiState.inputFieldTopic.text)
+                uiInteraction.setDialogInvisible()
+            }
+        ) {
+            Text(
+                text = stringResource(id = R.string.enter_topic_name_below),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Dimensions.space10.HeightSpacer()
+            InputFieldTopics(
+                uiState = uiState,
+                uiInteraction = uiInteraction
+            )
+        }
+    }
+    if(uiState.isInfoVisible) {
+        Info(
+            title = stringResource(id = R.string.how_to_access_1),
+            buttonFunction = { uiInteraction.setInfoInvisible() }
+        ) {
+            Text(
+                text = stringResource(id = R.string.how_to_access_2),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Dimensions.space22.HeightSpacer()
+            Text(
+                text = stringResource(id = R.string.how_to_access_3),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+
     LazyColumn {
 
         if (uiState.userProjectRole != UserProjectRole.View) {
@@ -39,16 +84,12 @@ fun TopicsScreenContent(
                 ButtonCommon(
                     text = stringResource(id = R.string.how_to_access),
                     type = ButtonCommonType.Alternative
-                ) {
-                    Log.d("button", "button pressed")
-                }
+                ) { uiInteraction.setInfoVisible() }
                 Dimensions.space10.HeightSpacer()
                 ButtonCommon(
                     text = stringResource(id = R.string.add_new_topic),
                     type = ButtonCommonType.Secondary
-                ) {
-                    Log.d("button", "button pressed")
-                }
+                ) { uiInteraction.setDialogVisible() }
                 Dimensions.space30.HeightSpacer()
             }
         }
@@ -147,4 +188,16 @@ private fun TopicTexts(
             )
         }
     }
+}
+
+@Composable
+fun InputFieldTopics(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction
+) {
+    InputField(
+        text = uiState.inputFieldTopic.text,
+        label = stringResource(id = uiState.inputFieldTopic.label),
+        onValueChange = { uiInteraction.onTextChangeTopic(it) }
+    )
 }
