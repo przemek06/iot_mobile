@@ -33,12 +33,6 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
 
-private val TABS = listOf(
-    R.string.dashboards,
-    R.string.topics,
-    R.string.group
-)
-
 @Composable
 fun ProjectDetailsScreen(
     navigation: ProjectDetailsNavigation
@@ -95,14 +89,14 @@ private fun ProjectDetailsScreenContent(
         }
         Dimensions.space10.HeightSpacer()
         TabRow(selectedTabIndex = uiState.selectedTabIndex) {
-            TABS.forEachIndexed { index, title ->
+            ProjectDetailsViewModel.ProjectTab.values().forEach { tab ->
                 Tab(text = { Text(
-                    text = stringResource(id = title),
+                    text = stringResource(id = tab.labelId),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onBackground
                 ) },
-                    selected = uiState.selectedTabIndex == index,
-                    onClick = { uiInteraction.setSelectedTabIndex(index) }
+                    selected = uiState.selectedTabIndex == tab.index,
+                    onClick = { uiInteraction.setSelectedTabIndex(tab) }
                 )
             }
         }
