@@ -15,7 +15,13 @@ import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.DashboardRemot
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ProjectRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.TopicRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.UserRemoteDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.impl.DashboardRepositoryImpl
+import edu.pwr.iotmobile.androidimcs.model.repository.impl.ProjectRepositoryImpl
+import edu.pwr.iotmobile.androidimcs.model.repository.impl.TopicRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.UserRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicViewModel
@@ -57,6 +63,9 @@ object AppKoin {
     // Module for repositories accessing data sources
     private val repositories = module {
         singleOf(::UserRepositoryImpl) bind UserRepository::class
+        singleOf(::ProjectRepositoryImpl) bind ProjectRepository::class
+        singleOf(::DashboardRepositoryImpl) bind DashboardRepository::class
+        singleOf(::TopicRepositoryImpl) bind TopicRepository::class
     }
 
     // Module for view models
