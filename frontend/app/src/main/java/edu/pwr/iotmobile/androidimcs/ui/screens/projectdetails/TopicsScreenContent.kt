@@ -33,31 +33,9 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 @Composable
 fun TopicsScreenContent(
     uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiInteraction: ProjectDetailsUiInteraction,
+    navigation: ProjectDetailsNavigation
 ) {
-    if (uiState.isDialogVisible) {
-        SimpleDialog(
-            title = stringResource(R.string.add_new_topic_dialog),
-            buttonText1 = stringResource(id = R.string.cancel),
-            buttonText2 = stringResource(id = R.string.confirm),
-            buttonFunction1 = { uiInteraction.setDialogInvisible() },
-            buttonFunction2 = {
-                uiInteraction.addNewDashboard(uiState.inputFieldTopic.text)
-                uiInteraction.setDialogInvisible()
-            }
-        ) {
-            Text(
-                text = stringResource(id = R.string.enter_topic_name_below),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Dimensions.space10.HeightSpacer()
-            InputFieldTopics(
-                uiState = uiState,
-                uiInteraction = uiInteraction
-            )
-        }
-    }
     if(uiState.isInfoVisible) {
         Info(
             title = stringResource(id = R.string.how_to_access_1),
@@ -89,7 +67,7 @@ fun TopicsScreenContent(
                 ButtonCommon(
                     text = stringResource(id = R.string.add_new_topic),
                     type = ButtonCommonType.Secondary
-                ) { uiInteraction.setDialogVisible() }
+                ) { navigation.openAddTopic() }
                 Dimensions.space30.HeightSpacer()
             }
         }
@@ -188,16 +166,4 @@ private fun TopicTexts(
             )
         }
     }
-}
-
-@Composable
-fun InputFieldTopics(
-    uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
-) {
-    InputField(
-        text = uiState.inputFieldTopic.text,
-        label = stringResource(id = uiState.inputFieldTopic.label),
-        onValueChange = { uiInteraction.onTextChangeTopic(it) }
-    )
 }

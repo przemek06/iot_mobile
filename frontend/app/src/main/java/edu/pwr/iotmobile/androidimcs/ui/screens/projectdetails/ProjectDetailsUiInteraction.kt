@@ -7,7 +7,6 @@ interface ProjectDetailsUiInteraction {
     fun setInfoVisible()
     fun setInfoInvisible()
     fun onTextChangeDashboard(text: String)
-    fun onTextChangeTopic(text: String)
     fun addNewDashboard(name: String)
     fun addNewTopic(name: String)
 
@@ -35,9 +34,6 @@ interface ProjectDetailsUiInteraction {
 
             override fun onTextChangeDashboard(text: String) {
                 viewModel.onTextChangeDashboard(text)
-            }
-            override fun onTextChangeTopic(text: String) {
-                viewModel.onTextChangeTopic(text)
             }
 
             override fun addNewDashboard(name: String) {

@@ -17,8 +17,7 @@ data class ProjectDetailsUiState(
     val members: List<User>,
     val isDialogVisible: Boolean,
     val isInfoVisible: Boolean,
-    val inputFieldDashboard: InputFieldData,
-    val inputFieldTopic: InputFieldData
+    val inputFieldDashboard: InputFieldData
 ) {
     companion object {
         fun default(
@@ -33,8 +32,7 @@ data class ProjectDetailsUiState(
             members: List<User> = emptyList(),
             isDialogVisible: Boolean = false,
             isInfoVisible: Boolean = false,
-            inputFieldDashboard: InputFieldData = InputFieldData(),
-            inputFieldTopic: InputFieldData = InputFieldData()
+            inputFieldDashboard: InputFieldData = InputFieldData()
         ) = ProjectDetailsUiState(
             selectedTabIndex = selectedTabIndex,
             user = user,
@@ -47,7 +45,6 @@ data class ProjectDetailsUiState(
             menuOptionsList = menuOptionsList,
             isDialogVisible = isDialogVisible,
             inputFieldDashboard = inputFieldDashboard,
-            inputFieldTopic = inputFieldTopic,
             isInfoVisible = isInfoVisible
         )
     }

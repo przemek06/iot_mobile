@@ -123,11 +123,6 @@ class ProjectDetailsViewModel : ViewModel() {
             it.copy(inputFieldDashboard = it.inputFieldDashboard.copy(text = text))
         }
     }
-    fun onTextChangeTopic(text: String) {
-        _uiState.update {
-            it.copy(inputFieldTopic = it.inputFieldTopic.copy(text = text))
-        }
-    }
 
     fun addNewDashboard(name: String) {
 
