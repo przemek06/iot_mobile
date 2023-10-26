@@ -45,7 +45,7 @@ class ProjectDetailsViewModel : ViewModel() {
 
     private fun getUserRoleDescription(role: UserProjectRole) = when (role) {
         UserProjectRole.Admin -> R.string.admin_desc
-        UserProjectRole.Modify -> R.string.modify_desc
+        UserProjectRole.Editor -> R.string.modify_desc
         UserProjectRole.View -> R.string.view_desc
     }
 
@@ -72,7 +72,7 @@ class ProjectDetailsViewModel : ViewModel() {
                 onClick = { /*TODO*/}
             )
         )
-        UserProjectRole.Modify -> listOf(
+        UserProjectRole.Editor -> listOf(
             MenuOption(
                 titleId = R.string.leave_group,
                 isBold = true,

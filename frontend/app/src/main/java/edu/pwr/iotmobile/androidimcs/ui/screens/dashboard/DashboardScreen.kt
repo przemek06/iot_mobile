@@ -11,9 +11,11 @@ import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -41,6 +43,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.LightPurple
 import kotlinx.coroutines.CoroutineScope
@@ -65,10 +68,20 @@ private fun DashboardScreenContent(
     uiState: DashboardUiState,
     uiInteraction: DashboardUiInteraction
 ) {
-    ComponentsList(
-        uiState =  uiState,
-        uiInteraction = uiInteraction
-    )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = Dimensions.space22)
+    ) {
+        TopBar(
+            menuItems = uiState.menuOptionsList,
+            onReturn = { /*TODO*/ }
+        )
+        ComponentsList(
+            uiState =  uiState,
+            uiInteraction = uiInteraction
+        )
+    }
 }
 
 @Composable
@@ -118,10 +131,12 @@ private fun ComponentsList(
                 Component(
                     item = item,
                     uiInteraction = uiInteraction,
-                    onPlaceItem = { uiInteraction.onPlaceDraggedComponent(
-                        visibleItems = gridState.layoutInfo.visibleItemsInfo,
-                        windowWidth = windowWidth
-                    ) },
+                    onPlaceItem = {
+                        uiInteraction.onPlaceDraggedComponent(
+                            visibleItems = gridState.layoutInfo.visibleItemsInfo,
+                            windowWidth = windowWidth
+                        )
+                    },
                     coroutineScope = coroutineScope
                 )
             }

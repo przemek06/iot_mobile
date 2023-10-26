@@ -122,4 +122,6 @@
     <string name="s17">Account registered successfully!</string>
     <string name="s18">Show password</string>
     <string name="s19">Hide password</string>
+    <string name="s20">Edit dashboard</string>
+    <string name="s21">Delete dashboard</string>
 </resources>

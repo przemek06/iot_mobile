@@ -2,10 +2,12 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Dp
+import edu.pwr.iotmobile.androidimcs.data.MenuOption
 
 data class DashboardUiState(
     val draggedComponentId: Int? = null,
-    val components: List<ComponentData> = emptyList()
+    val components: List<ComponentData> = emptyList(),
+    val menuOptionsList: List<MenuOption> = emptyList(),
 )
 
 data class ComponentData(
