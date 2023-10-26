@@ -8,13 +8,15 @@ import edu.pwr.iotmobile.androidimcs.data.result.ActivateAccountResult
 import edu.pwr.iotmobile.androidimcs.data.result.ForgotPasswordResult
 import edu.pwr.iotmobile.androidimcs.data.result.LoginUserResult
 import edu.pwr.iotmobile.androidimcs.data.result.RegisterUserResult
+import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserLocalDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 
 private const val TAG = "UserRepo"
 
 class UserRepositoryImpl(
-    private val remoteDataSource: UserRemoteDataSource
+    private val remoteDataSource: UserRemoteDataSource,
+    private val localDataSource: UserLocalDataSource
 ) : UserRepository {
     override suspend fun login(email: String, password: String): LoginUserResult {
         val params = mapOf(
@@ -24,6 +26,13 @@ class UserRepositoryImpl(
         val response = remoteDataSource.loginUser(params)
         val resultCode = response.code()
         Log.d(TAG, "login result code: $resultCode")
+
+        // Save user session
+        val cookie = response.headers()["Set-Cookie"]
+        cookie?.let {
+            localDataSource.saveUserSessionCookie(it)
+        }
+
         return when (resultCode) {
             200 -> LoginUserResult.Success
             401 -> LoginUserResult.AccountInactive
