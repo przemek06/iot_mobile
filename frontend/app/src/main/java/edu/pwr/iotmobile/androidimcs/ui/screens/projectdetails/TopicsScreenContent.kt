@@ -24,14 +24,37 @@ import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.components.Info
+import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 
 @Composable
 fun TopicsScreenContent(
     uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiInteraction: ProjectDetailsUiInteraction,
+    navigation: ProjectDetailsNavigation
 ) {
+    if(uiState.isInfoVisible) {
+        Info(
+            title = stringResource(id = R.string.how_to_access_1),
+            buttonFunction = { uiInteraction.setInfoInvisible() }
+        ) {
+            Text(
+                text = stringResource(id = R.string.how_to_access_2),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Dimensions.space22.HeightSpacer()
+            Text(
+                text = stringResource(id = R.string.how_to_access_3),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+
     LazyColumn {
 
         if (uiState.userProjectRole != UserProjectRole.View) {
@@ -39,16 +62,12 @@ fun TopicsScreenContent(
                 ButtonCommon(
                     text = stringResource(id = R.string.how_to_access),
                     type = ButtonCommonType.Alternative
-                ) {
-                    Log.d("button", "button pressed")
-                }
+                ) { uiInteraction.setInfoVisible() }
                 Dimensions.space10.HeightSpacer()
                 ButtonCommon(
                     text = stringResource(id = R.string.add_new_topic),
                     type = ButtonCommonType.Secondary
-                ) {
-                    Log.d("button", "button pressed")
-                }
+                ) { navigation.openAddTopic() }
                 Dimensions.space30.HeightSpacer()
             }
         }
