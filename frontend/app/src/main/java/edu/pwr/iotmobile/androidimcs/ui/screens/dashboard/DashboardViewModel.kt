@@ -17,13 +17,14 @@ class DashboardViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
 
-    private var userProjectRole: UserProjectRole? = null
+    private var userProjectRole: UserProjectRole? = UserProjectRole.Editor
 
     init {
         _uiState.update {
             it.copy(
                 components = generateComponents(),
-                menuOptionsList = generateMenuOptions(userProjectRole)
+                menuOptionsList = generateMenuOptions(userProjectRole),
+                userProjectRole = userProjectRole
             )
         }
     }
@@ -186,7 +187,11 @@ class DashboardViewModel : ViewModel() {
     private fun generateMenuOptions(role: UserProjectRole?) = when (role) {
         UserProjectRole.Admin, UserProjectRole.Editor -> listOf(
             MenuOption(
-                titleId = R.string.delete_project,
+                titleId = R.string.s20,
+                onClick = {/*TODO*/}
+            ),
+            MenuOption(
+                titleId = R.string.s21,
                 onClick = {/*TODO*/}
             )
         )

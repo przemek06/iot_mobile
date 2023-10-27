@@ -2,6 +2,7 @@
 
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,9 +41,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
+import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.LightPurple
@@ -77,6 +83,14 @@ private fun DashboardScreenContent(
             menuItems = uiState.menuOptionsList,
             onReturn = { /*TODO*/ }
         )
+        if (uiState.userProjectRole != null && uiState.userProjectRole != UserProjectRole.View) {
+            ButtonCommon(
+                text = stringResource(id = R.string.add_new_component),
+                type = ButtonCommonType.Secondary
+            ) {
+                Log.d("button", "button pressed")
+            }
+        }
         ComponentsList(
             uiState =  uiState,
             uiInteraction = uiInteraction
