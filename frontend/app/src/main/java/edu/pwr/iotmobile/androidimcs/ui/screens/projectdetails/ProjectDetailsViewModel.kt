@@ -1,14 +1,28 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
+import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
+import edu.pwr.iotmobile.androidimcs.data.dto.TopicDto
+import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
+import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.Dashboard.Companion.toDashboard
+import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.Topic.Companion.toTopic
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+private const val TAG = "ProjectDetVM"
 
 val mockUser = User(
     id = "1",
@@ -17,16 +31,22 @@ val mockUser = User(
     role = UserRole.Normal
 )
 
-class ProjectDetailsViewModel : ViewModel() {
+class ProjectDetailsViewModel(
+    private val dashboardRepository: DashboardRepository,
+    private val topicRepository: TopicRepository,
+    private val projectRepository: ProjectRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(ProjectDetailsUiState.default())
     val uiState = _uiState.asStateFlow()
 
+    private var projectId: Int? = null
+    private var userProjectRole: UserProjectRole? = null
+
     fun init(navigation: ProjectDetailsNavigation) {
         val userProjectRole = UserProjectRole.Admin
+        projectId = navigation.projectId?.toInt()
         _uiState.update {
             it.copy(
-                dashboards = listOf(1,2,3),
-                topics = listOf(1,2,3),
                 user = mockUser,
                 members = listOf(mockUser, mockUser, mockUser),
                 userRoleDescriptionId = getUserRoleDescription(userProjectRole),
@@ -37,9 +57,104 @@ class ProjectDetailsViewModel : ViewModel() {
         }
     }
 
-    fun setSelectedTabIndex(index: Int) {
+    fun setSelectedTabIndex(tab: ProjectTab) {
+        when (tab) {
+            ProjectTab.Dashboards -> getDashboards()
+            ProjectTab.Topics -> getTopics()
+            ProjectTab.Group -> { /*TODO*/ }
+        }
         _uiState.update {
-            it.copy(selectedTabIndex = index)
+            it.copy(selectedTabIndex = tab.index)
+        }
+    }
+
+    fun addDashboard(name: String) {
+        val localProjectId = projectId ?: return
+        viewModelScope.launch(Dispatchers.Default) {
+            val dashboardDto = DashboardDto(
+                name = name,
+                projectId = localProjectId
+            )
+            kotlin.runCatching {
+                dashboardRepository.createDashboard(dashboardDto)
+            }.onSuccess {
+                getDashboards()
+            }.onFailure {
+                Log.d(TAG, "Add dashboard error")
+            }
+        }
+    }
+
+    fun addTopic(name: String, uniqueName: String, dataType: TopicDataType) {
+        val localProjectId = projectId ?: return
+        viewModelScope.launch(Dispatchers.Default) {
+            val topicDto = TopicDto(
+                name = name,
+                uniqueName = uniqueName,
+                valueType = dataType,
+                projectId = localProjectId
+            )
+            kotlin.runCatching {
+                topicRepository.createTopic(topicDto)
+            }.onSuccess {
+                getTopics()
+            }.onFailure {
+                Log.d(TAG, "Add topic error")
+            }
+        }
+    }
+
+    fun deleteDashboard(id: Int) {
+        viewModelScope.launch(Dispatchers.Default) {
+            kotlin.runCatching {
+                dashboardRepository.deleteDashboard(id)
+            }.onSuccess {
+                getDashboards()
+            }.onFailure {
+                Log.d(TAG, "Delete dashboard error")
+            }
+        }
+    }
+
+    fun deleteTopic(id: Int) {
+        viewModelScope.launch(Dispatchers.Default) {
+            kotlin.runCatching {
+                topicRepository.deleteTopic(id)
+            }.onSuccess {
+                getTopics()
+            }.onFailure {
+                Log.d(TAG, "Delete topic error")
+            }
+        }
+    }
+
+    private fun getDashboards() {
+        val localProjectId = projectId ?: return
+        viewModelScope.launch(Dispatchers.Default) {
+            kotlin.runCatching {
+                dashboardRepository.getDashboardsByProjectId(localProjectId)
+            }.onSuccess { dashboards ->
+                _uiState.update { ui ->
+                    ui.copy(dashboards = dashboards.mapNotNull { it.toDashboard() })
+                }
+            }.onFailure {
+                Log.d(TAG, "Get dashboards error")
+            }
+        }
+    }
+
+    private fun getTopics() {
+        val localProjectId = projectId ?: return
+        viewModelScope.launch(Dispatchers.Default) {
+            kotlin.runCatching {
+                topicRepository.getTopicsByProjectId(localProjectId)
+            }.onSuccess { topics ->
+                _uiState.update { ui ->
+                    ui.copy(topics = topics.mapNotNull { it.toTopic() })
+                }
+            }.onFailure {
+                Log.d(TAG, "Get topics error")
+            }
         }
     }
 
@@ -129,5 +244,11 @@ class ProjectDetailsViewModel : ViewModel() {
     }
     fun addNewTopic(name: String) {
 
+    }
+
+    enum class ProjectTab(val labelId: Int, val index: Int) {
+        Dashboards(labelId = R.string.dashboards, index = 0),
+        Topics(labelId = R.string.topics, index = 1),
+        Group(labelId = R.string.group, index = 2)
     }
 }

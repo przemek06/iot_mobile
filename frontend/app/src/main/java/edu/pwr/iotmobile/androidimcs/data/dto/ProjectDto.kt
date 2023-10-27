@@ -4,5 +4,5 @@ data class ProjectDto(
     val id: Int? = null,
     val name: String,
     val createdBy: Int,
-    val connectionKey: String?
+    val connectionKey: String? = null
 )

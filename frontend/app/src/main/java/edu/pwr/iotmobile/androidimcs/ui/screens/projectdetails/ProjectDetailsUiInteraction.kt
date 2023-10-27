@@ -1,7 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
 interface ProjectDetailsUiInteraction {
-    fun setSelectedTabIndex(index: Int)
+    fun setSelectedTabIndex(tab: ProjectDetailsViewModel.ProjectTab)
     fun setDialogVisible()
     fun setDialogInvisible()
     fun setInfoVisible()
@@ -14,8 +14,8 @@ interface ProjectDetailsUiInteraction {
         fun default(
             viewModel: ProjectDetailsViewModel
         ) = object : ProjectDetailsUiInteraction {
-            override fun setSelectedTabIndex(index: Int) {
-                viewModel.setSelectedTabIndex(index)
+            override fun setSelectedTabIndex(tab: ProjectDetailsViewModel.ProjectTab) {
+                viewModel.setSelectedTabIndex(tab)
             }
 
             override fun setDialogVisible() {
