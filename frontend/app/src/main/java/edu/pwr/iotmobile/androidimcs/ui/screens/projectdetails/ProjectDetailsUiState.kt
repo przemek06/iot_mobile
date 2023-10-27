@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
+import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
@@ -13,7 +14,10 @@ data class ProjectDetailsUiState(
     val menuOptionsList: List<MenuOption>,
     val dashboards: List<Any>,
     val topics: List<Any>,
-    val members: List<User>
+    val members: List<User>,
+    val isDialogVisible: Boolean,
+    val isInfoVisible: Boolean,
+    val inputFieldDashboard: InputFieldData
 ) {
     companion object {
         fun default(
@@ -26,6 +30,9 @@ data class ProjectDetailsUiState(
             dashboards: List<Any> = emptyList(),
             topics: List<Any> = emptyList(),
             members: List<User> = emptyList(),
+            isDialogVisible: Boolean = false,
+            isInfoVisible: Boolean = false,
+            inputFieldDashboard: InputFieldData = InputFieldData()
         ) = ProjectDetailsUiState(
             selectedTabIndex = selectedTabIndex,
             user = user,
@@ -35,7 +42,10 @@ data class ProjectDetailsUiState(
             dashboards = dashboards,
             topics = topics,
             members = members,
-            menuOptionsList = menuOptionsList
+            menuOptionsList = menuOptionsList,
+            isDialogVisible = isDialogVisible,
+            inputFieldDashboard = inputFieldDashboard,
+            isInfoVisible = isInfoVisible
         )
     }
 }

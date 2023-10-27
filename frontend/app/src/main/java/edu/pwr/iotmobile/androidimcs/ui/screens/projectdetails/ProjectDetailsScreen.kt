@@ -123,7 +123,7 @@ private fun TabContent(
             DashboardsScreenContent(uiState, uiInteraction, navigation)
         }
         AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 1) {
-            TopicsScreenContent(uiState, uiInteraction)
+            TopicsScreenContent(uiState, uiInteraction, navigation)
         }
         AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 2) {
             GroupScreenContent(uiState, uiInteraction)
