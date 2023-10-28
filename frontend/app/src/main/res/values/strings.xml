@@ -13,6 +13,7 @@
     <string name="add_new_dashboard">+ Add new dashboard</string>
     <string name="add_new_dashboard_dialog">Add new dashboard</string>
     <string name="add_new_group">+ Add new group</string>
+    <string name="add_new_component">+ Add new component</string>
     <string name="how_to_access">How to access?</string>
     <string name="how_to_access_1">How to access topic?</string>
     <string name="how_to_access_2">To access a topic from your IoT device, append the topic name to the connection link of the project. Gain authorization by providing the connection string in your setup code.</string>
@@ -129,4 +130,6 @@
     <string name="s17">Account registered successfully!</string>
     <string name="s18">Show password</string>
     <string name="s19">Hide password</string>
+    <string name="s20">Edit dashboard</string>
+    <string name="s21">Delete dashboard</string>
 </resources>
