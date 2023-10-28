@@ -2,13 +2,11 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
-import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -31,9 +29,7 @@ private fun DashboardScreenContent(
     navigation: DashboardNavigation
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Dimensions.space22)
+        modifier = Modifier.fillMaxSize()
     ) {
         TopBar(
             menuItems = uiState.menuOptionsList,
