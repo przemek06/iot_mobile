@@ -1,7 +1,7 @@
 package edu.pwr.iotmobile.service
 
 import edu.pwr.iotmobile.dto.TopicDTO
-import edu.pwr.iotmobile.error.exception.DashboardAlreadyExistsException
+import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.error.exception.NotAllowedException
 import edu.pwr.iotmobile.error.exception.TopicAlreadyExistsException
 import edu.pwr.iotmobile.repositories.TopicRepository
@@ -13,21 +13,23 @@ class TopicService(
     val userService: UserService,
     val projectService: ProjectService
 ) {
-    fun createTopic(dashboard: TopicDTO) : TopicDTO {
-        val userId = userService.getActiveUserId()
-        if (!projectService.isEditor(userId, dashboard.projectId))
+    fun createTopic(topic: TopicDTO) : TopicDTO {
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
+        if (!projectService.isEditor(userId, topic.projectId))
             throw NotAllowedException()
 
-        if (topicRepository.existsByNameAndProjectId(dashboard.name, dashboard.projectId))
+        if (topicRepository.existsByNameAndProjectId(topic.name, topic.projectId))
             throw TopicAlreadyExistsException()
 
-        val toSave = dashboard.toEntity()
+        val projectName = projectService.findProjectById(topic.projectId).name
+
+        val toSave = topic.toEntity(projectName)
         return topicRepository.save(toSave).toDTO()
     }
 
-    fun deleteTopic(dashboardId: Int) : Boolean {
-        val userId = userService.getActiveUserId()
-        val topic = topicRepository.findById(dashboardId)
+    fun deleteTopic(topicId: Int) : Boolean {
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
+        val topic = topicRepository.findById(topicId)
 
         if (topic.isEmpty)
             return false
@@ -43,7 +45,7 @@ class TopicService(
     }
 
     fun findAllTopicsInProject(projectId: Int) : List<TopicDTO> {
-        val userId = userService.getActiveUserId()
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
 
         if (!projectService.isInProject(userId, projectId))
             throw NotAllowedException()

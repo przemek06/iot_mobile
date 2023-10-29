@@ -4,6 +4,7 @@ import edu.pwr.iotmobile.entities.User
 import jakarta.mail.internet.MimeMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
@@ -28,6 +29,7 @@ class MailService(private val templateEngine: TemplateEngine, private val mailSe
         mailSender.send(simpleMailMessage)
     }
 
+    @Async
     fun sendUserVerificationMail(user: User, code: String) {
         val html = generateMailHtml(
             "verification_mail",
@@ -37,6 +39,7 @@ class MailService(private val templateEngine: TemplateEngine, private val mailSe
         sendHtmlMail("Account activation", user.email, html)
     }
 
+    @Async
     fun sendResetPasswordMail(user: User, code: String) {
         val html = generateMailHtml("reset_password_mail", Pair("name", user.name), Pair("code", code))
         sendHtmlMail("Reset Password", user.email, html)

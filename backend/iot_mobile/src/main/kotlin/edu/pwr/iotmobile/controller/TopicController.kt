@@ -8,17 +8,18 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 class TopicController(val topicService: TopicService) {
+    // 400, 401, 403, 409
     @PostMapping("/user/topic")
     fun createTopic(@Valid @RequestBody topic: TopicDTO): ResponseEntity<TopicDTO> {
         return ResponseEntity.ok(topicService.createTopic(topic))
     }
-
+    // 400, 401, 403
     @DeleteMapping("/user/topic/{topicId}")
     fun deleteTopic(@PathVariable topicId: Int): ResponseEntity<Unit> {
         return if (topicService.deleteTopic(topicId)) ResponseEntity.ok().build()
         else ResponseEntity.noContent().build()
     }
-
+    // 400, 401, 403
     @GetMapping("/user/topic/{projectId}")
     fun findAllTopicsInProject(@PathVariable projectId: Int) : ResponseEntity<List<TopicDTO>> {
         return ResponseEntity.ok(topicService.findAllTopicsInProject(projectId))

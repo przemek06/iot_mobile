@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size
 data class DashboardDTO(
     val id: Int?=null,
     @field:NotNull
-    @field:Size(min = 3, max = 64)
+    @field:Size(max = 64)
     val name: String,
     @field:NotNull
     val projectId: Int

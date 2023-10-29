@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.entities
 
+import edu.pwr.iotmobile.dto.ActionDestinationDTO
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -12,4 +13,10 @@ class ActionDestination (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?=null
-)
+) {
+    constructor() : this("", "")
+
+    fun toDTO() : ActionDestinationDTO {
+        return ActionDestinationDTO(type, token, id)
+    }
+}

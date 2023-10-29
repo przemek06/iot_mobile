@@ -1,20 +1,26 @@
 package edu.pwr.iotmobile.entities
 
+import edu.pwr.iotmobile.dto.ComponentDTO
+import edu.pwr.iotmobile.enums.EComponentType
+import edu.pwr.iotmobile.listener.OutputComponentEntityListener
 import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import java.time.LocalDateTime
+import jakarta.persistence.EntityListeners
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 
 @Entity
-class OutputComponent (
-    var dashboardId: Int,
-    var topicId: Int,
-    var type: String,
-    var size: Int,
-    var xCoordinate: Int,
-    var yCoordinate: Int,
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int?=null
-)
+class OutputComponent(
+    @ManyToOne
+    @JoinColumn(name = "topic_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    var topic: Topic
+) : Component() {
+    constructor() : this(Topic()) {
+    }
+
+    fun toDTO(): ComponentDTO {
+        return ComponentDTO(id, EComponentType.OUTPUT, type, size, index, topic.id!!)
+    }
+}
