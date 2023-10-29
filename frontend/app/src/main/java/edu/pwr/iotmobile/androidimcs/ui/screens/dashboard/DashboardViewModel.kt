@@ -5,6 +5,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.MenuOption
+import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -14,9 +17,15 @@ class DashboardViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var userProjectRole: UserProjectRole? = UserProjectRole.Editor
+
     init {
         _uiState.update {
-            it.copy(components = generateComponents())
+            it.copy(
+                components = generateComponents(),
+                menuOptionsList = generateMenuOptions(userProjectRole),
+                userProjectRole = userProjectRole
+            )
         }
     }
 
@@ -174,4 +183,18 @@ class DashboardViewModel : ViewModel() {
             height = 80.dp
         ),
     )
+
+    private fun generateMenuOptions(role: UserProjectRole?) = when (role) {
+        UserProjectRole.Admin, UserProjectRole.Editor -> listOf(
+            MenuOption(
+                titleId = R.string.s20,
+                onClick = {/*TODO*/}
+            ),
+            MenuOption(
+                titleId = R.string.s21,
+                onClick = {/*TODO*/}
+            )
+        )
+        else -> emptyList()
+    }
 }

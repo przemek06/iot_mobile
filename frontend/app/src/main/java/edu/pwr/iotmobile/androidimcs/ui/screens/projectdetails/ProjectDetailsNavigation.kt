@@ -10,6 +10,7 @@ interface ProjectDetailsNavigation {
     val projectId: String?
 
     fun openDashboardScreen(id: Int)
+    fun openAddTopic()
 
     companion object {
         fun default(
@@ -22,6 +23,10 @@ interface ProjectDetailsNavigation {
 
                 override fun openDashboardScreen(id: Int) {
                     navController.navigate(Screen.Dashboard.path.appendArguments(id))
+                }
+
+                override fun openAddTopic() {
+                    navController.navigate(Screen.AddTopic.path)
                 }
 
             }

@@ -42,12 +42,13 @@ sealed class Screen(
     object Register : Screen("register")
     object ForgotPassword : Screen("forgotPassword")
     object RegisterConfirmation : Screen("registerConfirmation")
-    object ActivateAccount : Screen("activateAccount")
+    object ActivateAccount : Screen("activateAccount/{arguments}")
     object ChangePassword : Screen("changePassword")
     object Admin : Screen("admin")
     object Search : Screen("search")
 
     object Dashboard : Screen("dashboard/{arguments}")
+    object AddComponent : Screen("addComponent")
 }
 
 

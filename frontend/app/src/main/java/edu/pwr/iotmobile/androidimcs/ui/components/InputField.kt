@@ -2,28 +2,56 @@
 
 package edu.pwr.iotmobile.androidimcs.ui.components
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
+import edu.pwr.iotmobile.androidimcs.extensions.conditional
 
 @Composable
 fun InputField(
     text: String,
     label: String,
+    width: Dp? = null,
     isError: Boolean = false,
     errorText: String = "Error",
+    trailingIcon: @Composable () -> Unit = {},
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     onValueChange: (v: String) -> Unit
 ) {
-    OutlinedTextField(
-        value = text,
-        onValueChange = { onValueChange(it) },
-        label = { Text(label) },
-        isError = isError,
-        supportingText = { ErrorText(errorText, isError) },
-        singleLine = true
-    )
+    Column(
+        modifier = Modifier.conditional(width != null) {
+            width?.let { width(it) } ?: run { this }
+        }
+    ) {
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = text,
+            onValueChange = { onValueChange(it) },
+            label = { Text(label) },
+            singleLine = true,
+            trailingIcon = trailingIcon,
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            isError = isError
+        )
+        ErrorText(
+            text = errorText,
+            isError = isError
+        )
+    }
 }
 
 @Composable

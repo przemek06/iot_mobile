@@ -21,9 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.zIndex
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
+import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 
 @Composable
@@ -39,12 +42,17 @@ fun TopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .zIndex(2f)
             .padding(horizontal = padding)
             .height(Dimensions.topBarHeight)
     ) {
-        IconButton(onClick = onReturn) {
+        IconButton(
+            modifier = Modifier.align(Alignment.CenterStart),
+            onClick = onReturn
+        ) {
             Image(
-                modifier = Modifier.align(Alignment.CenterStart),
+                modifier = Modifier.align(Alignment.Center),
+                alignment = Alignment.Center,
                 painter = painterResource(id = R.drawable.ic_arrow_back),
                 contentDescription = "Return",
                 colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onBackground)
@@ -67,9 +75,13 @@ fun TopBar(
                     .align(Alignment.CenterEnd)
                     .wrapContentSize(Alignment.TopEnd)
             ) {
-                IconButton(onClick = { expanded = !expanded }) {
+                IconButton(
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    onClick = { expanded = !expanded }
+                ) {
                     Image(
-                        modifier = Modifier.align(Alignment.CenterEnd),
+                        modifier = Modifier.align(Alignment.Center),
+                        alignment = Alignment.Center,
                         painter = painterResource(id = R.drawable.ic_menu),
                         contentDescription = "Return",
                         colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onBackground)
@@ -94,6 +106,16 @@ fun TopBar(
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TopBarPreview() {
+    AndroidIMCSTheme {
+        TopBar() {
+
         }
     }
 }

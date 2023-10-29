@@ -89,7 +89,7 @@ private fun AddTopicScreenContent(
                 ButtonCommon(
                     text = stringResource(id = R.string.confirm),
                     width = Dimensions.buttonWidth
-                ) { }
+                ) { navigation.goBack() }
             }
         }
     }

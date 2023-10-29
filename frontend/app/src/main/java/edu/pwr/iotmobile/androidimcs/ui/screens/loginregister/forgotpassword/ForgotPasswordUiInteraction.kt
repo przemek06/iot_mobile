@@ -5,6 +5,7 @@ interface ForgotPasswordUiInteraction {
     fun onConfirmEmail()
     fun onConfirmNewPassword()
     fun onResendCode()
+    fun checkData()
 
     companion object {
         fun default(
@@ -19,11 +20,15 @@ interface ForgotPasswordUiInteraction {
             }
 
             override fun onConfirmNewPassword() {
-                TODO("Not yet implemented")
+                viewModel.onConfirmNewPassword()
             }
 
             override fun onResendCode() {
                 viewModel.onResendCode()
+            }
+
+            override fun checkData() {
+                viewModel.checkData()
             }
 
         }
