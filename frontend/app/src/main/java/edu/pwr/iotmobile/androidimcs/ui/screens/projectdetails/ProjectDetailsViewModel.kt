@@ -44,16 +44,18 @@ class ProjectDetailsViewModel(
 
     fun init(navigation: ProjectDetailsNavigation) {
         val userProjectRole = UserProjectRole.Admin
-        projectId = navigation.projectId?.toInt()
-        _uiState.update {
-            it.copy(
-                user = mockUser,
-                members = listOf(mockUser, mockUser, mockUser),
-                userRoleDescriptionId = getUserRoleDescription(userProjectRole),
-                userProjectRole = userProjectRole,
-                userOptionsList = generateUserOptions(userProjectRole, navigation),
-                menuOptionsList = generateMenuOptions(userProjectRole)
-            )
+        if (projectId == null || projectId != navigation.projectId) {
+            projectId = navigation.projectId
+            _uiState.update {
+                it.copy(
+                    user = mockUser,
+                    members = listOf(mockUser, mockUser, mockUser),
+                    userRoleDescriptionId = getUserRoleDescription(userProjectRole),
+                    userProjectRole = userProjectRole,
+                    userOptionsList = generateUserOptions(userProjectRole, navigation),
+                    menuOptionsList = generateMenuOptions(userProjectRole)
+                )
+            }
         }
     }
 
@@ -237,13 +239,6 @@ class ProjectDetailsViewModel(
         _uiState.update {
             it.copy(inputFieldDashboard = it.inputFieldDashboard.copy(text = text))
         }
-    }
-
-    fun addNewDashboard(name: String) {
-
-    }
-    fun addNewTopic(name: String) {
-
     }
 
     enum class ProjectTab(val labelId: Int, val index: Int) {

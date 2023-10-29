@@ -1,5 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
+import edu.pwr.iotmobile.androidimcs.data.TopicDataType
+
 interface ProjectDetailsUiInteraction {
     fun setSelectedTabIndex(tab: ProjectDetailsViewModel.ProjectTab)
     fun setDialogVisible()
@@ -8,7 +10,7 @@ interface ProjectDetailsUiInteraction {
     fun setInfoInvisible()
     fun onTextChangeDashboard(text: String)
     fun addNewDashboard(name: String)
-    fun addNewTopic(name: String)
+    fun addNewTopic(name: String, uniqueName: String, dataType: TopicDataType)
 
     companion object {
         fun default(
@@ -37,10 +39,10 @@ interface ProjectDetailsUiInteraction {
             }
 
             override fun addNewDashboard(name: String) {
-                viewModel.addNewDashboard(name)
+                viewModel.addDashboard(name)
             }
-            override fun addNewTopic(name: String) {
-                viewModel.addNewTopic(name)
+            override fun addNewTopic(name: String, uniqueName: String, dataType: TopicDataType) {
+                viewModel.addTopic(name,uniqueName, dataType)
             }
         }
     }

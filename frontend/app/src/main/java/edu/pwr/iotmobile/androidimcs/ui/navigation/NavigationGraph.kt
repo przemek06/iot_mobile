@@ -41,7 +41,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Dashboard.path,
+        startDestination = Screen.Login.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {

@@ -37,8 +37,6 @@ import org.koin.androidx.compose.koinViewModel
 fun ProjectDetailsScreen(
     navigation: ProjectDetailsNavigation
 ) {
-    Log.d("nav", "project id:")
-    navigation.projectId?.let { Log.d("nav", it) }
     val viewModel = koinViewModel<ProjectDetailsViewModel>()
     val uiState by viewModel.uiState.collectAsState()
 

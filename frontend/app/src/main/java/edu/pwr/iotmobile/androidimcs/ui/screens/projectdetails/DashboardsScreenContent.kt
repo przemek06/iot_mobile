@@ -1,6 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -23,32 +22,8 @@ fun DashboardsScreenContent(
     uiInteraction: ProjectDetailsUiInteraction,
     navigation: ProjectDetailsNavigation
 ) {
-    if (uiState.isDialogVisible) {
-        SimpleDialog(
-            title = stringResource(R.string.add_new_dashboard_dialog),
-            buttonText1 = stringResource(id = R.string.cancel),
-            buttonText2 = stringResource(id = R.string.confirm),
-            buttonFunction1 = { uiInteraction.setDialogInvisible() },
-            buttonFunction2 = {
-                uiInteraction.addNewDashboard(uiState.inputFieldDashboard.text)
-                uiInteraction.setDialogInvisible()
-            }
-        ) {
-            Text(
-                text = stringResource(id = R.string.enter_dashboard_name_below),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Dimensions.space10.HeightSpacer()
-            InputFieldDashboard(
-                uiState = uiState,
-                uiInteraction = uiInteraction
-            )
-        }
-    }
-
+    AddNewDashboardDialog(uiState, uiInteraction)
     LazyColumn {
-
         if (uiState.userProjectRole != UserProjectRole.View) {
             item {
                 ButtonCommon(
@@ -70,7 +45,37 @@ fun DashboardsScreenContent(
 }
 
 @Composable
-fun InputFieldDashboard(
+private fun AddNewDashboardDialog(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction,
+) {
+    if (uiState.isDialogVisible) {
+        SimpleDialog(
+            title = stringResource(R.string.add_new_dashboard_dialog),
+            buttonText1 = stringResource(id = R.string.cancel),
+            buttonText2 = stringResource(id = R.string.confirm),
+            onCloseDialog = { uiInteraction.setDialogInvisible() },
+            onConfirm = {
+                uiInteraction.addNewDashboard(uiState.inputFieldDashboard.text)
+                uiInteraction.setDialogInvisible()
+            }
+        ) {
+            Text(
+                text = stringResource(id = R.string.enter_dashboard_name_below),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Dimensions.space10.HeightSpacer()
+            InputFieldDashboard(
+                uiState = uiState,
+                uiInteraction = uiInteraction
+            )
+        }
+    }
+}
+
+@Composable
+private fun InputFieldDashboard(
     uiState: ProjectDetailsUiState,
     uiInteraction: ProjectDetailsUiInteraction
 ) {

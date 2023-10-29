@@ -11,8 +11,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import edu.pwr.iotmobile.androidimcs.ui.theme.WidthSpacer
@@ -20,10 +22,10 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.WidthSpacer
 @Composable
 fun SimpleDialog(
     title: String,
-    buttonText1: String,
-    buttonText2: String,
-    buttonFunction1: () -> Unit,
-    buttonFunction2: () -> Unit,
+    buttonText1: String = stringResource(id = R.string.cancel),
+    buttonText2: String = stringResource(id = R.string.confirm),
+    onCloseDialog: () -> Unit,
+    onConfirm: () -> Unit,
     content: @Composable() () -> Unit = {}
 ) {
     Dialog(
@@ -59,14 +61,14 @@ fun SimpleDialog(
                     ButtonCommon(
                         modifier = Modifier.weight(1f),
                         text = buttonText1,
-                        onClick = buttonFunction1,
+                        onClick = onCloseDialog,
                         type = ButtonCommonType.Alternative
                     )
                     Dimensions.space22.WidthSpacer()
                     ButtonCommon(
                         modifier = Modifier.weight(1f),
                         text = buttonText2,
-                        onClick = buttonFunction2
+                        onClick = onConfirm
                     )
                 }
             }

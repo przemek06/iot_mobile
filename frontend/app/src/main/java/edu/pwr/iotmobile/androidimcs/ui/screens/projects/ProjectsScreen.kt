@@ -50,8 +50,8 @@ fun ProjectsScreenContent(
             title = stringResource(R.string.add_new_project_dialog),
             buttonText1 = stringResource(id = R.string.cancel),
             buttonText2 = stringResource(id = R.string.confirm),
-            buttonFunction1 = { uiInteraction.setDialogInvisible() },
-            buttonFunction2 = {
+            onCloseDialog = { uiInteraction.setDialogInvisible() },
+            onConfirm = {
                 uiInteraction.addNewProject(uiState.inputFiled.text)
                 uiInteraction.setDialogInvisible()
             }
