@@ -9,6 +9,7 @@ import edu.pwr.iotmobile.error.exception.UserAlreadyExistsException
 import edu.pwr.iotmobile.error.exception.UserNotFoundException
 import edu.pwr.iotmobile.repositories.UserRepository
 import edu.pwr.iotmobile.enums.ERole
+import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.security.UserDetailsImpl
 import io.mockk.*
 import org.junit.jupiter.api.AfterEach
@@ -83,7 +84,7 @@ internal class UserServiceTest {
         every { userRepository.existsByEmail(EMAIL) } returns true
 
         // when
-        val actual = userService.userExists(EMAIL)
+        val actual = userService.userExistsByEmail(EMAIL)
 
         // then
         assert(actual)
@@ -95,7 +96,7 @@ internal class UserServiceTest {
         every { userRepository.existsByEmail(EMAIL) } returns false
 
         // when
-        val actual = userService.userExists(EMAIL)
+        val actual = userService.userExistsByEmail(EMAIL)
 
         // then
         assert(!actual)
@@ -202,6 +203,7 @@ internal class UserServiceTest {
         val token = mockCorrectToken(user)
         every { verificationTokenService.findActiveByCode(VALID_CODE_STRING) } returns token
         every { userRepository.save(user) } returns user
+        every { verificationTokenService.deleteAllByUserId(user.id!!) } returns Unit
 
         // when
         val actual = userService.verifyUser(VALID_CODE_STRING)
@@ -218,6 +220,7 @@ internal class UserServiceTest {
         val token = mockCorrectToken(user)
         every { verificationTokenService.findActiveByCode(VALID_CODE_STRING) } returns token
         every { userRepository.save(user) } returns user
+        every { verificationTokenService.deleteAllByUserId(user.id!!) } returns Unit
 
         // when
         val actual = userService.verifyUser(VALID_CODE_STRING)
@@ -397,7 +400,7 @@ internal class UserServiceTest {
         every { authentication.principal is UserDetailsImpl } returns false
 
         // then
-        assertThrows<UserNotFoundException> {
+        assertThrows<NoAuthenticationException> {
             userService.getActiveUserInfo()
         }
     }

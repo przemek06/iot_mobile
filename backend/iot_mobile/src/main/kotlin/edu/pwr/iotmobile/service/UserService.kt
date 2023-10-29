@@ -4,11 +4,9 @@ import edu.pwr.iotmobile.dto.EmailDTO
 import edu.pwr.iotmobile.dto.PasswordDTO
 import edu.pwr.iotmobile.dto.UserDTO
 import edu.pwr.iotmobile.dto.UserInfoDTO
-import edu.pwr.iotmobile.error.exception.TokenCodeIncorrectException
-import edu.pwr.iotmobile.error.exception.UserAlreadyExistsException
-import edu.pwr.iotmobile.error.exception.UserNotFoundException
 import edu.pwr.iotmobile.repositories.UserRepository
 import edu.pwr.iotmobile.enums.ERole
+import edu.pwr.iotmobile.error.exception.*
 import edu.pwr.iotmobile.security.UserDetailsImpl
 import org.springframework.beans.BeanUtils
 import org.springframework.security.core.Authentication
@@ -27,12 +25,16 @@ class UserService(
     val passwordEncoder: PasswordEncoder
 ) {
 
-    fun userExists(email: String): Boolean {
+    fun userExistsByEmail(email: String): Boolean {
         return userRepository.existsByEmail(email)
     }
 
+    fun userExistsById(id: Int): Boolean {
+        return userRepository.existsById(id)
+    }
+
     fun createUser(userDTO: UserDTO, role: ERole) : UserDTO {
-        if (userExists(userDTO.email)) {
+        if (userExistsByEmail(userDTO.email)) {
             throw UserAlreadyExistsException()
         }
 
@@ -45,7 +47,7 @@ class UserService(
 
     @Transactional
     fun registerUser(userDTO: UserDTO): UserDTO {
-        if (userExists(userDTO.email)) {
+        if (userExistsByEmail(userDTO.email)) {
             throw UserAlreadyExistsException()
         }
 
@@ -86,14 +88,14 @@ class UserService(
         return SecurityContextHolder.getContext().authentication
     }
 
-    fun getActiveUserId() : Int {
+    fun getActiveUserId() : Int? {
         val authentication: Authentication = getAuthentication()
 
         if (authentication.principal is UserDetailsImpl) {
-            return (authentication.principal as UserDetailsImpl).getId() ?: throw UserNotFoundException()
+            return (authentication.principal as UserDetailsImpl).getId()
         }
 
-        throw UserNotFoundException()
+        return null
     }
 
     fun deleteUserById(id: Int) {
@@ -114,6 +116,11 @@ class UserService(
 
     private fun updateUser(id: Int, user: UserDTO) : UserDTO {
         val toUpdate = userRepository.findUserById(id) ?: throw UserNotFoundException()
+
+        if ((userExistsByEmail(user.email)) and (toUpdate.email != user.email)) {
+            throw UserAlreadyExistsException()
+        }
+
         val password = toUpdate.password
         BeanUtils.copyProperties(user, toUpdate)
         toUpdate.password = password
@@ -127,17 +134,17 @@ class UserService(
     }
 
     fun updateActiveUserPassword(passwordDTO: PasswordDTO) : UserDTO {
-        val id = getActiveUserId()
+        val id = getActiveUserId() ?: throw NoAuthenticationException()
         return updateUserPassword(id, passwordDTO)
     }
 
     fun updateActiveUser(user: UserDTO) : UserDTO {
-        val id = getActiveUserId()
+        val id = getActiveUserId() ?: throw NoAuthenticationException()
         return updateUser(id, user)
     }
 
     fun deleteActiveUser() {
-        val id = getActiveUserId()
+        val id = getActiveUserId() ?: throw NoAuthenticationException()
         userRepository.deleteById(id)
     }
 
@@ -153,7 +160,7 @@ class UserService(
     }
 
     fun getActiveUserInfo() : UserInfoDTO {
-        val id = getActiveUserId()
+        val id = getActiveUserId() ?: throw NoAuthenticationException()
         return getUserInfoById(id)
     }
 

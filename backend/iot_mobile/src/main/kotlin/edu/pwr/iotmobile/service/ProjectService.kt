@@ -25,6 +25,20 @@ class ProjectService(
     val invitationRepository: InvitationRepository,
     val userService: UserService
 ) {
+
+    fun findProjectById(id: Int) : ProjectDTO {
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
+
+        if (!projectRoleRepository.existsByUserIdAndProjectId(userId, id)) {
+            throw NotAllowedException()
+        }
+
+        return projectRepository
+            .findById(id)
+            .orElseThrow { ProjectNotFoundException() }
+            .toDTO()
+    }
+
     private fun findAllProjectsByUserId(userId: Int): List<ProjectDTO> {
         return projectRoleRepository
             .findAllByUserId(userId)
@@ -32,7 +46,7 @@ class ProjectService(
     }
 
     fun findAllProjectsForActiveUser(): List<ProjectDTO> {
-        val userId = userService.getActiveUserId()
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
         return findAllProjectsByUserId(userId)
     }
 
@@ -51,7 +65,7 @@ class ProjectService(
 
     @Transactional
     fun createProject(projectDTO: ProjectDTO): ProjectDTO {
-        val userId = userService.getActiveUserId()
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
 
         if (projectDTO.createdBy != userId) {
             throw NotAllowedException()
@@ -78,7 +92,7 @@ class ProjectService(
     fun findAllUsersByProjectId(projectId: Int): List<UserInfoDTO> {
         val projectUserList = projectRoleRepository.findAllByProjectId(projectId)
         val userIdList = projectUserList.map { it.user.id }
-        val activeUserId = userService.getActiveUserId()
+        val activeUserId = userService.getActiveUserId() ?: throw NoAuthenticationException()
 
         if (!userIdList.contains(activeUserId)) {
             throw NotAllowedException()
@@ -92,8 +106,14 @@ class ProjectService(
         return projectUserList.map { it.toDTO() }
     }
 
+    fun findActiveUserProjectRole(projectId: Int) : ProjectRoleDTO {
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
+        val projectRole = projectRoleRepository.findByUserIdAndProjectId(userId, projectId) ?: throw UserNotFoundException()
+        return projectRole.toDTO()
+    }
+
     fun revokeAccess(projectId: Int, userId: Int): Boolean {
-        val activeUserId = userService.getActiveUserId()
+        val activeUserId = userService.getActiveUserId() ?: throw NoAuthenticationException()
         if ((!isActiveUserProjectAdmin(projectId)) and (userId != activeUserId))
             throw NotAllowedException()
 
@@ -138,7 +158,7 @@ class ProjectService(
     }
 
     fun isActiveUserProjectAdmin(projectId: Int): Boolean {
-        val activeUserId = userService.getActiveUserId()
+        val activeUserId = userService.getActiveUserId() ?: return false
         val projectRole = projectRoleRepository.findByUserIdAndProjectId(activeUserId, projectId)
             ?: return false
 
@@ -148,6 +168,14 @@ class ProjectService(
     fun createInvitation(invitation: InvitationDTO): InvitationDTO {
         if (!isActiveUserProjectAdmin(invitation.projectId))
             throw NotAllowedException()
+
+        if (!userService.userExistsById(invitation.userId)) {
+            throw UserNotFoundException()
+        }
+
+        if (!projectRepository.existsById(invitation.projectId)) {
+            throw ProjectNotFoundException()
+        }
 
         if (pendingInvitationExists(invitation.userId, invitation.projectId))
             throw InvitationAlreadyExistsException()
@@ -164,7 +192,7 @@ class ProjectService(
     }
 
     fun findAllInvitationsForActiveUser(): List<InvitationDTO> {
-        val userId = userService.getActiveUserId()
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
         return findAllInvitationsByUserId(userId)
     }
 
@@ -173,7 +201,7 @@ class ProjectService(
     }
 
     fun findAllPendingInvitationsForActiveUser(): List<InvitationDTO> {
-        val userId = userService.getActiveUserId()
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
         return findAllPendingInvitationsByUserId(userId)
     }
 
@@ -182,7 +210,7 @@ class ProjectService(
             .findById(invitationId)
             .orElseThrow { InvitationNotFoundException() }
 
-        val userId = userService.getActiveUserId()
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
 
         if (invitation.user.id != userId)
             throw NotAllowedException()

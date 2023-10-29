@@ -14,7 +14,7 @@ data class UserDTO(
     @field:Size(min = 8, max = 64)
     val password: String,
     @field:NotNull
-    @field:Size(min = 3, max = 64)
+    @field:Size(max = 64)
     val name: String,
 
 ) {

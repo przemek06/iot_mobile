@@ -7,28 +7,26 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
 @Entity
-@Table(
-    uniqueConstraints = [UniqueConstraint(columnNames = ["project_id", "name"])]
-)
 class Topic (
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     var project: Project,
     var name: String,
+    @Column(unique = true)
+    var uniqueName: String,
     var valueType: EValueType,
-    var isHistoric: Boolean,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?=null
 ) {
-    constructor() : this(Project(), "", EValueType.TEXT, false) {
+    constructor() : this(Project(), "", "", EValueType.TEXT) {
 
     }
-
     fun toDTO() : TopicDTO {
         return  TopicDTO(
-            id, project.id!!, name, valueType, isHistoric
+            id, project.id!!, name, uniqueName, valueType
         )
     }
+
 }
