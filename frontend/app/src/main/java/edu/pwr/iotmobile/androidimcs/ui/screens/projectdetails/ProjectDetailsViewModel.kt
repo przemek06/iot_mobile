@@ -40,20 +40,21 @@ class ProjectDetailsViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var projectId: Int? = null
-    private var userProjectRole: UserProjectRole? = null
+    private var userProjectRole: UserProjectRole? = UserProjectRole.Admin
 
     fun init(navigation: ProjectDetailsNavigation) {
-        val userProjectRole = UserProjectRole.Admin
         if (projectId == null || projectId != navigation.projectId) {
+            val localUserProjectRole = userProjectRole ?: return
+            getDashboards()
             projectId = navigation.projectId
             _uiState.update {
                 it.copy(
                     user = mockUser,
                     members = listOf(mockUser, mockUser, mockUser),
-                    userRoleDescriptionId = getUserRoleDescription(userProjectRole),
-                    userProjectRole = userProjectRole,
-                    userOptionsList = generateUserOptions(userProjectRole, navigation),
-                    menuOptionsList = generateMenuOptions(userProjectRole)
+                    userRoleDescriptionId = getUserRoleDescription(localUserProjectRole),
+                    userProjectRole = localUserProjectRole,
+                    userOptionsList = generateUserOptions(localUserProjectRole, navigation),
+                    menuOptionsList = generateMenuOptions(localUserProjectRole)
                 )
             }
         }
