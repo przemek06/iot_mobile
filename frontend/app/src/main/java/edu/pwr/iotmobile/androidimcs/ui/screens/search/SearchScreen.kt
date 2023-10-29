@@ -60,8 +60,6 @@ private fun SearchScreenContent(
                     uiState.data.dialogTitleAlternative,
                     uiState.selectedUser?.displayName ?: "USER_NAME"
                 ) },
-            buttonText1 = stringResource(id = R.string.cancel),
-            buttonText2 = stringResource(id = R.string.confirm),
             onCloseDialog = { uiInteraction.setDialogInvisible() },
             onConfirm = {
                 if (!alternative) {

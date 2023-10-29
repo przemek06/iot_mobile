@@ -48,8 +48,6 @@ fun ProjectsScreenContent(
     if (uiState.isDialogVisible) {
         SimpleDialog(
             title = stringResource(R.string.add_new_project_dialog),
-            buttonText1 = stringResource(id = R.string.cancel),
-            buttonText2 = stringResource(id = R.string.confirm),
             onCloseDialog = { uiInteraction.setDialogInvisible() },
             onConfirm = {
                 uiInteraction.addNewProject(uiState.inputFiled.text)

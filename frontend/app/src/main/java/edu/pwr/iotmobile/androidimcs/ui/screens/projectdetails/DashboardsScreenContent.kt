@@ -52,8 +52,6 @@ private fun AddNewDashboardDialog(
     if (uiState.isDialogVisible) {
         SimpleDialog(
             title = stringResource(R.string.add_new_dashboard_dialog),
-            buttonText1 = stringResource(id = R.string.cancel),
-            buttonText2 = stringResource(id = R.string.confirm),
             onCloseDialog = { uiInteraction.setDialogInvisible() },
             onConfirm = {
                 uiInteraction.addNewDashboard(uiState.inputFieldDashboard.text)

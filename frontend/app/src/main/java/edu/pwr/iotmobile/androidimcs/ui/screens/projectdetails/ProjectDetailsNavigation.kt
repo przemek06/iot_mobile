@@ -11,13 +11,13 @@ interface ProjectDetailsNavigation {
 
     fun openDashboardScreen(id: Int)
     fun openAddTopic()
+    fun onReturn()
 
     companion object {
         fun default(
             navController: NavHostController,
             navBackStackEntry: NavBackStackEntry
-        ) =
-            object : ProjectDetailsNavigation {
+        ) = object : ProjectDetailsNavigation {
                 override val projectId: Int?
                     get() = navBackStackEntry.getArguments().getOrNull(0)?.toInt()
 
@@ -27,6 +27,10 @@ interface ProjectDetailsNavigation {
 
                 override fun openAddTopic() {
                     navController.navigate(Screen.AddTopic.path)
+                }
+
+                override fun onReturn() {
+                    navController.popBackStack()
                 }
 
             }

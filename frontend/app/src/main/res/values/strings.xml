@@ -7,11 +7,11 @@
     <string name="projects">Projects</string>
     <string name="account">Account</string>
     <string name="add_new_project">+ Add new project</string>
-    <string name="add_new_project_dialog">Add new project</string>
+    <string name="add_new_project_dialog">Add a new project</string>
     <string name="add_new_topic">+ Add new topic</string>
-    <string name="add_new_topic_dialog">Add new topic</string>
+    <string name="add_new_topic_dialog">Add a new topic</string>
     <string name="add_new_dashboard">+ Add new dashboard</string>
-    <string name="add_new_dashboard_dialog">Add new dashboard</string>
+    <string name="add_new_dashboard_dialog">Add a new dashboard</string>
     <string name="add_new_group">+ Add new group</string>
     <string name="add_new_component">+ Add new component</string>
     <string name="how_to_access">How to access?</string>
@@ -44,9 +44,9 @@
     <string name="return_text">Return</string>
     <string name="search">Search</string>
     <string name="close">Close</string>
-    <string name="enter_project_name">Enter project name below</string>
-    <string name="enter_dashboard_name_below">Enter dashboard name below</string>
-    <string name="enter_topic_name_below">Enter topic name below</string>
+    <string name="enter_project_name">Enter a project name below</string>
+    <string name="enter_dashboard_name_below">Enter a dashboard name below</string>
+    <string name="enter_topic_name_below">Enter a topic name below</string>
     <string name="add_topic">Add topic</string>
     <string name="enter_topic_name">Enter topic name</string>
     <string name="select_data_type">Select data type</string>
