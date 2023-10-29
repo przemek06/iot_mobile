@@ -32,4 +32,11 @@ class QueueController(
         queueService.sendMessage(queueName, message)
         return ResponseEntity.ok(message)
     }
+
+    @PostMapping("/test")
+    fun registerTestQueue(@RequestBody queueName: String): ResponseEntity<String> {
+        queueService.addTestQueue(queueName)
+        return ResponseEntity.ok(queueName)
+    }
+
 }
