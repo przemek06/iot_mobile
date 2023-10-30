@@ -1,6 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,34 +20,33 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.extensions.firstUppercaseRestLowercase
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.components.InfoDialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 
 @Composable
 fun TopicsScreenContent(
     uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiInteraction: ProjectDetailsUiInteraction,
+    navigation: ProjectDetailsNavigation
 ) {
+    TopicAccessDialog(uiState, uiInteraction)
     LazyColumn {
-
         if (uiState.userProjectRole != UserProjectRole.View) {
             item {
                 ButtonCommon(
                     text = stringResource(id = R.string.how_to_access),
                     type = ButtonCommonType.Alternative
-                ) {
-                    Log.d("button", "button pressed")
-                }
+                ) { uiInteraction.setInfoVisible() }
                 Dimensions.space10.HeightSpacer()
                 ButtonCommon(
                     text = stringResource(id = R.string.add_new_topic),
                     type = ButtonCommonType.Secondary
-                ) {
-                    Log.d("button", "button pressed")
-                }
+                ) { navigation.openAddTopic() }
                 Dimensions.space30.HeightSpacer()
             }
         }
@@ -56,17 +54,42 @@ fun TopicsScreenContent(
         items(uiState.topics) {
             if (uiState.userProjectRole == UserProjectRole.View) {
                 NonErasableBlock(
-                    primaryText = "Topic 1",
-                    secondaryText = "Float",
+                    primaryText = it.title + ": " + it.name,
+                    secondaryText = it.dataType.name.firstUppercaseRestLowercase(),
                 )
             } else {
                 ErasableBlock(
-                    primaryText = "Topic 1",
-                    secondaryText = "Float",
+                    primaryText = it.title + ": " + it.name,
+                    secondaryText = it.dataType.name.firstUppercaseRestLowercase(),
                     onErase = {}
                 )
             }
             Dimensions.space14.HeightSpacer()
+        }
+    }
+}
+
+@Composable
+private fun TopicAccessDialog(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction
+) {
+    if(uiState.isInfoVisible) {
+        InfoDialog(
+            title = stringResource(id = R.string.how_to_access_1),
+            buttonFunction = { uiInteraction.setInfoInvisible() }
+        ) {
+            Text(
+                text = stringResource(id = R.string.how_to_access_2),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Dimensions.space22.HeightSpacer()
+            Text(
+                text = stringResource(id = R.string.how_to_access_3),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }
@@ -78,7 +101,6 @@ private fun ErasableBlock(
     onErase: () -> Unit
 ) {
     Block(
-        text = "Block",
         onClick = {}
     ) {
         Box(
@@ -110,7 +132,6 @@ private fun NonErasableBlock(
     secondaryText: String? = null,
 ) {
     Block(
-        text = "Block",
         onClick = {}
     ) {
         Box(

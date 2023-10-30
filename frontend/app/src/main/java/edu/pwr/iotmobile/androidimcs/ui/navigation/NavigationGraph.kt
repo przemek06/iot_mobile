@@ -5,15 +5,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
@@ -27,6 +31,8 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNav
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchScreen
 
 @Composable
 fun NavGraph(
@@ -35,7 +41,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Admin.path,
+        startDestination = Screen.Login.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -69,6 +75,13 @@ fun NavGraph(
             )
         }
 
+        composable(Screen.AddTopic.path) {
+            AddTopicScreen(navigation = AddTopicNavigation.default(
+                navController = navController,
+                navBackStackEntry = it
+            ))
+        }
+
         composable(Screen.Login.path) {
             LoginScreen(
                 navigation = LoginNavigation.default(navController)
@@ -98,6 +111,24 @@ fun NavGraph(
 
         composable(Screen.Admin.path) {
             AdminScreen(navigation = AdminNavigation.default(navController))
+        }
+
+        composable(Screen.Search.path) {
+            SearchScreen(
+                navigation = SearchNavigation.default(
+                    navController = navController,
+                    navBackStackEntry = it
+                )
+            )
+        }
+
+        composable(Screen.Dashboard.path) {
+            DashboardScreen(
+                navigation = DashboardNavigation.default(
+                    navController = navController,
+                    navBackStackEntry = it
+                )
+            )
         }
     }
 }

@@ -10,28 +10,57 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 class ErrorHandler : ResponseEntityExceptionHandler() {
 
-    @ExceptionHandler(UserNotFoundException::class, TokenNotFoundException::class)
+    @ExceptionHandler(
+        DashboardNotFoundException::class,
+        UserNotFoundException::class,
+        TokenNotFoundException::class,
+        ProjectNotFoundException::class,
+        InvitationNotFoundException::class
+    )
     fun handleNotFound(ex: Exception): ResponseEntity<String> {
         logError(ex)
         return ResponseEntity(ex.message, HttpStatus.NOT_FOUND)
     }
 
-    @ExceptionHandler(UserAlreadyExistsException::class)
+    @ExceptionHandler(
+        InvalidDataException::class,
+        QueueException::class,
+        ChannelException::class
+        )
     fun handleBadRequest(ex: Exception): ResponseEntity<String> {
         logError(ex)
         return ResponseEntity(ex.message, HttpStatus.BAD_REQUEST)
     }
 
-    @ExceptionHandler(TokenCodeIncorrectException::class)
+    @ExceptionHandler(NoAuthenticationException::class)
     fun handleUnauthorized(ex: Exception): ResponseEntity<String> {
         logError(ex)
         return ResponseEntity(ex.message, HttpStatus.UNAUTHORIZED)
     }
 
-    @ExceptionHandler(QueueException::class, ChannelException::class)
-    fun handleRabbitError(ex: Exception): ResponseEntity<String> {
+    @ExceptionHandler(TokenCodeIncorrectException::class, NotAllowedException::class)
+    fun handleForbidden(ex: Exception): ResponseEntity<String> {
         logError(ex)
-        return ResponseEntity(ex.message, HttpStatus.BAD_REQUEST)
+        return ResponseEntity(ex.message, HttpStatus.FORBIDDEN)
+    }
+
+    @ExceptionHandler(
+        InvitationNotPendingException::class,
+        UserAlreadyExistsException::class,
+        InvitationAlreadyExistsException::class,
+        UserAlreadyInProjectException::class,
+        TopicAlreadyExistsException::class,
+        DashboardAlreadyExistsException::class
+    )
+    fun handleConflict(ex: Exception): ResponseEntity<String> {
+        logError(ex)
+        return ResponseEntity(ex.message, HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(InvalidStateException::class)
+    fun handleInternalServerError(ex: Exception): ResponseEntity<String> {
+        logError(ex)
+        return ResponseEntity(ex.message, HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
     private fun logError(ex: Exception) {

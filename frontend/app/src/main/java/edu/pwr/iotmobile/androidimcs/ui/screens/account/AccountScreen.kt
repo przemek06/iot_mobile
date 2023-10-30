@@ -54,17 +54,15 @@ private fun AccountScreenContent(
     uiState: AccountUiState,
     uiInteraction: AccountUiInteraction
 ) {
-    var isDisplayNameDialogVisible = remember { mutableStateOf(false) }
-    var isLogOutDialogVisible = remember { mutableStateOf(false) }
-    var isDeleteAccountDialogVisible = remember { mutableStateOf(false) }
+    val isDisplayNameDialogVisible = remember { mutableStateOf(false) }
+    val isLogOutDialogVisible = remember { mutableStateOf(false) }
+    val isDeleteAccountDialogVisible = remember { mutableStateOf(false) }
 
     if (isDisplayNameDialogVisible.value) {
         SimpleDialog(
             title = stringResource(id = R.string.enter_new_display_name),
-            buttonText1 = stringResource(id = R.string.cancel),
-            buttonText2 = stringResource(id = R.string.confirm),
-            buttonFunction1 = { isDisplayNameDialogVisible.value = false },
-            buttonFunction2 = {
+            onCloseDialog = { isDisplayNameDialogVisible.value = false },
+            onConfirm = {
                 uiInteraction.setDisplayName(uiState.inputField.text)
                 isDisplayNameDialogVisible.value = false
             },
@@ -74,19 +72,19 @@ private fun AccountScreenContent(
     if (isLogOutDialogVisible.value) {
         SimpleDialog(
             title = stringResource(id = R.string.u_sure_logout),
-            buttonText1 = stringResource(id = R.string.no),
-            buttonText2 = stringResource(id = R.string.yes),
-            buttonFunction1 = { isLogOutDialogVisible.value = false },
-            buttonFunction2 = { isLogOutDialogVisible.value = false }
+            closeButtonText = stringResource(id = R.string.no),
+            confirmButtonText = stringResource(id = R.string.yes),
+            onCloseDialog = { isLogOutDialogVisible.value = false },
+            onConfirm = { isLogOutDialogVisible.value = false }
         )
     }
     if (isDeleteAccountDialogVisible.value) {
         SimpleDialog(
             title = stringResource(id = R.string.u_sure_delete_account),
-            buttonText1 = stringResource(id = R.string.no),
-            buttonText2 = stringResource(id = R.string.yes),
-            buttonFunction1 = { isDeleteAccountDialogVisible.value = false },
-            buttonFunction2 = { isDeleteAccountDialogVisible.value = false },
+            closeButtonText = stringResource(id = R.string.no),
+            confirmButtonText = stringResource(id = R.string.yes),
+            onCloseDialog = { isDeleteAccountDialogVisible.value = false },
+            onConfirm = { isDeleteAccountDialogVisible.value = false },
             content = { AccountDeletionContent() }
         )
     }

@@ -8,7 +8,8 @@ import edu.pwr.iotmobile.error.exception.TokenCodeIncorrectException
 import edu.pwr.iotmobile.error.exception.UserAlreadyExistsException
 import edu.pwr.iotmobile.error.exception.UserNotFoundException
 import edu.pwr.iotmobile.repositories.UserRepository
-import edu.pwr.iotmobile.security.Role
+import edu.pwr.iotmobile.enums.ERole
+import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.security.UserDetailsImpl
 import io.mockk.*
 import org.junit.jupiter.api.AfterEach
@@ -83,7 +84,7 @@ internal class UserServiceTest {
         every { userRepository.existsByEmail(EMAIL) } returns true
 
         // when
-        val actual = userService.userExists(EMAIL)
+        val actual = userService.userExistsByEmail(EMAIL)
 
         // then
         assert(actual)
@@ -95,7 +96,7 @@ internal class UserServiceTest {
         every { userRepository.existsByEmail(EMAIL) } returns false
 
         // when
-        val actual = userService.userExists(EMAIL)
+        val actual = userService.userExistsByEmail(EMAIL)
 
         // then
         assert(!actual)
@@ -107,12 +108,12 @@ internal class UserServiceTest {
         val user = mockUser()
         val userDTO: UserDTO = mockk()
         every { userDTO.email } returns EMAIL
-        every { userDTO.toEntity(Role.ADMIN_ROLE) } returns user
+        every { userDTO.toEntity(ERole.ADMIN_ROLE) } returns user
         every { userRepository.existsByEmail(EMAIL) } returns true
 
         // then
         assertThrows<UserAlreadyExistsException> {
-            userService.createUser(userDTO, Role.USER_ROLE)
+            userService.createUser(userDTO, ERole.USER_ROLE)
         }
     }
 
@@ -121,14 +122,14 @@ internal class UserServiceTest {
         // given
         val user = mockUser()
         val userDTO: UserDTO = mockk()
-        every { userDTO.toEntity(Role.ADMIN_ROLE) } returns user
+        every { userDTO.toEntity(ERole.ADMIN_ROLE) } returns user
         every { userDTO.email } returns EMAIL
         every { userRepository.existsByEmail(EMAIL) } returns false
         every { passwordEncoder.encode(NOT_ENCODED_PASSWORD) } returns ENCODED_PASSWORD
         every { userRepository.save(any()) } returns user
 
         // when
-        val actual = userService.createUser(userDTO, Role.ADMIN_ROLE)
+        val actual = userService.createUser(userDTO, ERole.ADMIN_ROLE)
 
         // then
         assertEquals(EMAIL, actual.email)
@@ -141,14 +142,14 @@ internal class UserServiceTest {
         // given
         val user = mockUser()
         val userDTO: UserDTO = mockk()
-        every { userDTO.toEntity(Role.USER_ROLE) } returns user
+        every { userDTO.toEntity(ERole.USER_ROLE) } returns user
         every { userDTO.email } returns EMAIL
         every { userRepository.existsByEmail(EMAIL) } returns false
         every { passwordEncoder.encode(NOT_ENCODED_PASSWORD) } returns ENCODED_PASSWORD
         every { userRepository.save(any()) } returns user
 
         // when
-        val actual = userService.createUser(userDTO, Role.USER_ROLE)
+        val actual = userService.createUser(userDTO, ERole.USER_ROLE)
 
         // then
         assertEquals(EMAIL, actual.email)
@@ -174,7 +175,7 @@ internal class UserServiceTest {
         val actual = userService.registerUser(userDTO)
 
         // then
-        assertEquals(Role.USER_ROLE, user.role)
+        assertEquals(ERole.USER_ROLE, user.role)
         assertEquals(EMAIL, actual.email)
         assertEquals(ENCODED_PASSWORD, actual.password)
         assertEquals(NAME, actual.name)
@@ -186,7 +187,7 @@ internal class UserServiceTest {
         val user = mockUser()
         val userDTO: UserDTO = mockk()
         every { userDTO.email } returns EMAIL
-        every { userDTO.toEntity(Role.ADMIN_ROLE) } returns user
+        every { userDTO.toEntity(ERole.ADMIN_ROLE) } returns user
         every { userRepository.existsByEmail(EMAIL) } returns true
 
         // then
@@ -202,6 +203,7 @@ internal class UserServiceTest {
         val token = mockCorrectToken(user)
         every { verificationTokenService.findActiveByCode(VALID_CODE_STRING) } returns token
         every { userRepository.save(user) } returns user
+        every { verificationTokenService.deleteAllByUserId(user.id!!) } returns Unit
 
         // when
         val actual = userService.verifyUser(VALID_CODE_STRING)
@@ -218,6 +220,7 @@ internal class UserServiceTest {
         val token = mockCorrectToken(user)
         every { verificationTokenService.findActiveByCode(VALID_CODE_STRING) } returns token
         every { userRepository.save(user) } returns user
+        every { verificationTokenService.deleteAllByUserId(user.id!!) } returns Unit
 
         // when
         val actual = userService.verifyUser(VALID_CODE_STRING)
@@ -273,7 +276,7 @@ internal class UserServiceTest {
 
         // then
         assertThrows<UserNotFoundException> {
-            userService.changeUserRole(USER_ID, Role.ADMIN_ROLE)
+            userService.changeUserRole(USER_ID, ERole.ADMIN_ROLE)
         }
     }
 
@@ -285,10 +288,10 @@ internal class UserServiceTest {
         every { userRepository.save(user) } returns user
 
         // when
-        val actual = userService.changeUserRole(USER_ID, Role.USER_ROLE)
+        val actual = userService.changeUserRole(USER_ID, ERole.USER_ROLE)
 
         // then
-        assertEquals(Role.USER_ROLE, actual.role)
+        assertEquals(ERole.USER_ROLE, actual.role)
     }
 
     @Test
@@ -299,10 +302,10 @@ internal class UserServiceTest {
         every { userRepository.save(user) } returns user
 
         // when
-        val actual = userService.changeUserRole(USER_ID, Role.ADMIN_ROLE)
+        val actual = userService.changeUserRole(USER_ID, ERole.ADMIN_ROLE)
 
         // then
-        assertEquals(Role.ADMIN_ROLE, actual.role)
+        assertEquals(ERole.ADMIN_ROLE, actual.role)
     }
 
     @Test
@@ -353,7 +356,7 @@ internal class UserServiceTest {
         assertEquals(USER_ID, actual[0].id)
         assertEquals(EMAIL, actual[0].email)
         assertEquals(NAME, actual[0].name)
-        assertEquals(Role.USER_ROLE, actual[0].role)
+        assertEquals(ERole.USER_ROLE, actual[0].role)
         assertEquals(false, actual[0].isBlocked)
         assertEquals(false, actual[0].isActive)
 
@@ -383,7 +386,7 @@ internal class UserServiceTest {
         assertEquals(USER_ID, actual.id)
         assertEquals(EMAIL, actual.email)
         assertEquals(NAME, actual.name)
-        assertEquals(Role.USER_ROLE, actual.role)
+        assertEquals(ERole.USER_ROLE, actual.role)
         assertEquals(false, actual.isBlocked)
         assertEquals(false, actual.isActive)
     }
@@ -397,7 +400,7 @@ internal class UserServiceTest {
         every { authentication.principal is UserDetailsImpl } returns false
 
         // then
-        assertThrows<UserNotFoundException> {
+        assertThrows<NoAuthenticationException> {
             userService.getActiveUserInfo()
         }
     }
@@ -434,7 +437,7 @@ internal class UserServiceTest {
         assertEquals(USER_ID, actual.id)
         assertEquals(EMAIL, actual.email)
         assertEquals(NAME, actual.name)
-        assertEquals(Role.USER_ROLE, actual.role)
+        assertEquals(ERole.USER_ROLE, actual.role)
         assertEquals(false, actual.isBlocked)
         assertEquals(false, actual.isActive)
     }

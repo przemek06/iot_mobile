@@ -1,18 +1,31 @@
 package edu.pwr.iotmobile.entities
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import java.time.LocalDateTime
+import edu.pwr.iotmobile.dto.DashboardDTO
+import jakarta.persistence.*
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 
 @Entity
+@Table(
+    uniqueConstraints = [UniqueConstraint(columnNames = ["project_id", "name"])]
+)
 class Dashboard (
-    var projectId: Int,
+    @ManyToOne
+    @JoinColumn(name = "project_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    var project: Project,
     var name: String,
-    var createdBy: Int,
-    var createdAt: LocalDateTime,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?=null
-)
+) {
+    constructor() : this(Project(), "")
+
+    fun toDTO() : DashboardDTO {
+        return DashboardDTO(
+            id,  name, project.id!!
+        )
+    }
+
+
+}

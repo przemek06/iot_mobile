@@ -4,7 +4,8 @@ data class User(
     val id: String,
     val displayName: String,
     val email: String,
-    val role: UserRole
+    val role: UserRole,
+    val isBlocked: Boolean = false
 )
 
 enum class UserRole {
@@ -14,6 +15,6 @@ enum class UserRole {
 
 enum class UserProjectRole {
     View,
-    Modify,
+    Editor,
     Admin
 }

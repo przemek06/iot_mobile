@@ -2,7 +2,7 @@ package edu.pwr.iotmobile.entities
 
 import edu.pwr.iotmobile.dto.UserDTO
 import edu.pwr.iotmobile.dto.UserInfoDTO
-import edu.pwr.iotmobile.security.Role
+import edu.pwr.iotmobile.enums.ERole
 import jakarta.persistence.*
 
 @Entity(name = "_user")
@@ -12,7 +12,7 @@ class User (
     @Column(nullable = false)
     var password: String,
     @Column(nullable = false)
-    var role: Role,
+    var role: ERole,
     @Column(nullable = false)
     var name: String,
     @Column(nullable = false)
@@ -22,8 +22,8 @@ class User (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?=null
-) {
-    constructor() : this("", "", Role.USER_ROLE, "", false, false)
+    ) {
+    constructor() : this("", "", ERole.USER_ROLE, "", false, false)
 
     fun toUserDTO() : UserDTO {
         return UserDTO(email, password, name)

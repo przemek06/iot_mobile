@@ -23,7 +23,7 @@ class Project (
 
     fun toDTO() : ProjectDTO {
         return ProjectDTO(
-            id, name, createdBy.toUserInfoDTO(), connectionKey
+            id, name, createdBy.id!!, connectionKey
         )
     }
 }

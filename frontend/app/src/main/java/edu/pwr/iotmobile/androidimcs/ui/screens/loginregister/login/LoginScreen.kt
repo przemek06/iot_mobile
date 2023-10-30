@@ -22,11 +22,12 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
+import edu.pwr.iotmobile.androidimcs.ui.components.PasswordInputField
 import edu.pwr.iotmobile.androidimcs.ui.components.TextLink
-import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
@@ -39,7 +40,13 @@ fun LoginScreen(navigation: LoginNavigation) {
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        // TODO: navigate to main screen based on event type.
+        when (it) {
+            LoginViewModel.LOGIN_SUCCESS_EVENT -> navigation.openMainScreen()
+            LoginViewModel.LOGIN_ACCOUNT_INACTIVE_EVENT ->
+                uiState.inputFields[LoginViewModel.InputFieldType.Email]?.text?.let {e ->
+                    navigation.openAccountInactiveScreen(e)
+                }
+        }
     }
     viewModel.toast.CollectToast(context)
 
@@ -84,13 +91,23 @@ private fun LoginScreenContent(
         // Input fields
         uiState.inputFields.forEach { inputField ->
             val data = inputField.value
-            InputField(
-                text = data.text,
-                label = stringResource(id = data.label),
-                errorText = stringResource(id = data.errorMessage),
-                isError = data.isError,
-                onValueChange = { uiInteraction.onTextChange(inputField.key, it) }
-            )
+
+            if (inputField.key == LoginViewModel.InputFieldType.Password) {
+                PasswordInputField(
+                    text = data.text,
+                    label = stringResource(id = data.label),
+                    errorText = stringResource(id = data.errorMessage),
+                    isError = data.isError,
+                    onValueChange = { uiInteraction.onTextChange(inputField.key, it) })
+            } else {
+                InputField(
+                    text = data.text,
+                    label = stringResource(id = data.label),
+                    errorText = stringResource(id = data.errorMessage),
+                    isError = data.isError,
+                    onValueChange = { uiInteraction.onTextChange(inputField.key, it) }
+                )
+            }
             Dimensions.space18.HeightSpacer()
         }
 

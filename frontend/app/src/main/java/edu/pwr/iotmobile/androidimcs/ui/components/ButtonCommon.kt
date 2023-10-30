@@ -25,6 +25,7 @@ enum class ButtonCommonType {
 
 @Composable
 fun ButtonCommon(
+    modifier: Modifier = Modifier,
     text: String,
     type: ButtonCommonType = ButtonCommonType.Primary,
     width: Dp? = null,
@@ -53,9 +54,9 @@ fun ButtonCommon(
     ) else null
 
     Button(
-        modifier = Modifier
-            .conditional(width != null) { width?.let { width(it) } ?: run { Modifier } },
-        shape = MaterialTheme.shapes.small,
+        modifier = modifier
+            .conditional(width != null) { width?.let { width(it) } ?: run { modifier } },
+        shape = MaterialTheme.shapes.medium,
         colors = colors,
         border = border,
         contentPadding = PaddingValues(horizontal = Dimensions.space22, vertical = Dimensions.space14),
@@ -65,8 +66,9 @@ fun ButtonCommon(
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = textColor
+            fontWeight = FontWeight.Medium,
+            color = textColor,
+            maxLines = 1
         )
     }
 }

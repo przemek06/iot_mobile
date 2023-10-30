@@ -1,22 +1,30 @@
 package edu.pwr.iotmobile.entities
 
+import edu.pwr.iotmobile.dto.ComponentDTO
+import edu.pwr.iotmobile.enums.EComponentType
+import edu.pwr.iotmobile.listener.TriggerComponentEntityListener
 import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import java.time.LocalDateTime
+import jakarta.persistence.EntityListeners
+import jakarta.persistence.OneToOne
 
 @Entity
-class TriggerComponent (
-    var dashboardId: Int,
-    var eventSourceId: Int,
-    var actionDestId: Int,
-    var type: String,
-    var size: Int,
-    var tsLastEvent: LocalDateTime,
-    var xCoordinate: Int,
-    var yCoordinate: Int,
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int?=null
-)
+class TriggerComponent(
+    @OneToOne
+    var eventSource: EventSource,
+    @OneToOne
+    var actionDestination: ActionDestination,
+) : Component() {
+    constructor() : this(EventSource(), ActionDestination())
+
+    fun toDTO(): ComponentDTO {
+        return ComponentDTO(
+            id,
+            EComponentType.TRIGGER,
+            type,
+            size,
+            index,
+            actionDestinationDTO = actionDestination.toDTO(),
+            eventSourceDTO = eventSource.toDTO()
+        )
+    }
+}

@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.security
 
+import edu.pwr.iotmobile.enums.ERole
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -48,8 +49,8 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.invoke {
             authorizeRequests {
-                authorize("/user/**", hasAuthority(Role.USER_ROLE.name))
-                authorize("/admin/**", hasAuthority(Role.ADMIN_ROLE.name))
+                authorize("/user/**", hasAuthority(ERole.USER_ROLE.name))
+                authorize("/admin/**", hasAuthority(ERole.ADMIN_ROLE.name))
                 authorize("/anon/**", permitAll)
                 authorize("/login", permitAll)
                 authorize("/logout", permitAll)

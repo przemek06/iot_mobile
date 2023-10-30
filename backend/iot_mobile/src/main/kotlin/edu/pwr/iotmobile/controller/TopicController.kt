@@ -1,33 +1,27 @@
 package edu.pwr.iotmobile.controller
 
 import edu.pwr.iotmobile.dto.TopicDTO
-import edu.pwr.iotmobile.entities.Topic
-import edu.pwr.iotmobile.repositories.TopicRepository
 import edu.pwr.iotmobile.service.TopicService
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/topics")
-class TopicController(
-
-    val topicService: TopicService
-) {
-
-    @PostMapping
-    fun registerTopic(@RequestBody topicDTO: TopicDTO): ResponseEntity<TopicDTO>{
-        val topic: Topic = topicService.addTopic(topicDTO.toEntity())
-        return ResponseEntity.ok(topic.toDTO())
+class TopicController(val topicService: TopicService) {
+    // 400, 401, 403, 409
+    @PostMapping("/user/topic")
+    fun createTopic(@Valid @RequestBody topic: TopicDTO): ResponseEntity<TopicDTO> {
+        return ResponseEntity.ok(topicService.createTopic(topic))
     }
-
-    @GetMapping
-    fun getAllTopics(): ResponseEntity<List<TopicDTO>>{
-        val topics: List<Topic> = topicService.getAllTopics()
-        return ResponseEntity.ok(topics.map{it.toDTO()})
+    // 400, 401, 403
+    @DeleteMapping("/user/topic/{topicId}")
+    fun deleteTopic(@PathVariable topicId: Int): ResponseEntity<Unit> {
+        return if (topicService.deleteTopic(topicId)) ResponseEntity.ok().build()
+        else ResponseEntity.noContent().build()
     }
-
+    // 400, 401, 403
+    @GetMapping("/user/topic/{projectId}")
+    fun findAllTopicsInProject(@PathVariable projectId: Int) : ResponseEntity<List<TopicDTO>> {
+        return ResponseEntity.ok(topicService.findAllTopicsInProject(projectId))
+    }
 }

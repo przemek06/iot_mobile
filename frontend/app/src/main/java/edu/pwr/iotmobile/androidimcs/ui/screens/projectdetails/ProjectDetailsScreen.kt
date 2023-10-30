@@ -33,18 +33,10 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
 
-private val TABS = listOf(
-    R.string.dashboards,
-    R.string.topics,
-    R.string.group
-)
-
 @Composable
 fun ProjectDetailsScreen(
     navigation: ProjectDetailsNavigation
 ) {
-    Log.d("nav", "project id:")
-    navigation.projectId?.let { Log.d("nav", it) }
     val viewModel = koinViewModel<ProjectDetailsViewModel>()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -54,73 +46,80 @@ fun ProjectDetailsScreen(
 
     ProjectDetailsScreenContent(
         uiState = uiState,
-        uiInteraction = ProjectDetailsUiInteraction.default(viewModel)
+        uiInteraction = ProjectDetailsUiInteraction.default(viewModel),
+        navigation = navigation
     )
 }
 
 @Composable
 private fun ProjectDetailsScreenContent(
     uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiInteraction: ProjectDetailsUiInteraction,
+    navigation: ProjectDetailsNavigation
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Dimensions.space22)
-    ) {
+    Column {
         TopBar(
             menuItems = uiState.menuOptionsList,
-            onReturn = { /*TODO*/ }
+            onReturn = { navigation.onReturn() }
         )
-        Dimensions.space10.HeightSpacer()
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = Dimensions.space22)
         ) {
-            Text(
-                text = "Project 1",
-                style = MaterialTheme.typography.titleSmall
-            )
-            if (uiState.userProjectRole != UserProjectRole.View) {
-                ButtonCommon(
-                    text = stringResource(id = R.string.show_access),
-                    type = ButtonCommonType.Alternative
-                ) {
-                    Log.d("button", "button pressed")
+            Dimensions.space10.HeightSpacer()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Project 1",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                if (uiState.userProjectRole != UserProjectRole.View) {
+                    ButtonCommon(
+                        text = stringResource(id = R.string.show_access),
+                        type = ButtonCommonType.Alternative
+                    ) {
+                        Log.d("button", "button pressed")
+                    }
                 }
             }
-        }
-        Dimensions.space10.HeightSpacer()
-        TabRow(selectedTabIndex = uiState.selectedTabIndex) {
-            TABS.forEachIndexed { index, title ->
-                Tab(text = { Text(
-                    text = stringResource(id = title),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onBackground
-                ) },
-                    selected = uiState.selectedTabIndex == index,
-                    onClick = { uiInteraction.setSelectedTabIndex(index) }
-                )
+            Dimensions.space10.HeightSpacer()
+            TabRow(selectedTabIndex = uiState.selectedTabIndex) {
+                ProjectDetailsViewModel.ProjectTab.values().forEach { tab ->
+                    Tab(text = {
+                        Text(
+                            text = stringResource(id = tab.labelId),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    },
+                        selected = uiState.selectedTabIndex == tab.index,
+                        onClick = { uiInteraction.setSelectedTabIndex(tab) }
+                    )
+                }
             }
-        }
-        Dimensions.space22.HeightSpacer()
+            Dimensions.space22.HeightSpacer()
 
-        TabContent(uiState = uiState, uiInteraction = uiInteraction)
+            TabContent(uiState, uiInteraction, navigation)
+        }
     }
 }
 
 @Composable
 private fun TabContent(
     uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiInteraction: ProjectDetailsUiInteraction,
+    navigation: ProjectDetailsNavigation
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 0) {
-            DashboardsScreenContent(uiState, uiInteraction)
+            DashboardsScreenContent(uiState, uiInteraction, navigation)
         }
         AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 1) {
-            TopicsScreenContent(uiState, uiInteraction)
+            TopicsScreenContent(uiState, uiInteraction, navigation)
         }
         AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 2) {
             GroupScreenContent(uiState, uiInteraction)

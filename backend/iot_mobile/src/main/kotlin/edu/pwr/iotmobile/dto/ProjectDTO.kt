@@ -1,21 +1,24 @@
 package edu.pwr.iotmobile.dto
 
 import edu.pwr.iotmobile.entities.Project
-import edu.pwr.iotmobile.security.Role
+import edu.pwr.iotmobile.entities.User
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
 data class ProjectDTO(
     val id: Int?=null,
     @field:NotNull
-    @field:Size(min = 3, max = 64)
+    @field:Size(max = 64)
     val name: String,
-    val createdBy: UserInfoDTO,
+    @field:NotNull
+    val createdBy: Int,
     val connectionKey: String?,
 ) {
     fun toEntity() : Project {
+        val user = User()
+        user.id = createdBy
         return Project(
-            name, createdBy.toEntity(Role.USER_ROLE), connectionKey ?: "", id
+            name, user, connectionKey ?: "", id
         )
     }
 }

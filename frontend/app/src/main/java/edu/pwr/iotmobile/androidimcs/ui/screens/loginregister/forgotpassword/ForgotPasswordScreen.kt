@@ -17,18 +17,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
-import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
@@ -39,11 +40,41 @@ fun ForgotPasswordScreen(navigation: ForgotPasswordNavigation) {
     val uiState by viewModel.uiState.collectAsState()
     val uiInteraction = ForgotPasswordUiInteraction.default(viewModel)
 
-    ForgotPasswordScreenContent(
-        uiState = uiState,
-        uiInteraction = uiInteraction,
-        navigation = navigation
-    )
+    val context = LocalContext.current
+    viewModel.toast.CollectToast(context)
+
+    if (uiState.isSuccess) {
+        ForgotPasswordSuccess(navigation)
+    } else {
+        ForgotPasswordScreenContent(
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            navigation = navigation
+        )
+    }
+}
+
+@Composable
+private fun ForgotPasswordSuccess(
+    navigation: ForgotPasswordNavigation
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(id = R.string.s16),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+            lineHeight = 34.sp
+        )
+        Dimensions.space30.HeightSpacer()
+        ButtonCommon(text = stringResource(id = R.string.return_text)) {
+            navigation.onReturn()
+        }
+    }
 }
 
 @Composable
@@ -70,6 +101,7 @@ private fun ForgotPasswordScreenContent(
                 .fillMaxSize()
                 .clickable(interactionSource = MutableInteractionSource(), indication = null) {
                     keyboardFocus.clear()
+                    uiInteraction.checkData()
                 }
                 .padding(horizontal = Dimensions.space40)
                 .align(Alignment.Center),
@@ -192,7 +224,7 @@ private fun EnterCodeContent(
         )
         Dimensions.space18.HeightSpacer()
         ButtonCommon(
-            text = stringResource(id = R.string.confirm),
+            text = stringResource(id = R.string.resend_link),
             type = ButtonCommonType.Alternative,
             onClick = { uiInteraction.onResendCode() }
         )

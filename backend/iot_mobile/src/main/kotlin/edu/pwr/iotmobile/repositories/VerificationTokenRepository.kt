@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface VerificationTokenRepository : JpaRepository<VerificationToken, Int> {
     fun findByCode(code: String) : VerificationToken?
+    fun deleteAllByUserId(userId: Int)
 }
