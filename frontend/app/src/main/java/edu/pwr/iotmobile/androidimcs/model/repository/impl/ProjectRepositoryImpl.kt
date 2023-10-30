@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ProjectRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
@@ -40,5 +41,23 @@ class ProjectRepositoryImpl(
             body
         else
             emptyList()
+    }
+
+    override suspend fun getProjectById(id: Int): ProjectDto? {
+        val result = remoteDataSource.findProjectById(id)
+        val body = result.body()
+        return if (result.isSuccessful && body != null)
+            body
+        else
+            null
+    }
+
+    override suspend fun getUserProjectRole(id: Int): ProjectRoleDto? {
+        val result = remoteDataSource.findActiveUserProjectRole(id)
+        val body = result.body()
+        return if (result.isSuccessful && body != null)
+            body
+        else
+            null
     }
 }

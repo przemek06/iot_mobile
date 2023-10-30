@@ -36,7 +36,7 @@ fun TopicsScreenContent(
 ) {
     TopicAccessDialog(uiState, uiInteraction)
     LazyColumn {
-        if (uiState.userProjectRole != UserProjectRole.View) {
+        if (uiState.userProjectRole != UserProjectRole.VIEWER) {
             item {
                 ButtonCommon(
                     text = stringResource(id = R.string.how_to_access),
@@ -52,7 +52,7 @@ fun TopicsScreenContent(
         }
 
         items(uiState.topics) {
-            if (uiState.userProjectRole == UserProjectRole.View) {
+            if (uiState.userProjectRole == UserProjectRole.VIEWER) {
                 NonErasableBlock(
                     primaryText = it.title + ": " + it.name,
                     secondaryText = it.dataType.name.firstUppercaseRestLowercase(),

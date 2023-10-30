@@ -14,7 +14,7 @@ enum class UserRole {
 }
 
 enum class UserProjectRole {
-    View,
-    Editor,
-    Admin
+    VIEWER,
+    EDITOR,
+    ADMIN
 }

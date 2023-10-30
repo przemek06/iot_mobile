@@ -107,7 +107,7 @@ private fun SearchScreenContent(
             items(uiState.searchedUsers) {
                 ActionOption(
                     user = it,
-                    userProjectRole = UserProjectRole.View,
+                    userProjectRole = UserProjectRole.VIEWER,
                     buttonText = if(!uiState.data.alternative(it)) {
                         stringResource(uiState.data.buttonText)
                     } else {

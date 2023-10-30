@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.model.datasource.remote
 
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
 import retrofit2.Response
 import retrofit2.http.Body
@@ -28,4 +29,14 @@ interface ProjectRemoteDataSource {
     suspend fun getUsersByProjectId(
         @Path("id") id: Int
     ): Response<List<UserInfoDto>>
+
+    @GET("/user/project/{id}")
+    suspend fun findProjectById(
+        @Path("id") id: Int
+    ): Response<ProjectDto>
+
+    @GET("/user/project/users/roles/active/{id}")
+    suspend fun findActiveUserProjectRole(
+        @Path("id") id: Int
+    ): Response<ProjectRoleDto>
 }
