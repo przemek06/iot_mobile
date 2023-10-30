@@ -15,14 +15,18 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
         UserNotFoundException::class,
         TokenNotFoundException::class,
         ProjectNotFoundException::class,
-        InvitationNotFoundException::class
+        InvitationNotFoundException::class,
+        QueueException::class
     )
     fun handleNotFound(ex: Exception): ResponseEntity<String> {
         logError(ex)
         return ResponseEntity(ex.message, HttpStatus.NOT_FOUND)
     }
 
-    @ExceptionHandler(InvalidDataException::class)
+    @ExceptionHandler(
+        InvalidDataException::class,
+        ChannelException::class
+        )
     fun handleBadRequest(ex: Exception): ResponseEntity<String> {
         logError(ex)
         return ResponseEntity(ex.message, HttpStatus.BAD_REQUEST)

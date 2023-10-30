@@ -18,8 +18,11 @@ services:
         - "8080"
       env_file:
         - dev.env
+      environment:
+        - SPRING_RABBITMQ_HOST=rabbitmq
       depends_on:
         - db
+        - rabbitmq
 
   db:
     image: postgres
@@ -32,3 +35,11 @@ services:
       - "5432:5432"
     expose:
       - "5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "15672:15672"
+      - "5672:5672"
