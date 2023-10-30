@@ -1,12 +1,29 @@
 package edu.pwr.iotmobile.androidimcs.data
 
+import edu.pwr.iotmobile.androidimcs.UserStore
+import edu.pwr.iotmobile.androidimcs.extensions.asEnum
+
 data class User(
-    val id: String,
+    val id: Int,
     val displayName: String,
     val email: String,
     val role: UserRole,
-    val isBlocked: Boolean = false
-)
+    val isBlocked: Boolean = false,
+    val isActive: Boolean = false,
+) {
+    companion object {
+        fun UserStore.toUser(): User? {
+            return User(
+                id = id,
+                displayName = name,
+                email = email,
+                role = role.asEnum<UserRole>() ?: return null,
+                isBlocked = isBlocked,
+                isActive = isActive
+            )
+        }
+    }
+}
 
 enum class UserRole {
     Normal,
