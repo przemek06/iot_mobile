@@ -16,7 +16,7 @@ class Message (
     var topic: Topic,
     var message: String,
     var type: String,
-    var tsSent: LocalDateTime?=LocalDateTime.now(),
+    var tsSent: LocalDateTime=LocalDateTime.now(),
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?=null

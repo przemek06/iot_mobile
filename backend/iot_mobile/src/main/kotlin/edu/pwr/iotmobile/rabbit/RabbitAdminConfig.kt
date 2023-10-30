@@ -1,8 +1,6 @@
 package edu.pwr.iotmobile.rabbit
 
 
-
-
 import com.rabbitmq.client.Connection
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitAdmin
@@ -15,19 +13,28 @@ import org.springframework.context.annotation.Scope
 
 
 @Configuration
-class RabbitAdminConfig() {
+class RabbitAdminConfig(
 
     @Value("\${rabbit.username}")
-    lateinit var username: String
+    val username: String,
     @Value("\${rabbit.password}")
-    lateinit var password: String
+    val password: String,
+    @Value("\${rabbit.virtualHost}")
+    val virtualHost: String,
+    @Value("\${rabbit.host}")
+    val host: String,
+    @Value("\${rabbit.port}")
+    val port: Int
+) {
+
 
     @Bean
-    fun rabbitAdmin(connectionFactory: ConnectionFactory): RabbitAdmin{
+    fun rabbitAdmin(connectionFactory: ConnectionFactory): RabbitAdmin {
         return RabbitAdmin(connectionFactory)
     }
+
     @Bean
-    fun  rabbitListenerEndpointRegistry():RabbitListenerEndpointRegistry{
+    fun rabbitListenerEndpointRegistry(): RabbitListenerEndpointRegistry {
         return RabbitListenerEndpointRegistry()
     }
 
@@ -41,14 +48,14 @@ class RabbitAdminConfig() {
         val factory = com.rabbitmq.client.ConnectionFactory()
         factory.username = username
         factory.password = password
-        factory.virtualHost = "/"
-        factory.host = "localhost"
-        factory.port = 5672
+        factory.virtualHost = virtualHost
+        factory.host = host
+        factory.port = port
         return factory.newConnection()
     }
 
 
-    fun closeConnection(connection: Connection){
+    fun closeConnection(connection: Connection) {
         connection.close()
     }
 
