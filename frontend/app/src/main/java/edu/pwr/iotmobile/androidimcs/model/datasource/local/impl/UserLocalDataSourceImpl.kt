@@ -1,32 +1,47 @@
 package edu.pwr.iotmobile.androidimcs.model.datasource.local.impl
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.Serializer
+import androidx.datastore.dataStoreFile
+import edu.pwr.iotmobile.androidimcs.UserStore
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserLocalDataSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import java.io.InputStream
+import java.io.OutputStream
 
-class UserLocalDataSourceImpl(
-    private val context: Context
-) : UserLocalDataSource {
+private const val FILENAME = "user_store_file"
 
-    private val Context.preferences: DataStore<Preferences>
-        by preferencesDataStore(name = "userSessionPreferences")
+class UserLocalDataSourceImpl(context: Context) : UserLocalDataSource {
+    private val userData = DataStoreFactory.create(
+        serializer = UserStoreSerializer,
+        produceFile = { context.dataStoreFile(FILENAME) }
+    )
+    override fun getData(): Flow<UserStore> {
+        return userData.data
+    }
 
-    private val USER_SESSION_COOKIE = stringPreferencesKey("userSessionCookie")
+    override suspend fun updateData(transform: suspend (t: UserStore) -> UserStore): UserStore {
+        return userData.updateData(transform)
+    }
+}
 
-    override val userSessionCookie: Flow<String?>
-        get() = context.preferences.data.map {
-            it[USER_SESSION_COOKIE]
-        }
+object UserStoreSerializer : Serializer<UserStore> {
+    override val defaultValue: UserStore
+        get() = UserStore.getDefaultInstance()
 
-    override suspend fun saveUserSessionCookie(cookie: String) {
-        context.preferences.edit {
-            it[USER_SESSION_COOKIE] = cookie
+    override suspend fun readFrom(input: InputStream): UserStore {
+        return withContext(Dispatchers.IO) {
+            kotlin.runCatching { UserStore.parseFrom(input) }
+        }.getOrDefault(defaultValue)
+    }
+
+    override suspend fun writeTo(t: UserStore, output: OutputStream) {
+        withContext(Dispatchers.IO) {
+            kotlin.runCatching { t.writeTo(output) }
         }
     }
+
 }

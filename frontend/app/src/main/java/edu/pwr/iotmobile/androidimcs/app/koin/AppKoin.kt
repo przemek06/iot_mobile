@@ -8,8 +8,8 @@ import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.event.EventImpl
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.helpers.toast.ToastImpl
-import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserLocalDataSource
-import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserLocalDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserSessionLocalDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserSessionLocalDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.DashboardRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ProjectRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.TopicRemoteDataSource
@@ -64,7 +64,7 @@ object AppKoin {
         singleOf(::TopicRemoteDataSourceImpl) bind TopicRemoteDataSource::class
 
         // Local
-        singleOf(::UserLocalDataSourceImpl) bind UserLocalDataSource::class
+        singleOf(::UserSessionLocalDataSourceImpl) bind UserSessionLocalDataSource::class
     }
 
     // Module for repositories accessing data sources
