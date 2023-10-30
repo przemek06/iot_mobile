@@ -29,4 +29,10 @@ class UserSessionLocalDataSourceImpl(
             it[USER_SESSION_COOKIE] = cookie
         }
     }
+
+    override suspend fun removeUserSessionCookie() {
+        context.preferences.edit {
+            it.clear()
+        }
+    }
 }

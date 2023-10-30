@@ -18,6 +18,7 @@ interface UserRepository {
      * Returns User if logged in, null otherwise.
      */
     suspend fun getLoggedInUser(): Flow<User?>
+    suspend fun logOut(): Result<Unit>
     suspend fun getUserInfoById(id: Int): Result<UserInfoDto>
     suspend fun getAllUserInfo(): Result<List<UserInfoDto>>
     suspend fun verifyUser(code: String): ActivateAccountResult

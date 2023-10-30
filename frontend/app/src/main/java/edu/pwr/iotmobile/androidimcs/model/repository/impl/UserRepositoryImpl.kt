@@ -83,6 +83,22 @@ class UserRepositoryImpl(
             .getData()
             .map { it.toUser() }
 
+    override suspend fun logOut(): Result<Unit> {
+        // TODO: add remote log out
+
+        return try {
+            // Delete user from local db
+            userLocalDataSource.updateData { store ->
+                store.toBuilder().clear().build()
+            }
+            // Delete user session
+            userSessionLocalDataSource.removeUserSessionCookie()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to remove user session."))
+        }
+    }
+
     override suspend fun getUserInfoById(id: Int): Result<UserInfoDto> {
         val response = remoteDataSource.getUserInfoById(id)
         val body = response.body()
