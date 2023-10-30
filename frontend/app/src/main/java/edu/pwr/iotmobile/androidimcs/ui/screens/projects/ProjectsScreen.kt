@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
@@ -31,6 +32,9 @@ fun ProjectsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val uiInteraction = ProjectsUiInteraction.default(viewModel)
 
+    val context = LocalContext.current
+    viewModel.toast.CollectToast(context)
+
     ProjectsScreenContent(
         uiState = uiState,
         uiInteraction = uiInteraction,
@@ -48,10 +52,8 @@ fun ProjectsScreenContent(
     if (uiState.isDialogVisible) {
         SimpleDialog(
             title = stringResource(R.string.add_new_project_dialog),
-            buttonText1 = stringResource(id = R.string.cancel),
-            buttonText2 = stringResource(id = R.string.confirm),
-            buttonFunction1 = { uiInteraction.setDialogInvisible() },
-            buttonFunction2 = {
+            onCloseDialog = { uiInteraction.setDialogInvisible() },
+            onConfirm = {
                 uiInteraction.addNewProject(uiState.inputFiled.text)
                 uiInteraction.setDialogInvisible()
             }
@@ -92,8 +94,8 @@ fun ProjectsScreenContent(
         ) {
             items(uiState.projects) {
                 Block(
-                    text = "Block",
-                    onClick = { navigation.openProjectDetails("1") }
+                    text = it.name,
+                    onClick = { navigation.openProjectDetails(it.id) }
                 )
             }
         }

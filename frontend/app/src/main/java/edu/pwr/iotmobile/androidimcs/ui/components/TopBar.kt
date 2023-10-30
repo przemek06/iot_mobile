@@ -34,7 +34,7 @@ fun TopBar(
     modifier: Modifier = Modifier,
     menuItems: List<MenuOption> = emptyList(),
     text: String? = null,
-    padding: Dp = Dimensions.none,
+    padding: Dp = Dimensions.space10,
     onReturn: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }

@@ -35,7 +35,7 @@ class UserRepositoryImpl(
 
         return when (resultCode) {
             200 -> LoginUserResult.Success
-            401 -> LoginUserResult.AccountInactive
+            403 -> LoginUserResult.AccountInactive
             else -> LoginUserResult.Failure
         }
     }

@@ -6,6 +6,6 @@ data class TopicDto(
     val id: Int? = null,
     val projectId: Int,
     val name: String,
-    val uniqueName: String,
+    val uniqueName: String?,  // TODO: non-nullable
     val valueType: TopicDataType
 )

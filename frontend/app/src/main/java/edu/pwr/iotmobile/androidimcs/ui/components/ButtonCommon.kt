@@ -55,8 +55,8 @@ fun ButtonCommon(
 
     Button(
         modifier = modifier
-            .conditional(width != null) { width?.let { width(it) } ?: run { Modifier } },
-        shape = MaterialTheme.shapes.small,
+            .conditional(width != null) { width?.let { width(it) } ?: run { modifier } },
+        shape = MaterialTheme.shapes.medium,
         colors = colors,
         border = border,
         contentPadding = PaddingValues(horizontal = Dimensions.space22, vertical = Dimensions.space14),
@@ -66,8 +66,9 @@ fun ButtonCommon(
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = textColor
+            fontWeight = FontWeight.Medium,
+            color = textColor,
+            maxLines = 1
         )
     }
 }

@@ -1,6 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -23,13 +22,38 @@ fun DashboardsScreenContent(
     uiInteraction: ProjectDetailsUiInteraction,
     navigation: ProjectDetailsNavigation
 ) {
+    AddNewDashboardDialog(uiState, uiInteraction)
+    LazyColumn {
+        if (uiState.userProjectRole != UserProjectRole.View) {
+            item {
+                ButtonCommon(
+                    text = stringResource(id = R.string.add_new_dashboard),
+                    type = ButtonCommonType.Secondary
+                ) { uiInteraction.setDialogVisible() }
+                Dimensions.space30.HeightSpacer()
+            }
+        }
+
+        items(uiState.dashboards) {
+            Block(
+                text = it.name,
+                onClick = { navigation.openDashboardScreen() }
+            )
+            Dimensions.space14.HeightSpacer()
+        }
+    }
+}
+
+@Composable
+private fun AddNewDashboardDialog(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction,
+) {
     if (uiState.isDialogVisible) {
         SimpleDialog(
             title = stringResource(R.string.add_new_dashboard_dialog),
-            buttonText1 = stringResource(id = R.string.cancel),
-            buttonText2 = stringResource(id = R.string.confirm),
-            buttonFunction1 = { uiInteraction.setDialogInvisible() },
-            buttonFunction2 = {
+            onCloseDialog = { uiInteraction.setDialogInvisible() },
+            onConfirm = {
                 uiInteraction.addNewDashboard(uiState.inputFieldDashboard.text)
                 uiInteraction.setDialogInvisible()
             }
@@ -46,31 +70,10 @@ fun DashboardsScreenContent(
             )
         }
     }
-
-    LazyColumn {
-
-        if (uiState.userProjectRole != UserProjectRole.View) {
-            item {
-                ButtonCommon(
-                    text = stringResource(id = R.string.add_new_dashboard),
-                    type = ButtonCommonType.Secondary
-                ) { uiInteraction.setDialogVisible() }
-                Dimensions.space30.HeightSpacer()
-            }
-        }
-
-        items(uiState.dashboards) {
-            Block(
-                text = "Block",
-                onClick = { navigation.openDashboardScreen(1) }
-            )
-            Dimensions.space14.HeightSpacer()
-        }
-    }
 }
 
 @Composable
-fun InputFieldDashboard(
+private fun InputFieldDashboard(
     uiState: ProjectDetailsUiState,
     uiInteraction: ProjectDetailsUiInteraction
 ) {

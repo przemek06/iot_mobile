@@ -8,7 +8,7 @@ data class SearchUiState (
     val users: List<User>,
     val searchedUsers: List<User>,
     val selectedUser: User?,
-    val data: ScreenData,
+    val data: SearchViewModel.ScreenData,
     val isDialogVisible: Boolean
 ) {
      companion object {
@@ -17,7 +17,7 @@ data class SearchUiState (
              users: List<User> = emptyList(),
              searchedUsers: List<User> = emptyList(),
              selectedUser: User? = null,
-             data: ScreenData = ScreenData(
+             data: SearchViewModel.ScreenData = SearchViewModel.ScreenData(
                  topBarText = R.string.nothing,
                  buttonText = R.string.nothing
              ),
