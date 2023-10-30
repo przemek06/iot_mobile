@@ -97,7 +97,7 @@ fun ComponentsList(
         ) {
             Column {
                 Dimensions.space30.HeightSpacer()
-                if (uiState.userProjectRole != null && uiState.userProjectRole != UserProjectRole.View) {
+                if (uiState.userProjectRole != null && uiState.userProjectRole != UserProjectRole.VIEWER) {
                     ButtonCommon(
                         text = stringResource(id = R.string.add_new_component),
                         type = ButtonCommonType.Secondary

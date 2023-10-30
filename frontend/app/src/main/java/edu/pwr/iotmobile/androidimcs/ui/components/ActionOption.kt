@@ -27,7 +27,7 @@ fun ActionOption(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (userProjectRole == UserProjectRole.Admin) {
+        if (userProjectRole == UserProjectRole.ADMIN) {
             AdminMember(user = user)
         } else {
             UserNameText(user = user)

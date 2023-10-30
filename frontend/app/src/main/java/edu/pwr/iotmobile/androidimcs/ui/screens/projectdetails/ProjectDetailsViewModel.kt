@@ -9,6 +9,9 @@ import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData.Companion.toProjectData
+import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
@@ -32,32 +35,46 @@ val mockUser = User(
 class ProjectDetailsViewModel(
     private val dashboardRepository: DashboardRepository,
     private val topicRepository: TopicRepository,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    val toast: Toast
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProjectDetailsUiState.default())
     val uiState = _uiState.asStateFlow()
 
     private var projectId: Int? = null
-    private var userProjectRole: UserProjectRole? = UserProjectRole.Admin
+    private var userProjectRole: UserProjectRole? = UserProjectRole.ADMIN
 
     fun init(navigation: ProjectDetailsNavigation) {
         // Only update UI if project id changed.
         if (projectId == null || projectId != navigation.projectId) {
-            val localUserProjectRole = userProjectRole ?: return
 
             // Set private project id field
-            projectId = navigation.projectId
+            val localProjectId = navigation.projectId ?: return
+            projectId = localProjectId
 
             viewModelScope.launch {
+
+                val projectUserInfo = projectRepository
+                    .getUserProjectRole(localProjectId)
+                    ?: return@launch
+
+                val projectRole = projectUserInfo.toUserProjectRole() ?: return@launch
+                userProjectRole = projectRole
+
+                val projectData = projectRepository
+                    .getProjectById(localProjectId)
+                    ?.toProjectData()
+                    ?: return@launch
+
                 _uiState.update {
                     it.copy(
-                        user = mockUser,
-                        members = listOf(mockUser, mockUser, mockUser),
-                        userRoleDescriptionId = getUserRoleDescription(localUserProjectRole),
-                        userProjectRole = localUserProjectRole,
-                        userOptionsList = generateUserOptions(localUserProjectRole, navigation),
-                        menuOptionsList = generateMenuOptions(localUserProjectRole),
-                        dashboards = getDashboards()
+                        user = projectUserInfo.user,
+                        userRoleDescriptionId = getUserRoleDescription(projectRole),
+                        userProjectRole = projectRole,
+                        userOptionsList = generateUserOptions(projectRole, navigation),
+                        menuOptionsList = generateMenuOptions(projectRole),
+                        dashboards = getDashboards(),
+                        projectData = projectData
                     )
                 }
             }
@@ -68,7 +85,7 @@ class ProjectDetailsViewModel(
         when (tab) {
             ProjectTab.Dashboards -> updateDashboards()
             ProjectTab.Topics -> updateTopics()
-            ProjectTab.Group -> { /*TODO*/ }
+            ProjectTab.Group -> updateUsers()
         }
         _uiState.update {
             it.copy(selectedTabIndex = tab.index)
@@ -163,17 +180,36 @@ class ProjectDetailsViewModel(
         }
     }
 
+    private fun updateUsers() {
+        val localProjectId = projectId ?: return
+        viewModelScope.launch(Dispatchers.Default) {
+            kotlin.runCatching {
+                projectRepository.getUsersByProjectId(localProjectId)
+            }.onSuccess { users ->
+                Log.d("null", "users")
+                users.forEach {
+                    Log.d("null", it.toString())
+                }
+                _uiState.update { ui ->
+                    ui.copy(members = users)
+                }
+            }.onFailure {
+                Log.d(TAG, "Get users error")
+            }
+        }
+    }
+
     private fun getUserRoleDescription(role: UserProjectRole) = when (role) {
-        UserProjectRole.Admin -> R.string.admin_desc
-        UserProjectRole.Editor -> R.string.modify_desc
-        UserProjectRole.View -> R.string.view_desc
+        UserProjectRole.ADMIN -> R.string.admin_desc
+        UserProjectRole.EDITOR -> R.string.modify_desc
+        UserProjectRole.VIEWER -> R.string.view_desc
     }
 
     private fun generateUserOptions(
         role: UserProjectRole,
         navigation: ProjectDetailsNavigation
     ) = when (role) {
-        UserProjectRole.Admin -> listOf(
+        UserProjectRole.ADMIN -> listOf(
             MenuOption(
                 titleId = R.string.invite_users,
                 isBold = true,
@@ -192,14 +228,14 @@ class ProjectDetailsViewModel(
                 onClick = { /*TODO*/}
             )
         )
-        UserProjectRole.Editor -> listOf(
+        UserProjectRole.EDITOR -> listOf(
             MenuOption(
                 titleId = R.string.leave_group,
                 isBold = true,
                 onClick = { /*TODO*/}
             )
         )
-        UserProjectRole.View -> listOf(
+        UserProjectRole.VIEWER -> listOf(
             MenuOption(
                 titleId = R.string.leave_group,
                 isBold = true,
@@ -209,7 +245,7 @@ class ProjectDetailsViewModel(
     }
 
     private fun generateMenuOptions(role: UserProjectRole) = when (role) {
-        UserProjectRole.Admin -> listOf(
+        UserProjectRole.ADMIN -> listOf(
             MenuOption(
                 titleId = R.string.delete_project,
                 onClick = {/*TODO*/}

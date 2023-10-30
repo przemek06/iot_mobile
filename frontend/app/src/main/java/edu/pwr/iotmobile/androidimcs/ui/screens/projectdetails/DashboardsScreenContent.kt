@@ -24,7 +24,7 @@ fun DashboardsScreenContent(
 ) {
     AddNewDashboardDialog(uiState, uiInteraction)
     LazyColumn {
-        if (uiState.userProjectRole != UserProjectRole.View) {
+        if (uiState.userProjectRole != UserProjectRole.VIEWER) {
             item {
                 ButtonCommon(
                     text = stringResource(id = R.string.add_new_dashboard),

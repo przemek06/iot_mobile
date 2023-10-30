@@ -17,7 +17,7 @@ class DashboardViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
 
-    private var userProjectRole: UserProjectRole? = UserProjectRole.Editor
+    private var userProjectRole: UserProjectRole? = UserProjectRole.EDITOR
 
     init {
         _uiState.update {
@@ -185,7 +185,7 @@ class DashboardViewModel : ViewModel() {
     )
 
     private fun generateMenuOptions(role: UserProjectRole?) = when (role) {
-        UserProjectRole.Admin, UserProjectRole.Editor -> listOf(
+        UserProjectRole.ADMIN, UserProjectRole.EDITOR -> listOf(
             MenuOption(
                 titleId = R.string.s20,
                 onClick = {/*TODO*/}

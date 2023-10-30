@@ -20,8 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
 import edu.pwr.iotmobile.androidimcs.ui.components.Label
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
@@ -134,17 +134,17 @@ private fun Role(uiState: ProjectDetailsUiState) {
 
 @Composable
 private fun LazyItemScope.Member(
-    user: User,
+    user: UserInfoDto,
     role: UserProjectRole,
 ) {
-    if (role == UserProjectRole.Admin)
+    if (role == UserProjectRole.ADMIN)
         AdminMember(user = user)
     else
         UserNameText(user = user)
 }
 
 @Composable
-private fun AdminMember(user: User) {
+private fun AdminMember(user: UserInfoDto) {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -155,9 +155,9 @@ private fun AdminMember(user: User) {
 }
 
 @Composable
-private fun UserNameText(user: User) {
+private fun UserNameText(user: UserInfoDto) {
     Text(
-        text = user.displayName,
+        text = user.name,
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onBackground
     )

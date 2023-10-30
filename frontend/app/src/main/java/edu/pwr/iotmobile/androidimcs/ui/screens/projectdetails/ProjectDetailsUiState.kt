@@ -3,39 +3,42 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.TopicDataType
-import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
 import edu.pwr.iotmobile.androidimcs.data.dto.TopicDto
+import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
+import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData
 
 data class ProjectDetailsUiState(
     val selectedTabIndex: Int,
-    val user: User,
+    val user: UserInfoDto,
     val userProjectRole: UserProjectRole,
     val userRoleDescriptionId: Int?,
     val userOptionsList: List<MenuOption>,
     val menuOptionsList: List<MenuOption>,
     val dashboards: List<Dashboard>,
     val topics: List<Topic>,
-    val members: List<User>,
+    val members: List<UserInfoDto>,
     val isDialogVisible: Boolean,
     val isInfoVisible: Boolean,
-    val inputFieldDashboard: InputFieldData
+    val inputFieldDashboard: InputFieldData,
+    val projectData: ProjectData
 ) {
     companion object {
         fun default(
             selectedTabIndex: Int = 0,
-            user: User = mockUser,  // TODO: nullable
-            userProjectRole: UserProjectRole = UserProjectRole.View,
+            user: UserInfoDto = UserInfoDto.empty(),
+            userProjectRole: UserProjectRole = UserProjectRole.VIEWER,
             userRoleDescriptionId: Int? = null,
             userOptionsList: List<MenuOption> = emptyList(),
             menuOptionsList: List<MenuOption> = emptyList(),
             dashboards: List<Dashboard> = emptyList(),
             topics: List<Topic> = emptyList(),
-            members: List<User> = emptyList(),
+            members: List<UserInfoDto> = emptyList(),
             isDialogVisible: Boolean = false,
             isInfoVisible: Boolean = false,
-            inputFieldDashboard: InputFieldData = InputFieldData()
+            inputFieldDashboard: InputFieldData = InputFieldData(),
+            projectData: ProjectData = ProjectData.empty()
         ) = ProjectDetailsUiState(
             selectedTabIndex = selectedTabIndex,
             user = user,
@@ -48,7 +51,8 @@ data class ProjectDetailsUiState(
             menuOptionsList = menuOptionsList,
             isDialogVisible = isDialogVisible,
             inputFieldDashboard = inputFieldDashboard,
-            isInfoVisible = isInfoVisible
+            isInfoVisible = isInfoVisible,
+            projectData = projectData
         )
     }
 }

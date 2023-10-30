@@ -77,7 +77,7 @@ private fun ProjectDetailsScreenContent(
                     text = "Project 1",
                     style = MaterialTheme.typography.titleSmall
                 )
-                if (uiState.userProjectRole != UserProjectRole.View) {
+                if (uiState.userProjectRole != UserProjectRole.VIEWER) {
                     ButtonCommon(
                         text = stringResource(id = R.string.show_access),
                         type = ButtonCommonType.Alternative
