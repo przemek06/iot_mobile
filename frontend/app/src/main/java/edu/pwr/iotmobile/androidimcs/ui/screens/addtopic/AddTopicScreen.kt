@@ -15,9 +15,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.data.TopicType
+import edu.pwr.iotmobile.androidimcs.data.TopicDataType
+import edu.pwr.iotmobile.androidimcs.extensions.firstUppercaseRestLowercase
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
@@ -32,6 +34,12 @@ fun AddTopicScreen(navigation: AddTopicNavigation) {
     val uiState by viewModel.uiState.collectAsState()
     val uiInteraction = AddTopicUiInteraction.default(viewModel)
 
+    val context = LocalContext.current
+    viewModel.event.CollectEvent(context) {
+        navigation.goBack()
+    }
+    viewModel.toast.CollectToast(context)
+
     AddTopicScreenContent(
         navigation = navigation,
         uiState = uiState,
@@ -45,31 +53,47 @@ private fun AddTopicScreenContent(
     uiState: AddTopicUiState,
     uiInteraction: AddTopicUiInteraction
 ) {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Dimensions.space22)
-    ) {
+    Column(Modifier.fillMaxSize()) {
         TopBar(text = stringResource(R.string.add_topic)) {
             navigation.goBack()
         }
         LazyColumn(
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = Dimensions.space22)
         ) {
             item {
-                Dimensions.space85.HeightSpacer()
-                Text(
-                    text = stringResource(id = R.string.enter_topic_name),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Dimensions.space22.HeightSpacer()
-                InputField(
-                    text = uiState.inputFieldData.text,
-                    label = stringResource(uiState.inputFieldData.label)
-                ) { uiInteraction.onTextChange(it) }
-                Dimensions.space40.HeightSpacer()
+                Dimensions.space30.HeightSpacer()
+            }
+
+            uiState.inputFields.forEach {
+                item {
+                    Text(
+                        text = stringResource(id = it.value.titleId),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Dimensions.space8.HeightSpacer()
+                    Text(
+                        text = stringResource(id = it.value.descriptionId),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Dimensions.space18.HeightSpacer()
+                    InputField(
+                        text = it.value.inputFieldData.text,
+                        label = stringResource(it.value.inputFieldData.label)
+                    ) { text ->
+                        uiInteraction.onTextChange(
+                            type = it.key,
+                            text = text
+                        )
+                    }
+                    Dimensions.space30.HeightSpacer()
+                }
+            }
+
+            item {
                 Text(
                     text = stringResource(id = R.string.select_data_type),
                     style = MaterialTheme.typography.titleSmall,
@@ -77,19 +101,21 @@ private fun AddTopicScreenContent(
                 )
                 Dimensions.space10.HeightSpacer()
             }
-            items(TopicType.values()) {
+
+            items(TopicDataType.values()) {
                 TopicRadio(
                     topic = it,
                     uiState = uiState,
                     uiInteraction = uiInteraction
                 )
             }
+
             item {
                 Dimensions.space40.HeightSpacer()
                 ButtonCommon(
                     text = stringResource(id = R.string.confirm),
                     width = Dimensions.buttonWidth
-                ) { navigation.goBack() }
+                ) { uiInteraction.addTopic(projectId = navigation.projectId) }
             }
         }
     }
@@ -97,23 +123,21 @@ private fun AddTopicScreenContent(
 
 @Composable
 private fun TopicRadio(
-    topic: TopicType,
+    topic: TopicDataType,
     uiState: AddTopicUiState,
     uiInteraction: AddTopicUiInteraction
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
-            selected = uiState.selectedTopic == topic.name,
+            selected = uiState.selectedTopic == topic,
             onClick = { uiInteraction.selectTopic(topic) }
         )
         Text(
-            modifier = Modifier
-                .weight(1f),
-            text = topic.label,
+            modifier = Modifier.weight(1f),
+            text = topic.name.firstUppercaseRestLowercase(),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
