@@ -4,6 +4,7 @@ import edu.pwr.iotmobile.dto.TopicDTO
 import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.error.exception.NotAllowedException
 import edu.pwr.iotmobile.error.exception.TopicAlreadyExistsException
+import edu.pwr.iotmobile.rabbit.queue.QueueService
 import edu.pwr.iotmobile.repositories.TopicRepository
 import org.springframework.stereotype.Service
 
@@ -11,7 +12,8 @@ import org.springframework.stereotype.Service
 class TopicService(
     val topicRepository: TopicRepository,
     val userService: UserService,
-    val projectService: ProjectService
+    val projectService: ProjectService,
+    val queueService: QueueService
 ) {
     fun createTopic(topic: TopicDTO) : TopicDTO {
         val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
@@ -22,6 +24,8 @@ class TopicService(
             throw TopicAlreadyExistsException()
 
         val projectName = projectService.findProjectById(topic.projectId).name
+
+        queueService.addQueue(topic.name)
 
         val toSave = topic.toEntity(projectName)
         return topicRepository.save(toSave).toDTO()
@@ -38,6 +42,8 @@ class TopicService(
 
         if (!projectService.isEditor(userId, projectId))
             throw NotAllowedException()
+
+        queueService.forceDeleteQueue(topic.get().name)
 
         topicRepository.delete(topic.get())
 

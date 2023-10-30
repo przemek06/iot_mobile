@@ -25,4 +25,12 @@ data class TopicDTO(
         project.id = projectId
         return Topic(project, name, "$projectName/$uniqueName", valueType, id)
     }
+
+    fun toEntity() : Topic {
+        val project = Project()
+        project.id = projectId
+        return Topic(project, name, uniqueName, valueType, id)
+    }
+
+    constructor() : this(1, 1, "default", "default", EValueType.TEXT){}
 }
