@@ -31,6 +31,7 @@ import edu.pwr.iotmobile.androidimcs.model.repository.impl.UserRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminViewModel
+import edu.pwr.iotmobile.androidimcs.ui.screens.app.MainViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountViewModel
@@ -92,6 +93,7 @@ object AppKoin {
         viewModelOf(::SearchViewModel)
         viewModelOf(::AddTopicViewModel)
         viewModelOf(::DashboardViewModel)
+        viewModelOf(::MainViewModel)
     }
 
     // Module for other singular classes

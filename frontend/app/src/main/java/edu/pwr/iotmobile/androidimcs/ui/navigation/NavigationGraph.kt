@@ -37,11 +37,12 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchScreen
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    innerPadding: PaddingValues = PaddingValues(10.dp)
+    innerPadding: PaddingValues = PaddingValues(10.dp),
+    startDestination: String = Screen.Login.path
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.path,
+        startDestination = startDestination,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {

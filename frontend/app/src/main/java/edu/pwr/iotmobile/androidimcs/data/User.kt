@@ -26,8 +26,8 @@ data class User(
 }
 
 enum class UserRole {
-    Normal,
-    Admin
+    USER_ROLE,
+    ADMIN_ROLE
 }
 
 enum class UserProjectRole {

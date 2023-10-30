@@ -37,6 +37,7 @@ private val SCREENS_WITHOUT_BOTTOM_BAR = listOf(
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController,
+    startDestination: String
 ) {
     val bottomNavItems = listOf(
         Screen.Main,
@@ -89,6 +90,10 @@ fun BottomNavigationBar(
             }
         }
     ) { innerPadding ->
-        NavGraph(navController = navController, innerPadding = innerPadding)
+        NavGraph(
+            navController = navController,
+            innerPadding = innerPadding,
+            startDestination = startDestination
+        )
     }
 }

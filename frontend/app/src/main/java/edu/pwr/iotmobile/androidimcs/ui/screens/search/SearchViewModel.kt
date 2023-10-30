@@ -12,7 +12,7 @@ val mockUser = User(
     id = 1,
     displayName = "Alan Walker",
     email = "alan@walker.com",
-    role = UserRole.Normal,
+    role = UserRole.USER_ROLE,
     isBlocked = true
 )
 
