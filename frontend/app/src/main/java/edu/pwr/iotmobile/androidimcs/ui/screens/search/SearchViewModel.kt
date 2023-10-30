@@ -1,7 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.search
 
-import android.util.Log
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.User
@@ -109,20 +107,19 @@ class SearchViewModel : ViewModel() {
             it.copy(searchedUsers = it.users.map { it.copy(isBlocked = false) })
         }
     }
-}
+    enum class SearchMode(val mode: String) {
+        ADD_ADMIN("AddAdmin"),
+        BLOCK_USERS("BlockUsers")
+    }
 
-enum class SearchMode(val mode: String) {
-    ADD_ADMIN("AddAdmin"),
-    BLOCK_USERS("BlockUsers")
+    data class ScreenData(
+        val topBarText: Int,
+        val buttonText: Int,
+        val buttonTextAlternative: Int = R.string.nothing,
+        val dialogTitle: Int = R.string.nothing,
+        val dialogTitleAlternative: Int = R.string.nothing,
+        val dialogButton2Function: (user: User) -> Unit = {},
+        val dialogButton2FunctionAlternative: (user: User) -> Unit = {},
+        val alternative: (user: User) -> Boolean = { false }
+    )
 }
-
-data class ScreenData(
-    val topBarText: Int,
-    val buttonText: Int,
-    val buttonTextAlternative: Int = R.string.nothing,
-    val dialogTitle: Int = R.string.nothing,
-    val dialogTitleAlternative: Int = R.string.nothing,
-    val dialogButton2Function: (user: User) -> Unit = {},
-    val dialogButton2FunctionAlternative: (user: User) -> Unit = {},
-    val alternative: (user: User) -> Boolean = { false }
-)

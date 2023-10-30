@@ -1,8 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.search
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,20 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
-import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ActionOption
-import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
-import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
-import edu.pwr.iotmobile.androidimcs.ui.components.Label
 import edu.pwr.iotmobile.androidimcs.ui.components.SearchField
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
-import edu.pwr.iotmobile.androidimcs.ui.screens.account.DisplayNameInputField
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
-import edu.pwr.iotmobile.androidimcs.ui.theme.WidthSpacer
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -42,7 +33,7 @@ fun SearchScreen(navigation: SearchNavigation) {
     val uiInteraction = SearchUiInteraction.default(viewModel)
 
     LaunchedEffect(Unit) {
-        viewModel.init(SearchMode.BLOCK_USERS)
+        viewModel.init(SearchViewModel.SearchMode.BLOCK_USERS)
     }
 
     SearchScreenContent(
@@ -69,10 +60,8 @@ private fun SearchScreenContent(
                     uiState.data.dialogTitleAlternative,
                     uiState.selectedUser?.displayName ?: "USER_NAME"
                 ) },
-            buttonText1 = stringResource(id = R.string.cancel),
-            buttonText2 = stringResource(id = R.string.confirm),
-            buttonFunction1 = { uiInteraction.setDialogInvisible() },
-            buttonFunction2 = {
+            onCloseDialog = { uiInteraction.setDialogInvisible() },
+            onConfirm = {
                 if (!alternative) {
                     uiState.selectedUser?.let {
                         uiState.data.dialogButton2Function(it)

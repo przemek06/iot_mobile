@@ -8,7 +8,6 @@ interface ProjectDetailsUiInteraction {
     fun setInfoInvisible()
     fun onTextChangeDashboard(text: String)
     fun addNewDashboard(name: String)
-    fun addNewTopic(name: String)
 
     companion object {
         fun default(
@@ -37,10 +36,7 @@ interface ProjectDetailsUiInteraction {
             }
 
             override fun addNewDashboard(name: String) {
-                viewModel.addNewDashboard(name)
-            }
-            override fun addNewTopic(name: String) {
-                viewModel.addNewTopic(name)
+                viewModel.addDashboard(name)
             }
         }
     }

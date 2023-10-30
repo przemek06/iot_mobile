@@ -7,6 +7,7 @@ import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectData.Companion.toProjectData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -69,11 +70,12 @@ class ProjectsViewModel(
             kotlin.runCatching {
                 projectRepository.getProjects()
             }.onSuccess { projects ->
-                _uiState.update {
-                    it.copy(projects = projects)
+                _uiState.update { ui ->
+                    ui.copy(projects = projects.mapNotNull { it.toProjectData() })
                 }
             }.onFailure {
                 Log.d(TAG, "Get projects error")
+                toast.toast("Could not retrieve projects.")
             }
         }
     }

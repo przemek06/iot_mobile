@@ -41,7 +41,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Dashboard.path,
+        startDestination = Screen.Login.path,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -76,7 +76,10 @@ fun NavGraph(
         }
 
         composable(Screen.AddTopic.path) {
-            AddTopicScreen(navigation = AddTopicNavigation.default(navController))
+            AddTopicScreen(navigation = AddTopicNavigation.default(
+                navController = navController,
+                navBackStackEntry = it
+            ))
         }
 
         composable(Screen.Login.path) {

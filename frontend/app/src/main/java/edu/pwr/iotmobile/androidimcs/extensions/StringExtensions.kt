@@ -10,3 +10,5 @@ inline fun <reified  T : Enum<T>> String.asEnum(): T? {
         null
     }
 }
+
+fun String.firstUppercaseRestLowercase() = this.lowercase().replaceFirstChar { it.uppercase() }
