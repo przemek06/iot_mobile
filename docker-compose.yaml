@@ -16,3 +16,19 @@ services:
         - "8080:8080"
       expose:
         - "8080"
+      env_file:
+        - dev.env
+      depends_on:
+        - db
+
+  db:
+    image: postgres
+    restart: always
+    env_file:
+      - dev.env
+    networks:
+      - iot-mobile-backend-network
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
