@@ -65,7 +65,7 @@ data class Topic(
             return Topic(
                 id = locId,
                 title = name,
-                name = uniqueName,
+                name = uniqueName ?: "", // TODO: will be not null
                 dataType = valueType
             )
         }

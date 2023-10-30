@@ -132,4 +132,8 @@
     <string name="s19">Hide password</string>
     <string name="s20">Edit dashboard</string>
     <string name="s21">Delete dashboard</string>
+    <string name="s22">This is the name which will be displayed throughout this app</string>
+    <string name="s23">This is the name, which will represent your topic when you want to access it on your IoT device.</string>
+    <string name="s24">Enter a unique name</string>
+    <string name="s25">Unique name</string>
 </resources>

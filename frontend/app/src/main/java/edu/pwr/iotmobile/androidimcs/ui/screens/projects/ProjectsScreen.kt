@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
@@ -30,6 +31,9 @@ fun ProjectsScreen(
     val viewModel = koinViewModel<ProjectsViewModel>()
     val uiState by viewModel.uiState.collectAsState()
     val uiInteraction = ProjectsUiInteraction.default(viewModel)
+
+    val context = LocalContext.current
+    viewModel.toast.CollectToast(context)
 
     ProjectsScreenContent(
         uiState = uiState,
@@ -90,8 +94,8 @@ fun ProjectsScreenContent(
         ) {
             items(uiState.projects) {
                 Block(
-                    text = "Block",
-                    onClick = { navigation.openProjectDetails("1") }
+                    text = it.name,
+                    onClick = { navigation.openProjectDetails(it.id) }
                 )
             }
         }

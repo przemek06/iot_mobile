@@ -47,7 +47,6 @@ fun LoginScreen(navigation: LoginNavigation) {
                     navigation.openAccountInactiveScreen(e)
                 }
         }
-
     }
     viewModel.toast.CollectToast(context)
 

@@ -76,7 +76,10 @@ fun NavGraph(
         }
 
         composable(Screen.AddTopic.path) {
-            AddTopicScreen(navigation = AddTopicNavigation.default(navController))
+            AddTopicScreen(navigation = AddTopicNavigation.default(
+                navController = navController,
+                navBackStackEntry = it
+            ))
         }
 
         composable(Screen.Login.path) {

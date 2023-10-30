@@ -36,8 +36,8 @@ fun DashboardsScreenContent(
 
         items(uiState.dashboards) {
             Block(
-                text = "Block",
-                onClick = { navigation.openDashboardScreen(1) }
+                text = it.name,
+                onClick = { navigation.openDashboardScreen() }
             )
             Dimensions.space14.HeightSpacer()
         }

@@ -5,12 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
-import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
-import edu.pwr.iotmobile.androidimcs.data.dto.TopicDto
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
@@ -43,27 +41,33 @@ class ProjectDetailsViewModel(
     private var userProjectRole: UserProjectRole? = UserProjectRole.Admin
 
     fun init(navigation: ProjectDetailsNavigation) {
+        // Only update UI if project id changed.
         if (projectId == null || projectId != navigation.projectId) {
             val localUserProjectRole = userProjectRole ?: return
-            getDashboards()
+
+            // Set private project id field
             projectId = navigation.projectId
-            _uiState.update {
-                it.copy(
-                    user = mockUser,
-                    members = listOf(mockUser, mockUser, mockUser),
-                    userRoleDescriptionId = getUserRoleDescription(localUserProjectRole),
-                    userProjectRole = localUserProjectRole,
-                    userOptionsList = generateUserOptions(localUserProjectRole, navigation),
-                    menuOptionsList = generateMenuOptions(localUserProjectRole)
-                )
+
+            viewModelScope.launch {
+                _uiState.update {
+                    it.copy(
+                        user = mockUser,
+                        members = listOf(mockUser, mockUser, mockUser),
+                        userRoleDescriptionId = getUserRoleDescription(localUserProjectRole),
+                        userProjectRole = localUserProjectRole,
+                        userOptionsList = generateUserOptions(localUserProjectRole, navigation),
+                        menuOptionsList = generateMenuOptions(localUserProjectRole),
+                        dashboards = getDashboards()
+                    )
+                }
             }
         }
     }
 
     fun setSelectedTabIndex(tab: ProjectTab) {
         when (tab) {
-            ProjectTab.Dashboards -> getDashboards()
-            ProjectTab.Topics -> getTopics()
+            ProjectTab.Dashboards -> updateDashboards()
+            ProjectTab.Topics -> updateTopics()
             ProjectTab.Group -> { /*TODO*/ }
         }
         _uiState.update {
@@ -81,28 +85,9 @@ class ProjectDetailsViewModel(
             kotlin.runCatching {
                 dashboardRepository.createDashboard(dashboardDto)
             }.onSuccess {
-                getDashboards()
+                updateDashboards()
             }.onFailure {
                 Log.d(TAG, "Add dashboard error")
-            }
-        }
-    }
-
-    fun addTopic(name: String, uniqueName: String, dataType: TopicDataType) {
-        val localProjectId = projectId ?: return
-        viewModelScope.launch(Dispatchers.Default) {
-            val topicDto = TopicDto(
-                name = name,
-                uniqueName = uniqueName,
-                valueType = dataType,
-                projectId = localProjectId
-            )
-            kotlin.runCatching {
-                topicRepository.createTopic(topicDto)
-            }.onSuccess {
-                getTopics()
-            }.onFailure {
-                Log.d(TAG, "Add topic error")
             }
         }
     }
@@ -112,7 +97,7 @@ class ProjectDetailsViewModel(
             kotlin.runCatching {
                 dashboardRepository.deleteDashboard(id)
             }.onSuccess {
-                getDashboards()
+                updateDashboards()
             }.onFailure {
                 Log.d(TAG, "Delete dashboard error")
             }
@@ -124,34 +109,51 @@ class ProjectDetailsViewModel(
             kotlin.runCatching {
                 topicRepository.deleteTopic(id)
             }.onSuccess {
-                getTopics()
+                updateTopics()
             }.onFailure {
                 Log.d(TAG, "Delete topic error")
             }
         }
     }
 
-    private fun getDashboards() {
-        val localProjectId = projectId ?: return
+    private fun updateDashboards() {
         viewModelScope.launch(Dispatchers.Default) {
-            kotlin.runCatching {
-                dashboardRepository.getDashboardsByProjectId(localProjectId)
-            }.onSuccess { dashboards ->
+            val dashboards = getDashboards()
+            if (dashboards.isNotEmpty()) {
                 _uiState.update { ui ->
-                    ui.copy(dashboards = dashboards.mapNotNull { it.toDashboard() })
+                    ui.copy(dashboards = dashboards)
                 }
-            }.onFailure {
-                Log.d(TAG, "Get dashboards error")
             }
         }
     }
 
-    private fun getTopics() {
+    private suspend fun getDashboards(): List<Dashboard> {
+        val localProjectId = projectId ?: return emptyList()
+        kotlin.runCatching {
+            dashboardRepository.getDashboardsByProjectId(localProjectId)
+        }.onSuccess { dashboards ->
+            Log.d("null", "dashboards")
+            dashboards.forEach {
+                Log.d("null", it.toString())
+            }
+            return dashboards.mapNotNull { it.toDashboard() }
+        }.onFailure {
+            Log.d(TAG, "Get dashboards error")
+            return emptyList()
+        }
+        return emptyList()
+    }
+
+    private fun updateTopics() {
         val localProjectId = projectId ?: return
         viewModelScope.launch(Dispatchers.Default) {
             kotlin.runCatching {
                 topicRepository.getTopicsByProjectId(localProjectId)
             }.onSuccess { topics ->
+                Log.d("null", "topics")
+                topics.forEach {
+                    Log.d("null", it.toString())
+                }
                 _uiState.update { ui ->
                     ui.copy(topics = topics.mapNotNull { it.toTopic() })
                 }
