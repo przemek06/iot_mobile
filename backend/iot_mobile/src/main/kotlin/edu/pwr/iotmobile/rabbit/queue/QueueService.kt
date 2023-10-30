@@ -1,8 +1,10 @@
 package edu.pwr.iotmobile.rabbit.queue
 
+import edu.pwr.iotmobile.error.exception.QueueException
 import lombok.extern.slf4j.Slf4j
 import org.hibernate.query.sqm.tree.SqmNode.log
 import org.springframework.amqp.core.Binding
+import org.springframework.amqp.core.DirectExchange
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageListener
 import org.springframework.amqp.core.Queue
@@ -25,65 +27,74 @@ class QueueService(
     val rabbitListenerEndpointRegistry: RabbitListenerEndpointRegistry
 ) {
     /**
-     * send message to default DIRECT exchange using explicit
-     * queueName and message value
+     * Send string message to queue with exchange of the same name
      */
-    fun sendMessage(queueName: String, message: String){
-        log.info("Mess" )
-        log.info( rabbitListenerEndpointRegistry.listenerContainers.size)
-        rabbitTemplate.convertAndSend("", queueName, message)
+    fun sendMessage(queueName: String, message: String) {
+        try {
+            log.info(message)
+            rabbitTemplate.convertAndSend(queueName, queueName, message)
+        } catch (_: Exception) {
+            throw QueueException()
+        }
     }
 
     /**
-     * add new queue with binding to default exchange and attach to default listener
+     * Add new queue with binding to exchange of the same name
      */
-    fun addQueue(queueName: String){
+    fun addQueue(queueName: String) {
 
         val queue = Queue(queueName, true, false, false)
-        val binging = Binding(queueName, Binding.DestinationType.QUEUE, "", queueName, null)
+        val exchange = DirectExchange(queueName)
         rabbitAdmin.declareQueue(queue)
+        rabbitAdmin.declareExchange(exchange)
+        val binging = Binding(queueName, Binding.DestinationType.QUEUE, queueName, queueName, null)
         rabbitAdmin.declareBinding(binging)
-//        addQueueToListener("default-listener", queue)
     }
 
-    fun addTestQueue(queueName: String){
-        addQueue(queueName)
-        val listenerContainer = SimpleMessageListenerContainer(rabbitTemplate.connectionFactory)
-        listenerContainer.setQueueNames(queueName)
-
-        val listener = MessageListener { data -> processMessage(data) }
-        listenerContainer.setMessageListener(listener)
-
-        val endpoint = SimpleRabbitListenerEndpoint()
-        endpoint.id = queueName
-        endpoint.messageListener = listener
-
-        val factory = SimpleRabbitListenerContainerFactory()
-        factory.setConnectionFactory(rabbitTemplate.connectionFactory)
-        rabbitListenerEndpointRegistry.registerListenerContainer(endpoint, factory, true
-        )
-
-    }
-
-    fun processMessage(data: Message) {
-        log.info(String(data.body))
-    }
     /**
-     * attach new queue to listener
+     * Force delete rabbit queue
      */
-//    fun addQueueToListener(listenerId: String, queue: Queue){
-//        getListenerById(listenerId).addQueues(queue)
-//    }
+    fun forceDeleteQueue(queueName: String) {
+        try {
+            rabbitAdmin.deleteQueue(queueName)
+        } catch (_: Exception) {
+            throw QueueException()
+        }
+    }
 
-//    fun getListenerById(listenerId: String): AbstractMessageListenerContainer {
-////        if (rabbitListenerEndpointRegistry.listenerContainerIds.contains(listenerId)) {
-//            return rabbitListenerEndpointRegistry.getListenerContainer(listenerId) as AbstractMessageListenerContainer
-////        }
-//
-//    }
+    /**
+     * Delete queue if empty and with no listeners
+     */
+    fun safeDeleteQueue(queueName: String) {
+        try {
+        rabbitAdmin.deleteQueue(queueName, true, true)
+        } catch (_: Exception) {
+            throw QueueException()
+        }
+    }
 
+    /**
+     * Delete queue
+     */
+    fun deleteQueue(queueName: String, force:Boolean){
+        if(force){
+            forceDeleteQueue(queueName)
+        }
+        else{
+            safeDeleteQueue(queueName)
+        }
+    }
 
-
+    /**
+     * Remove all messages from queue
+     */
+    fun clearQueue(queueName: String) {
+        try{
+        rabbitAdmin.purgeQueue(queueName)
+        } catch (_: Exception) {
+            throw QueueException()
+        }
+    }
 
 
 }

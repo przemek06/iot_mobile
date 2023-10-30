@@ -1,9 +1,6 @@
 package edu.pwr.iotmobile.error
 
-import edu.pwr.iotmobile.error.exception.TokenCodeIncorrectException
-import edu.pwr.iotmobile.error.exception.UserNotFoundException
-import edu.pwr.iotmobile.error.exception.TokenNotFoundException
-import edu.pwr.iotmobile.error.exception.UserAlreadyExistsException
+import edu.pwr.iotmobile.error.exception.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -29,6 +26,12 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
     fun handleUnauthorized(ex: Exception): ResponseEntity<String> {
         logError(ex)
         return ResponseEntity(ex.message, HttpStatus.UNAUTHORIZED)
+    }
+
+    @ExceptionHandler(QueueException::class, ChannelException::class)
+    fun handleRabbitError(ex: Exception): ResponseEntity<String> {
+        logError(ex)
+        return ResponseEntity(ex.message, HttpStatus.BAD_REQUEST)
     }
 
     private fun logError(ex: Exception) {

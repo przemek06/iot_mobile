@@ -12,8 +12,9 @@ class MessageController(
 ) {
 
     /**
-     * send message to default DIRECT exchange using Message entity
+     * Send message to specified queue
      */
+    //TODO change to DTO and check
     @PostMapping
     fun sendMessage(@RequestBody message: Message):ResponseEntity<String>{
         messageService.sendMessage(message)
