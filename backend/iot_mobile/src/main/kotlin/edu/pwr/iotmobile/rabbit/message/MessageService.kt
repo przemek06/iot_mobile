@@ -15,7 +15,6 @@ class MessageService (
     /**
      * Send message to specified queue
      */
-    //TODO: deserialize whole entity
     fun sendMessage(message: Message){
         try{
         rabbitTemplate.convertAndSend(message.topic.name, message.topic.name, message.message)

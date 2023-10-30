@@ -10,6 +10,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.IOException
+import java.nio.charset.Charset
 
 @Service
 @Slf4j
@@ -33,7 +34,7 @@ class RabbitListener(
                 properties: AMQP.BasicProperties,
                 body: ByteArray
             ) {
-                logger.info(consumerTag+": "+body.toString())
+                logger.info(consumerTag+": "+body.toString(Charset.defaultCharset()))
             }
         }
         try {

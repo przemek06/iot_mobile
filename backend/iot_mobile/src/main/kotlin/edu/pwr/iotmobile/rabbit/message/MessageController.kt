@@ -16,7 +16,6 @@ class MessageController(
     /**
      * Send message to specified queue
      */
-    //TODO change to DTO and check
     @PostMapping
     fun sendMessage(@RequestBody message: MessageDTO):ResponseEntity<MessageDTO>{
         messageService.sendMessage(message.toEntity())
