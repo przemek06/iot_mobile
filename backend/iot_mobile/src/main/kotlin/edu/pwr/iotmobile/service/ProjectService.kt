@@ -26,7 +26,7 @@ class ProjectService(
     val userService: UserService
 ) {
 
-    fun findProjectById(id: Int) : ProjectDTO {
+    fun findProjectById(id: Int): ProjectDTO {
         val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
 
         if (!projectRoleRepository.existsByUserIdAndProjectId(userId, id)) {
@@ -43,6 +43,12 @@ class ProjectService(
         return projectRoleRepository
             .findAllByUserId(userId)
             .map { it.project.toDTO() }
+    }
+
+    fun findAllProjectsByCreatedById(userId: Int): List<ProjectDTO> {
+        return projectRepository
+            .findAllByCreatedById(userId)
+            .map { it.toDTO() }
     }
 
     fun findAllProjectsForActiveUser(): List<ProjectDTO> {
@@ -79,6 +85,20 @@ class ProjectService(
         return saved.toDTO()
     }
 
+    @Transactional
+    fun deleteProject(projectId: Int) {
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
+        if (!isProjectOwner(userId, projectId))
+            throw NotAllowedException()
+
+        projectRepository.deleteById(projectId)
+    }
+
+    private fun isProjectOwner(userId: Int, projectId: Int): Boolean {
+        val project = projectRepository.findById(projectId).orElseThrow { ProjectNotFoundException() }
+        return project.createdBy.id == userId
+    }
+
     fun regenerateConnectionKey(projectId: Int): ProjectDTO {
         if (!isActiveUserProjectAdmin(projectId))
             throw NotAllowedException()
@@ -106,9 +126,10 @@ class ProjectService(
         return projectUserList.map { it.toDTO() }
     }
 
-    fun findActiveUserProjectRole(projectId: Int) : ProjectRoleDTO {
+    fun findActiveUserProjectRole(projectId: Int): ProjectRoleDTO {
         val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
-        val projectRole = projectRoleRepository.findByUserIdAndProjectId(userId, projectId) ?: throw UserNotFoundException()
+        val projectRole =
+            projectRoleRepository.findByUserIdAndProjectId(userId, projectId) ?: throw UserNotFoundException()
         return projectRole.toDTO()
     }
 
@@ -189,6 +210,10 @@ class ProjectService(
 
     fun findAllInvitationsByUserId(userId: Int): List<InvitationDTO> {
         return invitationRepository.findAllByUserId(userId).map { it.toDTO() }
+    }
+
+    fun findAllInvitationsByProjectId(projectId: Int): List<InvitationDTO> {
+        return invitationRepository.findAllByProjectId(projectId).map { it.toDTO() }
     }
 
     fun findAllInvitationsForActiveUser(): List<InvitationDTO> {

@@ -44,6 +44,21 @@ class ComponentService(
     }
 
     fun findAllByDashboardId(dashboardId: Int): ComponentListDTO {
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
+        val projectId = dashboardService.findById(dashboardId).projectId
+
+        if (!projectService.isInProject(userId, projectId)) {
+            throw NotAllowedException()
+        }
+
+        val entities = componentRepository.findAllByDashboardId(dashboardId)
+
+        val savedDTO = entitiesToDTOs(entities)
+
+        return ComponentListDTO(dashboardId, savedDTO)
+    }
+
+    fun findAllByDashboardIdNoSecurity(dashboardId: Int): ComponentListDTO {
         val entities = componentRepository.findAllByDashboardId(dashboardId)
 
         val savedDTO = entitiesToDTOs(entities)

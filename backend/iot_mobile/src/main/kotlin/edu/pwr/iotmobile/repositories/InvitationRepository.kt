@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface InvitationRepository : JpaRepository<Invitation, Int> {
     fun findAllByUserId(userId: Int) : List<Invitation>
+    fun findAllByProjectId(projectId: Int) : List<Invitation>
+
     fun findAllByUserIdAndStatus(userId: Int, status: EInvitationStatus) : List<Invitation>
     fun existsByUserIdAndProjectIdAndStatus(userId: Int, projectId: Int, status: EInvitationStatus) : Boolean
 }

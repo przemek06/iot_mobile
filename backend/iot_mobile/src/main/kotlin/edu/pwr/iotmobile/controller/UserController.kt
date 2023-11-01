@@ -81,17 +81,11 @@ class UserController(val userService: UserService) {
 
     // 401, 403 TODO: delete user from session
     @DeleteMapping("/user/users")
-    fun deleteActiveUser() : ResponseEntity<Unit> {
+    fun deleteActiveUser() : ResponseEntity<Int> {
         return ResponseEntity.ok(userService.deleteActiveUser())
     }
 
     // admin endpoints
-
-    // 403 TODO: delete user from session
-    @DeleteMapping("/admin/users/{id}")
-    fun deleteUserById(@PathVariable id: Int) : ResponseEntity<Unit> {
-        return ResponseEntity.ok(userService.deleteUserById(id))
-    }
 
     // 400, 403, 404, 409
     @PutMapping("/admin/users/role/{id}/{role}")

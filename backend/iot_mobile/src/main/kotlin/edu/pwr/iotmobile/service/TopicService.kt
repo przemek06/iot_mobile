@@ -4,8 +4,10 @@ import edu.pwr.iotmobile.dto.TopicDTO
 import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.error.exception.NotAllowedException
 import edu.pwr.iotmobile.error.exception.TopicAlreadyExistsException
+import edu.pwr.iotmobile.error.exception.TopicUsedException
 import edu.pwr.iotmobile.rabbit.queue.QueueService
 import edu.pwr.iotmobile.repositories.TopicRepository
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 
 @Service
@@ -45,7 +47,11 @@ class TopicService(
 
         queueService.forceDeleteQueue(topic.get().name)
 
-        topicRepository.delete(topic.get())
+        try {
+            topicRepository.delete(topic.get())
+        } catch (e: DataIntegrityViolationException) {
+            throw TopicUsedException()
+        }
 
         return true
     }
@@ -59,5 +65,9 @@ class TopicService(
         return topicRepository
             .findAllByProjectId(projectId)
             .map { it.toDTO() }
+    }
+
+    fun isTopicUsed(topicId: Int) : Boolean {
+        return topicRepository.countTopicUsage(topicId) > 0
     }
 }

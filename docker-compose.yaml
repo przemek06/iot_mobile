@@ -6,24 +6,6 @@ networks:
     driver: bridge
 
 services:
-  iot-mobile-backend:
-      build:
-        context: ./backend/iot_mobile
-        dockerfile: Dockerfile
-      networks:
-        - iot-mobile-backend-network
-      ports:
-        - "8080:8080"
-      expose:
-        - "8080"
-      env_file:
-        - dev.env
-      environment:
-        - SPRING_RABBITMQ_HOST=rabbitmq
-      depends_on:
-        - db
-        - rabbitmq
-
   db:
     image: postgres
     restart: always
@@ -40,6 +22,27 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - iot-mobile-backend-network
+    expose:
+      - "5672"
+      - "15672"
+      
+  iot-mobile-backend:
+    build:
+      context: ./backend/iot_mobile
+      dockerfile: Dockerfile
+    networks:
+      - iot-mobile-backend-network
     ports:
-      - "15672:15672"
-      - "5672:5672"
+      - "8080:8080"
+    expose:
+      - "8080"
+    env_file:
+      - dev.env
+    depends_on:
+      - db
+      - rabbitmq

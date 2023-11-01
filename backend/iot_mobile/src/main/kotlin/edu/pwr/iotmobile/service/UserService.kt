@@ -143,9 +143,10 @@ class UserService(
         return updateUser(id, user)
     }
 
-    fun deleteActiveUser() {
+    fun deleteActiveUser() : Int {
         val id = getActiveUserId() ?: throw NoAuthenticationException()
-        userRepository.deleteById(id)
+        deleteUserById(id)
+        return id
     }
 
     fun getAllUserInfo(): List<UserInfoDTO> {

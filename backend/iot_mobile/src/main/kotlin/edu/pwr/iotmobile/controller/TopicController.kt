@@ -13,7 +13,7 @@ class TopicController(val topicService: TopicService) {
     fun createTopic(@Valid @RequestBody topic: TopicDTO): ResponseEntity<TopicDTO> {
         return ResponseEntity.ok(topicService.createTopic(topic))
     }
-    // 400, 401, 403
+    // 400, 401, 403, 409 when topic is used
     @DeleteMapping("/user/topic/{topicId}")
     fun deleteTopic(@PathVariable topicId: Int): ResponseEntity<Unit> {
         return if (topicService.deleteTopic(topicId)) ResponseEntity.ok().build()
@@ -24,4 +24,11 @@ class TopicController(val topicService: TopicService) {
     fun findAllTopicsInProject(@PathVariable projectId: Int) : ResponseEntity<List<TopicDTO>> {
         return ResponseEntity.ok(topicService.findAllTopicsInProject(projectId))
     }
+
+    // 400, 401, 403
+    @GetMapping("/user/topic/used/{topicId}")
+    fun isTopicUsed(@PathVariable topicId: Int) : ResponseEntity<Boolean> {
+        return ResponseEntity.ok(topicService.isTopicUsed(topicId))
+    }
+
 }

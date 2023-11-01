@@ -2,9 +2,7 @@ package edu.pwr.iotmobile.entities
 
 import edu.pwr.iotmobile.dto.ComponentDTO
 import edu.pwr.iotmobile.enums.EComponentType
-import edu.pwr.iotmobile.listener.TriggerComponentEntityListener
 import jakarta.persistence.Entity
-import jakarta.persistence.EntityListeners
 import jakarta.persistence.OneToOne
 
 @Entity
