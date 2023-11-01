@@ -20,7 +20,7 @@ fun ChooseTopicScreenContent(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
-            text = stringResource(id = R.string.s27),
+            text = stringResource(id = R.string.s28),
             style = MaterialTheme.typography.titleSmall
         )
         Dimensions.space22.HeightSpacer()
