@@ -79,6 +79,7 @@
     <string name="block_users">Block users</string>
     <string name="block">Block</string>
     <string name="unblock">Unblock</string>
+    <string name="next">Next</string>
 
     <string name="change_password_1">Enter current password</string>
     <string name="change_password_2">Enter new password</string>
@@ -137,4 +138,5 @@
     <string name="s23">This is the name, which will represent your topic when you want to access it on your IoT device.</string>
     <string name="s24">Enter a unique name</string>
     <string name="s25">Unique name</string>
+    <string name="s26">Previous</string>
 </resources>
