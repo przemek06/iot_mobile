@@ -3,7 +3,7 @@ package edu.pwr.iotmobile.androidimcs.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -55,7 +55,7 @@ fun ButtonCommon(
 
     Button(
         modifier = modifier
-            .conditional(width != null) { width?.let { width(it) } ?: run { modifier } },
+            .conditional(width != null) { width?.let { widthIn(min = it) } ?: run { modifier } },
         shape = MaterialTheme.shapes.medium,
         colors = colors,
         border = border,

@@ -14,6 +14,7 @@
     <string name="add_new_dashboard_dialog">Add a new dashboard</string>
     <string name="add_new_group">+ Add new group</string>
     <string name="add_new_component">+ Add new component</string>
+    <string name="add_component">Add component</string>
     <string name="how_to_access">How to access?</string>
     <string name="how_to_access_1">How to access topic?</string>
     <string name="how_to_access_2">To access a topic from your IoT device, append the topic name to the connection link of the project. Gain authorization by providing the connection string in your setup code.</string>
@@ -78,6 +79,7 @@
     <string name="block_users">Block users</string>
     <string name="block">Block</string>
     <string name="unblock">Unblock</string>
+    <string name="next">Next</string>
 
     <string name="change_password_1">Enter current password</string>
     <string name="change_password_2">Enter new password</string>
@@ -136,4 +138,5 @@
     <string name="s23">This is the name, which will represent your topic when you want to access it on your IoT device.</string>
     <string name="s24">Enter a unique name</string>
     <string name="s25">Unique name</string>
+    <string name="s26">Previous</string>
 </resources>
