@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "edu.pwr.iotmobile.androidimcs";
+option java_multiple_files = true;
+
+message UserStore {
+    optional int32 id = 1;
+    optional string email = 2;
+    optional string role = 3;
+    optional string name = 4;
+    optional bool isBlocked = 5;
+    optional bool isActive = 6;
+}

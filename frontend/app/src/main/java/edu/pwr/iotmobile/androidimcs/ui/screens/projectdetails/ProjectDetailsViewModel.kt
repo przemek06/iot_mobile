@@ -26,10 +26,10 @@ import kotlinx.coroutines.launch
 private const val TAG = "ProjectDetVM"
 
 val mockUser = User(
-    id = "1",
+    id = 1,
     displayName = "Alan Walker",
     email = "alan@walker.com",
-    role = UserRole.Normal
+    role = UserRole.USER_ROLE
 )
 
 class ProjectDetailsViewModel(
