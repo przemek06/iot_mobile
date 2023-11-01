@@ -76,7 +76,7 @@ private fun AddTopicScreenContent(
                     Dimensions.space8.HeightSpacer()
                     Text(
                         text = stringResource(id = it.value.descriptionId),
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Dimensions.space18.HeightSpacer()

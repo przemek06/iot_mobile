@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import edu.pwr.iotmobile.androidimcs.R
@@ -62,5 +63,10 @@ class AddComponentViewModel : ViewModel() {
     data class BottomNavData(
         @StringRes val nextButtonText: Int = R.string.next,
         val hasPrevButton: Boolean = false,
+    )
+
+    data class ComponentData(
+        val title: String,
+        @DrawableRes val iconRes: Int
     )
 }

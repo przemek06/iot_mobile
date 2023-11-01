@@ -48,7 +48,7 @@ private fun AddComponentScreenContent(
 ) {
     NavigationWrapper(uiState, uiInteraction) {
         when (uiState.currentPage) {
-            AddComponentPage.ChooseComponent -> Text(text = "hello component")
+            AddComponentPage.ChooseComponent -> ChooseComponentScreenContent(uiState)
             AddComponentPage.ChooseTopic -> Text(text = "hello topic")
             AddComponentPage.Settings -> Text(text = "settings")
         }
