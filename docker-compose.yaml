@@ -1,8 +1,8 @@
 version: "3.8"
 
-networks:  
-  iot-mobile-backend-network:  
-    name: iot-mobile-backend-network  
+networks:
+  iot-mobile-backend-network:
+    name: iot-mobile-backend-network
     driver: bridge
 
 services:
@@ -21,6 +21,7 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
+    hostname: rabbitmq
     restart: always
     environment:
       - RABBITMQ_DEFAULT_USER=guest
@@ -30,11 +31,13 @@ services:
     expose:
       - "5672"
       - "15672"
-      
   iot-mobile-backend:
     build:
       context: ./backend/iot_mobile
       dockerfile: Dockerfile
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    restart: always
     networks:
       - iot-mobile-backend-network
     ports:

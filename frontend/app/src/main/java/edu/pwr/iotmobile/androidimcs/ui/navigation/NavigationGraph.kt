@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent.AddComponentScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminNavigation
@@ -37,11 +38,12 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchScreen
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    innerPadding: PaddingValues = PaddingValues(10.dp)
+    innerPadding: PaddingValues = PaddingValues(10.dp),
+    startDestination: String = Screen.Login.path
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.path,
+        startDestination = startDestination,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
@@ -129,6 +131,10 @@ fun NavGraph(
                     navBackStackEntry = it
                 )
             )
+        }
+
+        composable(Screen.AddComponent.path) {
+            AddComponentScreen()
         }
     }
 }

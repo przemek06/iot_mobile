@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 val mockUser = User(
-    id = "1",
+    id = 1,
     displayName = "Alan Walker",
     email = "alan@walker.com",
-    role = UserRole.Normal,
+    role = UserRole.USER_ROLE,
     isBlocked = true
 )
 

@@ -1,6 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
 import android.util.Log
+import edu.pwr.iotmobile.androidimcs.data.User
+import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
 import edu.pwr.iotmobile.androidimcs.data.dto.PasswordBody
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
@@ -9,14 +11,18 @@ import edu.pwr.iotmobile.androidimcs.data.result.ForgotPasswordResult
 import edu.pwr.iotmobile.androidimcs.data.result.LoginUserResult
 import edu.pwr.iotmobile.androidimcs.data.result.RegisterUserResult
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserLocalDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserSessionLocalDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 private const val TAG = "UserRepo"
 
 class UserRepositoryImpl(
     private val remoteDataSource: UserRemoteDataSource,
-    private val localDataSource: UserLocalDataSource
+    private val userSessionLocalDataSource: UserSessionLocalDataSource,
+    private val userLocalDataSource: UserLocalDataSource
 ) : UserRepository {
     override suspend fun login(email: String, password: String): LoginUserResult {
         val params = mapOf(
@@ -27,14 +33,35 @@ class UserRepositoryImpl(
         val resultCode = response.code()
         Log.d(TAG, "login result code: $resultCode")
 
-        // Save user session
-        val cookie = response.headers()["Set-Cookie"]
-        cookie?.let {
-            localDataSource.saveUserSessionCookie(it)
-        }
-
         return when (resultCode) {
-            200 -> LoginUserResult.Success
+            200 -> {
+                // Save user session
+                val cookie = response.headers()["Set-Cookie"]
+                cookie?.let {
+                    userSessionLocalDataSource.saveUserSessionCookie(it)
+                }
+
+                // Get user info
+                val userInfo = getActiveUserInfo().getOrNull() ?: return LoginUserResult.Failure
+
+                // Save user to local db
+                try {
+                    userLocalDataSource.updateData { store ->
+                        store.toBuilder()
+                            .setId(userInfo.id)
+                            .setEmail(userInfo.email)
+                            .setRole(userInfo.role)
+                            .setName(userInfo.name)
+                            .setIsBlocked(userInfo.isBlocked)
+                            .setIsActive(userInfo.isActive)
+                            .build()
+                    }
+                } catch (e: Exception) {
+                    return LoginUserResult.Failure
+                }
+
+                LoginUserResult.Success
+            }
             403 -> LoginUserResult.AccountInactive
             else -> LoginUserResult.Failure
         }
@@ -48,6 +75,27 @@ class UserRepositoryImpl(
             200 -> RegisterUserResult.Success
             400 -> RegisterUserResult.AccountExists
             else -> RegisterUserResult.Failure
+        }
+    }
+
+    override suspend fun getLoggedInUser(): Flow<User?> =
+        userLocalDataSource
+            .getData()
+            .map { it.toUser() }
+
+    override suspend fun logOut(): Result<Unit> {
+        // TODO: add remote log out
+
+        return try {
+            // Delete user from local db
+            userLocalDataSource.updateData { store ->
+                store.toBuilder().clear().build()
+            }
+            // Delete user session
+            userSessionLocalDataSource.removeUserSessionCookie()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to remove user session."))
         }
     }
 

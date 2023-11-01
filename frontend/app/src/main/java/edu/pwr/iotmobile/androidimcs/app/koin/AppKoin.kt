@@ -9,7 +9,9 @@ import edu.pwr.iotmobile.androidimcs.helpers.event.EventImpl
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.helpers.toast.ToastImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserLocalDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserSessionLocalDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserLocalDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserSessionLocalDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.DashboardRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ProjectRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.TopicRemoteDataSource
@@ -27,8 +29,10 @@ import edu.pwr.iotmobile.androidimcs.model.repository.impl.ProjectRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.TopicRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.UserRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountViewModel
+import edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent.AddComponentViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.addtopic.AddTopicViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminViewModel
+import edu.pwr.iotmobile.androidimcs.ui.screens.app.MainViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountViewModel
@@ -64,6 +68,7 @@ object AppKoin {
         singleOf(::TopicRemoteDataSourceImpl) bind TopicRemoteDataSource::class
 
         // Local
+        singleOf(::UserSessionLocalDataSourceImpl) bind UserSessionLocalDataSource::class
         singleOf(::UserLocalDataSourceImpl) bind UserLocalDataSource::class
     }
 
@@ -89,6 +94,8 @@ object AppKoin {
         viewModelOf(::SearchViewModel)
         viewModelOf(::AddTopicViewModel)
         viewModelOf(::DashboardViewModel)
+        viewModelOf(::MainViewModel)
+        viewModelOf(::AddComponentViewModel)
     }
 
     // Module for other singular classes

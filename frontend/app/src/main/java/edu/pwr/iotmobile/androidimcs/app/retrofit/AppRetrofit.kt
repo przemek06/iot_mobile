@@ -1,6 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.app.retrofit
 
-import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserLocalDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserSessionLocalDataSource
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -35,14 +35,14 @@ object AppRetrofit {
 }
 
 class AddCookiesInterceptor(
-    private val userLocalDataSource: UserLocalDataSource
+    private val userSessionLocalDataSource: UserSessionLocalDataSource
 ) : Interceptor {
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val builder: Request.Builder = chain.request().newBuilder()
 
         runBlocking {
-            val activeUserCookie = userLocalDataSource.userSessionCookie.firstOrNull()
+            val activeUserCookie = userSessionLocalDataSource.userSessionCookie.firstOrNull()
             activeUserCookie?.let {
                 builder.addHeader("Cookie", it)
             }
