@@ -2,6 +2,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -89,7 +90,9 @@ private fun ComponentItem(
         if (isSelected) MaterialTheme.colorScheme.gray  // TODO: change based on
         else MaterialTheme.colorScheme.background
     Card(
-        modifier = Modifier.height(120.dp),
+        modifier = Modifier
+            .height(120.dp)
+            .clickable { /*TODO*/ },
         border = BorderStroke(width = borderWidth, color = borderColor),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor,
