@@ -35,7 +35,7 @@ private val BOTTOM_BAR_BUTTON_WIDTH = 120.dp
 fun AddComponentScreen(navigation: AddComponentNavigation) {
     val viewModel: AddComponentViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
-    val uiInteraction = AddComponentInteraction.default(viewModel)
+    val uiInteraction = AddComponentUiInteraction.default(viewModel)
 
     navigation.projectId?.let {
         viewModel.init(it)
@@ -47,14 +47,14 @@ fun AddComponentScreen(navigation: AddComponentNavigation) {
 @Composable
 private fun AddComponentScreenContent(
     uiState: AddComponentUiState,
-    uiInteraction: AddComponentInteraction,
+    uiInteraction: AddComponentUiInteraction,
     navigation: AddComponentNavigation
 ) {
     NavigationWrapper(uiState, uiInteraction, navigation) {
         when (uiState.currentPage) {
-            AddComponentPage.ChooseComponent -> ChooseComponentScreenContent(uiState)
-            AddComponentPage.ChooseTopic -> ChooseTopicScreenContent(uiState)
-            AddComponentPage.Settings -> SettingsScreenContent(uiState)
+            AddComponentPage.ChooseComponent -> ChooseComponentScreenContent(uiState, uiInteraction)
+            AddComponentPage.ChooseTopic -> ChooseTopicScreenContent(uiState, uiInteraction)
+            AddComponentPage.Settings -> SettingsScreenContent(uiState, uiInteraction)
         }
     }
 }
@@ -62,7 +62,7 @@ private fun AddComponentScreenContent(
 @Composable
 private fun NavigationWrapper(
     uiState: AddComponentUiState,
-    uiInteraction: AddComponentInteraction,
+    uiInteraction: AddComponentUiInteraction,
     navigation: AddComponentNavigation,
     content: @Composable () -> Unit
 ) {
@@ -91,7 +91,7 @@ private fun NavigationWrapper(
 @Composable
 private fun BottomNavigationBar(
     modifier: Modifier = Modifier,
-    uiInteraction: AddComponentInteraction,
+    uiInteraction: AddComponentUiInteraction,
     bottomNavData: AddComponentViewModel.BottomNavData
 ) {
     Box(
@@ -132,7 +132,7 @@ private fun Preview() {
     AndroidIMCSTheme {
         AddComponentScreenContent(
             uiState = AddComponentUiState(),
-            uiInteraction = AddComponentInteraction.empty(),
+            uiInteraction = AddComponentUiInteraction.empty(),
             navigation = AddComponentNavigation.empty()
         )
     }

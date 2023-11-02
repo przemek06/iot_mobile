@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,7 +32,8 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.gray
 
 @Composable
 fun ChooseComponentScreenContent(
-    uiState: AddComponentUiState
+    uiState: AddComponentUiState,
+    uiInteraction: AddComponentUiInteraction
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -55,7 +57,11 @@ fun ChooseComponentScreenContent(
         }
 
         items(uiState.inputComponents) {
-            ComponentItem()
+            ComponentItem(
+                isSelected = uiState.newComponent.type == it.type,
+                data = it,
+                uiInteraction = uiInteraction
+            )
         }
 
         item(span = { GridItemSpan(2) }) {
@@ -78,7 +84,9 @@ fun ChooseComponentScreenContent(
 
 @Composable
 private fun ComponentItem(
-    isSelected: Boolean = false
+    isSelected: Boolean = false,
+    data: AddComponentViewModel.ComponentChoiceData,
+    uiInteraction: AddComponentUiInteraction
 ) {
     val borderWidth =
         if (isSelected) 3.dp
@@ -92,7 +100,8 @@ private fun ComponentItem(
     Card(
         modifier = Modifier
             .height(120.dp)
-            .clickable { /*TODO*/ },
+            .clickable { uiInteraction.onChooseComponent(data) }
+            .clip(CardDefaults.shape),
         border = BorderStroke(width = borderWidth, color = borderColor),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor,
@@ -104,13 +113,13 @@ private fun ComponentItem(
                 .padding(Dimensions.space10),
         ) {
             Text(
-                text = "Slider",
+                text = stringResource(id = data.titleId),
                 style = MaterialTheme.typography.bodySmall
             )
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
                     modifier = Modifier.align(Alignment.Center),
-                    painter = painterResource(id = R.drawable.ic_slider),
+                    painter = painterResource(id = data.iconRes),
                     colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary),
                     contentDescription = null,
                 )

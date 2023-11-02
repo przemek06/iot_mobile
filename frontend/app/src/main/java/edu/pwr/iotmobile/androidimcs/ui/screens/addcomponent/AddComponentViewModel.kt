@@ -87,6 +87,39 @@ class AddComponentViewModel(
         }
     }
 
+    fun onChooseComponent(componentData: ComponentChoiceData) {
+        _uiState.update {
+            it.copy(
+                newComponent = it.newComponent.copy(
+                    type = componentData.type
+                )
+            )
+        }
+    }
+
+    fun onChooseTopic(topic: Topic) {
+        _uiState.update {
+            it.copy(
+                newComponent = it.newComponent.copy(
+                    topic = topic
+                )
+            )
+        }
+    }
+
+    fun onTextChange(
+        type: SettingType,
+        text: String
+    ) {
+        _uiState.update { ui ->
+            val input = ui.settings[type] ?: return
+            val inputField = input.copy(inputFieldData = input.inputFieldData.copy(text = text))
+            val newSettings = ui.settings.toMutableMap()
+            newSettings.replace(type, inputField)
+            ui.copy(settings = newSettings)
+        }
+    }
+
     private suspend fun getTopicsForProject(projectId: Int): List<Topic> {
         kotlin.runCatching {
             topicRepository.getTopicsByProjectId(projectId)
@@ -194,7 +227,7 @@ class AddComponentViewModel(
     data class ComponentChoiceData(
         @StringRes val titleId: Int,
         @DrawableRes val iconRes: Int,
-        val type: ComponentType
+        val type: ComponentType,
     )
 
     data class SettingData(
