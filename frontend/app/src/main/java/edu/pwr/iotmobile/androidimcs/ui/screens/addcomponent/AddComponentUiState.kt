@@ -1,6 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
-import android.adservices.topics.Topic
+import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 
 data class AddComponentUiState(
     val currentPage: AddComponentPage = AddComponentPage.ChooseComponent,
