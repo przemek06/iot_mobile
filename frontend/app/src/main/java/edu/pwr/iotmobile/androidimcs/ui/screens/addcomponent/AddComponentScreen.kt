@@ -32,20 +32,25 @@ private val BOTTOM_BAR_HEIGHT = 80.dp
 private val BOTTOM_BAR_BUTTON_WIDTH = 120.dp
 
 @Composable
-fun AddComponentScreen() {
+fun AddComponentScreen(navigation: AddComponentNavigation) {
     val viewModel: AddComponentViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val uiInteraction = AddComponentInteraction.default(viewModel)
 
-    AddComponentScreenContent(uiState, uiInteraction)
+    navigation.projectId?.let {
+        viewModel.init(it)
+    }
+
+    AddComponentScreenContent(uiState, uiInteraction, navigation)
 }
 
 @Composable
 private fun AddComponentScreenContent(
     uiState: AddComponentUiState,
-    uiInteraction: AddComponentInteraction
+    uiInteraction: AddComponentInteraction,
+    navigation: AddComponentNavigation
 ) {
-    NavigationWrapper(uiState, uiInteraction) {
+    NavigationWrapper(uiState, uiInteraction, navigation) {
         when (uiState.currentPage) {
             AddComponentPage.ChooseComponent -> ChooseComponentScreenContent(uiState)
             AddComponentPage.ChooseTopic -> ChooseTopicScreenContent(uiState)
@@ -58,6 +63,7 @@ private fun AddComponentScreenContent(
 private fun NavigationWrapper(
     uiState: AddComponentUiState,
     uiInteraction: AddComponentInteraction,
+    navigation: AddComponentNavigation,
     content: @Composable () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -67,7 +73,7 @@ private fun NavigationWrapper(
         ) {
             TopBar(
                 text = stringResource(id = R.string.add_component),
-                onReturn = {/*TODO*/}
+                onReturn = navigation::onReturn
             )
             Dimensions.space14.HeightSpacer()
             Column(modifier = Modifier.padding(horizontal = Dimensions.space22)) {
@@ -126,7 +132,8 @@ private fun Preview() {
     AndroidIMCSTheme {
         AddComponentScreenContent(
             uiState = AddComponentUiState(),
-            uiInteraction = AddComponentInteraction.empty()
+            uiInteraction = AddComponentInteraction.empty(),
+            navigation = AddComponentNavigation.empty()
         )
     }
 }

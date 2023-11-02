@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 
 object AppRetrofit {
-    private const val BASE_URL = "http://172.20.10.8:8080/"
+    private const val BASE_URL = "http://192.168.66.46:8080/"
 
     fun create(
         cookiesInterceptor: AddCookiesInterceptor
