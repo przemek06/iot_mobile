@@ -145,4 +145,12 @@
     <string name="s30">Input components</string>
     <string name="s31">Output components</string>
     <string name="s32">Trigger components</string>
+    <string name="s33">On click send</string>
+    <string name="s34">value</string>
+    <string name="s35">On toggle on send</string>
+    <string name="s36">On toggle off send</string>
+    <string name="s37">Max value</string>
+    <string name="s38">Min value</string>
+    <string name="s39">Select title</string>
+    <string name="s40">Select default value</string>
 </resources>

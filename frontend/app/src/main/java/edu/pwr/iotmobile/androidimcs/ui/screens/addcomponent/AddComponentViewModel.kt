@@ -4,6 +4,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.InputFieldData
+import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,6 +23,9 @@ class AddComponentViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(AddComponentUiState())
     val uiState = _uiState.asStateFlow()
 
+    // TODO: get topics, build input component list,
+    // assign data from input fields to component data upon confirm click & send to backend
+
     fun navigateNext() {
         when (_uiState.value.currentPage) {
             AddComponentPage.ChooseComponent ->
@@ -31,7 +36,8 @@ class AddComponentViewModel : ViewModel() {
             AddComponentPage.ChooseTopic ->
                 _uiState.update { it.copy(
                     currentPage = AddComponentPage.Settings,
-                    bottomNavData = getBottomNavData(AddComponentPage.Settings)
+                    bottomNavData = getBottomNavData(AddComponentPage.Settings),
+                    settings = generateSettings()
                 ) }
             AddComponentPage.Settings ->
                 { /*TODO: add new component*/ }
@@ -60,13 +66,112 @@ class AddComponentViewModel : ViewModel() {
         AddComponentPage.Settings -> BottomNavDataList[2]
     }
 
+    private fun generateSettings(): Map<SettingType, SettingData> {
+        val defaultFields = mapOf(
+            SettingType.Name to SettingData(
+                title = R.string.s39,
+                inputFieldData = InputFieldData(
+                    label = R.string.name
+                )
+            ),
+            SettingType.DefaultValue to SettingData(
+                title = R.string.s40,
+                inputFieldData = InputFieldData(
+                    label = R.string.s34
+                )
+            )
+        )
+
+        val specificFields = when (uiState.value.newComponent.type) {
+
+            ComponentType.Button -> mapOf(
+                SettingType.OnClickSend to SettingData(
+                    title = R.string.s33,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                )
+            )
+
+            ComponentType.Toggle -> mapOf(
+                SettingType.OnToggleOnSend to SettingData(
+                    title = R.string.s35,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                ),
+                SettingType.OnToggleOffSend to SettingData(
+                    title = R.string.s36,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                )
+            )
+
+            ComponentType.Slider -> mapOf(
+                SettingType.MaxValue to SettingData(
+                    title = R.string.s37,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                ),
+                SettingType.MinValue to SettingData(
+                    title = R.string.s38,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                )
+            )
+
+            else -> emptyMap()
+
+        }
+
+        return defaultFields + specificFields
+    }
+
     data class BottomNavData(
         @StringRes val nextButtonText: Int = R.string.next,
         val hasPrevButton: Boolean = false,
     )
 
-    data class ComponentData(
+    data class ComponentChoiceData(
         val title: String,
         @DrawableRes val iconRes: Int
     )
+
+    data class SettingData(
+        @StringRes val title: Int,
+        val inputFieldData: InputFieldData
+    )
+
+    data class ComponentData(
+        val type: ComponentType? = null,
+        val topic: Topic? = null,
+        val name: String = "",
+        val defaultValue: Any? = null,
+        val onSendValue: Any? = null,
+        val onSendAlternativeValue: Any? = null,
+        val maxValue: Any? = null,
+        val minValue: Any? = null,
+    )
+
+    enum class ComponentType {
+        Button,
+        Toggle,
+        Slider,
+        Graph,
+//        LineGraph,
+//        SpeedGraph
+    }
+
+    enum class SettingType {
+        Name,
+        DefaultValue,
+        OnClickSend,
+        OnToggleOnSend,
+        OnToggleOffSend,
+        MaxValue,
+        MinValue,
+    }
 }
