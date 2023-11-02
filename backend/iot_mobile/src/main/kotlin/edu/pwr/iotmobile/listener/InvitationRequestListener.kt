@@ -9,7 +9,6 @@ import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.AfterReturning
 import org.aspectj.lang.annotation.Aspect
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 
@@ -29,12 +28,12 @@ class InvitationRequestListener {
                 "|| execution(* edu.pwr.iotmobile.controller.ProjectController.rejectInvitation(..))",
         returning = "response"
     )
-    fun sendNotification(joinPoint: JoinPoint?, response: ResponseEntity<InvitationDTO>) {
+    fun sendNotificationOnInvitationAction(joinPoint: JoinPoint?, response: ResponseEntity<InvitationDTO>) {
         response.body?.let { afterChange(it) }
     }
 
-    private fun afterChange(entity: InvitationDTO) {
-        val userId = entity.userId
+    private fun afterChange(dto: InvitationDTO) {
+        val userId = dto.userId
         val userInvitations = projectService.findAllInvitationsByUserId(userId)
         val anyPendingInvitation = userInvitations.any { it.status == EInvitationStatus.PENDING }
         invitationChangeService.processEntityChange(InvitationAlertDTO(userId, anyPendingInvitation))

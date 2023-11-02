@@ -50,7 +50,8 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
         InvitationAlreadyExistsException::class,
         UserAlreadyInProjectException::class,
         TopicAlreadyExistsException::class,
-        DashboardAlreadyExistsException::class
+        DashboardAlreadyExistsException::class,
+        TopicUsedException::class
     )
     fun handleConflict(ex: Exception): ResponseEntity<String> {
         logError(ex)
