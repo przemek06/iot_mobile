@@ -76,7 +76,7 @@ private fun AccountScreenContent(
             title = stringResource(id = R.string.u_sure_logout),
             buttonText1 = stringResource(id = R.string.no),
             buttonText2 = stringResource(id = R.string.yes),
-            buttonFunction1 = { isLogOutDialogVisible.value = false },
+            buttonFunction1 = { uiInteraction.logout() },
             buttonFunction2 = { isLogOutDialogVisible.value = false }
         )
     }
@@ -85,7 +85,7 @@ private fun AccountScreenContent(
             title = stringResource(id = R.string.u_sure_delete_account),
             buttonText1 = stringResource(id = R.string.no),
             buttonText2 = stringResource(id = R.string.yes),
-            buttonFunction1 = { isDeleteAccountDialogVisible.value = false },
+            buttonFunction1 = { uiInteraction.deleteAccount() },
             buttonFunction2 = { isDeleteAccountDialogVisible.value = false },
             content = { AccountDeletionContent() }
         )
@@ -112,7 +112,7 @@ private fun AccountScreenContent(
                 )
 
                 Text(
-                    text = uiState.email,
+                    text = uiState.user.email,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -138,7 +138,7 @@ private fun AccountScreenContent(
                 }
 
                 Text(
-                    text = uiState.displayName,
+                    text = uiState.user.displayName,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
