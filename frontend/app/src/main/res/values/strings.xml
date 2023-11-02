@@ -153,4 +153,7 @@
     <string name="s38">Min value</string>
     <string name="s39">Select title</string>
     <string name="s40">Select default value</string>
+    <string name="s41">Button</string>
+    <string name="s42">Toggle</string>
+    <string name="s43">Slider</string>
 </resources>

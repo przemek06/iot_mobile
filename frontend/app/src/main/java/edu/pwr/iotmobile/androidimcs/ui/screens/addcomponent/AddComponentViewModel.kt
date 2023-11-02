@@ -26,6 +26,12 @@ class AddComponentViewModel : ViewModel() {
     // TODO: get topics, build input component list,
     // assign data from input fields to component data upon confirm click & send to backend
 
+    init {
+        _uiState.update {
+            it.copy(inputComponents = generateInputComponents())
+        }
+    }
+
     fun navigateNext() {
         when (_uiState.value.currentPage) {
             AddComponentPage.ChooseComponent ->
@@ -130,14 +136,33 @@ class AddComponentViewModel : ViewModel() {
         return defaultFields + specificFields
     }
 
+    private fun generateInputComponents() = listOf(
+        ComponentChoiceData(
+            titleId = R.string.s41,
+            iconRes = R.drawable.ic_button,
+            type = ComponentType.Button
+        ),
+        ComponentChoiceData(
+            titleId = R.string.s42,
+            iconRes = R.drawable.ic_toggle,
+            type = ComponentType.Toggle
+        ),
+        ComponentChoiceData(
+            titleId = R.string.s43,
+            iconRes = R.drawable.ic_slider,
+            type = ComponentType.Slider
+        )
+    )
+
     data class BottomNavData(
         @StringRes val nextButtonText: Int = R.string.next,
         val hasPrevButton: Boolean = false,
     )
 
     data class ComponentChoiceData(
-        val title: String,
-        @DrawableRes val iconRes: Int
+        @StringRes val titleId: Int,
+        @DrawableRes val iconRes: Int,
+        val type: ComponentType
     )
 
     data class SettingData(
