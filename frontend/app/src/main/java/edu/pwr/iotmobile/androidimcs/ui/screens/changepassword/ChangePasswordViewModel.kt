@@ -1,11 +1,17 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.changepassword
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
+import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class ChangePasswordViewModel : ViewModel() {
+class ChangePasswordViewModel(
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChangePasswordUiState.default())
     val uiState = _uiState.asStateFlow()
@@ -18,6 +24,35 @@ class ChangePasswordViewModel : ViewModel() {
     fun onTextChangePasswordNew(text: String) {
         _uiState.update {
             it.copy(inputFieldPasswordNew = it.inputFieldPasswordNew.copy(text = text))
+        }
+    }
+    fun onConfirm(navigation: ChangePasswordNavigation) {
+
+        viewModelScope.launch {
+
+            val password = uiState.value.inputFieldPasswordNew.text
+            if(password.length < 8) {
+                _uiState.update {
+                    it.copy(inputFieldPasswordNew = it.inputFieldPasswordNew.copy(isError = true))
+                }
+                return@launch
+            }
+
+            val userDtoInfo = userRepository.getActiveUserInfo().getOrElse { return@launch }
+            val newUserDto = UserDto(
+                email = userDtoInfo.email,
+                password = password,
+                name = userDtoInfo.name
+            )
+            val result = userRepository.updateActiveUser(newUserDto)
+
+            if(result.isSuccess) {
+                navigation.goBack()
+            } else {
+                _uiState.update {
+                    it.copy(inputFieldPassword = it.inputFieldPassword.copy(isError = true))
+                }
+            }
         }
     }
 }
