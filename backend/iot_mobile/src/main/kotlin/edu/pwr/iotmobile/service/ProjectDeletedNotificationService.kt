@@ -33,7 +33,6 @@ class ProjectDeletedNotificationService {
 
     @Transactional
     fun processEntityChange(alert: ProjectDeletedDTO) {
-        println(alert)
         fluxSink.tryEmitNext(alert).orThrow()
     }
 }

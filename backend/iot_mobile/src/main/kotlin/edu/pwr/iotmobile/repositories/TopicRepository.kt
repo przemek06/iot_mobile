@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TopicRepository : JpaRepository<Topic, Int> {
     fun findAllByProjectId(projectId: Int) : List<Topic>
-    fun existsByNameAndProjectId(name: String, projectId: Int) : Boolean
+    fun existsByUniqueNameAndProjectId(uniqueName: String, projectId: Int) : Boolean
 
     @Query("SELECT COUNT(DISTINCT ic.id) + COUNT(DISTINCT oc.id) " +
             "FROM Topic t " +

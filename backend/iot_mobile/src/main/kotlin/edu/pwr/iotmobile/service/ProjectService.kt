@@ -212,8 +212,8 @@ class ProjectService(
         return invitationRepository.findAllByUserId(userId).map { it.toDTO() }
     }
 
-    fun findAllInvitationsByProjectId(projectId: Int): List<InvitationDTO> {
-        return invitationRepository.findAllByProjectId(projectId).map { it.toDTO() }
+    fun findAllPendingInvitationsByProjectId(projectId: Int): List<InvitationDTO> {
+        return invitationRepository.findAllByProjectIdAndStatus(projectId, EInvitationStatus.PENDING).map { it.toDTO() }
     }
 
     fun findAllInvitationsForActiveUser(): List<InvitationDTO> {

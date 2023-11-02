@@ -30,7 +30,6 @@ class ComponentChangeService {
 
     @Transactional
     fun processEntityChange(dto: ComponentListDTO) {
-        println(dto)
         fluxSink.tryEmitNext(dto).orThrow()
     }
 }

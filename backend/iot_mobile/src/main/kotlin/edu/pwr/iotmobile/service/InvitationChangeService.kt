@@ -38,7 +38,6 @@ class InvitationChangeService {
 
     @Transactional
     fun processEntityChange(alert: InvitationAlertDTO) {
-        println(alert)
         fluxSink.tryEmitNext(alert).orThrow()
     }
 }

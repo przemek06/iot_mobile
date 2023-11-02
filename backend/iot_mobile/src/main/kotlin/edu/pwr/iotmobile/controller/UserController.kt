@@ -81,7 +81,7 @@ class UserController(val userService: UserService) {
 
     // 401, 403 TODO: delete user from session
     @DeleteMapping("/user/users")
-    fun deleteActiveUser() : ResponseEntity<Int> {
+    fun deleteActiveUser() : ResponseEntity<Unit> {
         return ResponseEntity.ok(userService.deleteActiveUser())
     }
 

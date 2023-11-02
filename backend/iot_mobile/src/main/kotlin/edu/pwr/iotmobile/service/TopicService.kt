@@ -22,7 +22,7 @@ class TopicService(
         if (!projectService.isEditor(userId, topic.projectId))
             throw NotAllowedException()
 
-        if (topicRepository.existsByNameAndProjectId(topic.name, topic.projectId))
+        if (topicRepository.existsByUniqueNameAndProjectId(topic.uniqueName, topic.projectId))
             throw TopicAlreadyExistsException()
 
         val projectName = projectService.findProjectById(topic.projectId).name
@@ -45,13 +45,11 @@ class TopicService(
         if (!projectService.isEditor(userId, projectId))
             throw NotAllowedException()
 
-        queueService.forceDeleteQueue(topic.get().name)
-
-        try {
-            topicRepository.delete(topic.get())
-        } catch (e: DataIntegrityViolationException) {
+        if (isTopicUsed(topicId))
             throw TopicUsedException()
-        }
+
+        queueService.forceDeleteQueue(topic.get().name)
+        topicRepository.delete(topic.get())
 
         return true
     }
