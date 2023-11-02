@@ -63,11 +63,17 @@ class ProjectDeletedListener {
         val projectRoles = projectIds?.flatMap { projectService.findAllProjectRolesByProjectId(it) }
         val invitations = projectIds?.flatMap { projectService.findAllPendingInvitationsByProjectId(it) }
 
-        pjp.proceed()
+        val result = pjp.proceed()
+        if (result !is ResponseEntity<*>) {
+            return
+        }
 
-        projectRoles?.map { ProjectDeletedDTO(it.projectId, it.user.id) }
-            ?.forEach { projectDeletedNotificationService.processEntityChange(it) }
-        invitations?.forEach { afterChange(it) }
+        if (result.statusCode == HttpStatus.OK) {
+            projectRoles?.map { ProjectDeletedDTO(it.projectId, it.user.id) }
+                ?.forEach { projectDeletedNotificationService.processEntityChange(it) }
+
+            invitations?.forEach { afterChange(it) }
+        }
     }
 
     private fun afterChange(dto: InvitationDTO) {
