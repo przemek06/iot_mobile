@@ -40,6 +40,17 @@ class UserRepositoryImpl(
         }
     }
 
+    override suspend fun logout(): Result<Unit> {
+        val response = remoteDataSource.logoutUser()
+        val resultCode = response.code()
+        Log.d(TAG, "logout result code: $resultCode")
+
+        return if (response.isSuccessful)
+            Result.success(Unit)
+        else
+            Result.failure(Exception("Logout failed"))
+    }
+
     override suspend fun register(userDto: UserDto): RegisterUserResult {
         val response = remoteDataSource.registerUser(userDto)
         val resultCode = response.code()

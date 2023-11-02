@@ -10,6 +10,7 @@ import edu.pwr.iotmobile.androidimcs.data.result.RegisterUserResult
 
 interface UserRepository {
     suspend fun login(email: String, password: String): LoginUserResult
+    suspend fun logout(): Result<Unit>
     suspend fun register(userDto: UserDto): RegisterUserResult
     // TODO: suspend fun sendActivateCodeEmail(email: String): Result<Unit>
     suspend fun getUserInfoById(id: Int): Result<UserInfoDto>
