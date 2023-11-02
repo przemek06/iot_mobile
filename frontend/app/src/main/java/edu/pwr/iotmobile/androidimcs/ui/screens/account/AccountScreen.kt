@@ -110,7 +110,7 @@ private fun AccountScreenContent(
                 )
 
                 Text(
-                    text = uiState.email,
+                    text = uiState.user.email,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -136,7 +136,7 @@ private fun AccountScreenContent(
                 }
 
                 Text(
-                    text = uiState.displayName,
+                    text = uiState.user.displayName,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )

@@ -31,7 +31,7 @@ data class AccountUiState(
                 id = 0,
                 displayName = "",
                 email = "",
-                role = UserRole.Normal
+                role = UserRole.USER_ROLE
             )
         ) = AccountUiState(
             changePasswordOption = changePasswordOption,

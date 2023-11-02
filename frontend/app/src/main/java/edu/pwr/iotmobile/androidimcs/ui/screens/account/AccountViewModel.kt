@@ -7,11 +7,10 @@ import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.StatData
 import edu.pwr.iotmobile.androidimcs.data.User
-import edu.pwr.iotmobile.androidimcs.data.User.Companion.toDto
+import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
 import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
-import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto.Companion.toUser
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
@@ -80,11 +79,11 @@ class AccountViewModel(
                     name = userDtoInfo.name
                 ))
 
-                if(result.isSuccess){
-                    _uiState.update {
-                        it.copy(user = userDtoInfo.toUser())
-                    }
-                }
+//                if(result.isSuccess){
+//                    _uiState.update {
+//                        it.copy(user = userDtoInfo.toUser())
+//                    }
+//                }
             }
         } else {
             _uiState.update {
