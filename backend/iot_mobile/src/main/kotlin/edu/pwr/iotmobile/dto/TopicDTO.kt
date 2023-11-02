@@ -20,10 +20,10 @@ data class TopicDTO(
     @field:NotNull
     val valueType: EValueType
 ) {
-    fun toEntity(projectName: String) : Topic {
+    fun toEntityOnCreation() : Topic {
         val project = Project()
         project.id = projectId
-        return Topic(project, name, "$projectName/$uniqueName", valueType, id)
+        return Topic(project, name, "$projectId/$uniqueName", valueType, id)
     }
 
     fun toEntity() : Topic {

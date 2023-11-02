@@ -42,6 +42,12 @@ class ProjectController(val projectService: ProjectService) {
         return ResponseEntity.ok(projectService.findProjectById(projectId))
     }
 
+    // 400, 401, 403, 404
+    @DeleteMapping("/user/project/{projectId}")
+    fun deleteProjectById(@PathVariable projectId: Int): ResponseEntity<Unit> {
+        return ResponseEntity.ok(projectService.deleteProject(projectId))
+    }
+
     // 403, 404
     @PutMapping("/user/project/users/roles")
     fun editProjectRole(@Valid @RequestBody projectRole: ProjectRoleDTO) : ResponseEntity<ProjectRoleDTO> {

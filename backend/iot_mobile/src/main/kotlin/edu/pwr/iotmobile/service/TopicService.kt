@@ -4,6 +4,7 @@ import edu.pwr.iotmobile.dto.TopicDTO
 import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.error.exception.NotAllowedException
 import edu.pwr.iotmobile.error.exception.TopicAlreadyExistsException
+import edu.pwr.iotmobile.error.exception.TopicUsedException
 import edu.pwr.iotmobile.rabbit.queue.QueueService
 import edu.pwr.iotmobile.repositories.TopicRepository
 import org.springframework.stereotype.Service
@@ -20,14 +21,12 @@ class TopicService(
         if (!projectService.isEditor(userId, topic.projectId))
             throw NotAllowedException()
 
-        if (topicRepository.existsByNameAndProjectId(topic.name, topic.projectId))
+        if (topicRepository.existsByUniqueNameAndProjectId(topic.uniqueName, topic.projectId))
             throw TopicAlreadyExistsException()
-
-        val projectName = projectService.findProjectById(topic.projectId).name
 
         queueService.addQueue(topic.name)
 
-        val toSave = topic.toEntity(projectName)
+        val toSave = topic.toEntityOnCreation()
         return topicRepository.save(toSave).toDTO()
     }
 
@@ -43,8 +42,10 @@ class TopicService(
         if (!projectService.isEditor(userId, projectId))
             throw NotAllowedException()
 
-        queueService.forceDeleteQueue(topic.get().name)
+        if (isTopicUsed(topicId))
+            throw TopicUsedException()
 
+        queueService.forceDeleteQueue(topic.get().name)
         topicRepository.delete(topic.get())
 
         return true
@@ -59,5 +60,9 @@ class TopicService(
         return topicRepository
             .findAllByProjectId(projectId)
             .map { it.toDTO() }
+    }
+
+    fun isTopicUsed(topicId: Int) : Boolean {
+        return topicRepository.countTopicUsage(topicId) > 0
     }
 }

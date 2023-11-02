@@ -87,12 +87,6 @@ class UserController(val userService: UserService) {
 
     // admin endpoints
 
-    // 403 TODO: delete user from session
-    @DeleteMapping("/admin/users/{id}")
-    fun deleteUserById(@PathVariable id: Int) : ResponseEntity<Unit> {
-        return ResponseEntity.ok(userService.deleteUserById(id))
-    }
-
     // 400, 403, 404, 409
     @PutMapping("/admin/users/role/{id}/{role}")
     fun updateUserRole(@PathVariable id: Int, @PathVariable role: ERole) : ResponseEntity<UserInfoDTO> {

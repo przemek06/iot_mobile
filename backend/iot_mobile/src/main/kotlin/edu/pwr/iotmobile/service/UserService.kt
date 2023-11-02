@@ -4,9 +4,12 @@ import edu.pwr.iotmobile.dto.EmailDTO
 import edu.pwr.iotmobile.dto.PasswordDTO
 import edu.pwr.iotmobile.dto.UserDTO
 import edu.pwr.iotmobile.dto.UserInfoDTO
-import edu.pwr.iotmobile.repositories.UserRepository
 import edu.pwr.iotmobile.enums.ERole
-import edu.pwr.iotmobile.error.exception.*
+import edu.pwr.iotmobile.error.exception.NoAuthenticationException
+import edu.pwr.iotmobile.error.exception.TokenCodeIncorrectException
+import edu.pwr.iotmobile.error.exception.UserAlreadyExistsException
+import edu.pwr.iotmobile.error.exception.UserNotFoundException
+import edu.pwr.iotmobile.repositories.UserRepository
 import edu.pwr.iotmobile.security.UserDetailsImpl
 import org.springframework.beans.BeanUtils
 import org.springframework.security.core.Authentication
@@ -143,9 +146,9 @@ class UserService(
         return updateUser(id, user)
     }
 
-    fun deleteActiveUser() {
+    fun deleteActiveUser() : Unit {
         val id = getActiveUserId() ?: throw NoAuthenticationException()
-        userRepository.deleteById(id)
+        deleteUserById(id)
     }
 
     fun getAllUserInfo(): List<UserInfoDTO> {
