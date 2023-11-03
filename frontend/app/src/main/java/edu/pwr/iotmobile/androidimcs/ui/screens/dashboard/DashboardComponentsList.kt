@@ -43,9 +43,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ButtonComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ToggleComponent
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -115,7 +117,7 @@ fun ComponentsList(
                 key = item.id,
                 span = itemSpan
             ) {
-                ToggleComponent(
+                ComponentChoice(
                     item = item,
                     uiState = uiState,
                     uiInteraction = uiInteraction,
@@ -129,6 +131,38 @@ fun ComponentsList(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun LazyStaggeredGridItemScope.ComponentChoice(
+    item: ComponentData,
+    uiState: DashboardUiState,
+    uiInteraction: DashboardUiInteraction,
+    onPlaceItem: () -> Unit,
+    coroutineScope: CoroutineScope,
+) {
+    when (item.type) {
+
+        ComponentDetailedType.Toggle -> ToggleComponent(
+            uiState = uiState,
+            item = item,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+
+        ComponentDetailedType.Button -> ButtonComponent(
+            item = item,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+
+        // TODO: other component types
+
+        else -> {}
+
     }
 }
 
