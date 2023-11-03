@@ -22,10 +22,12 @@ import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.DashboardRemot
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ProjectRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.TopicRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.UserRemoteDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.impl.ComponentRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.DashboardRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.ProjectRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.TopicRepositoryImpl
@@ -81,6 +83,7 @@ object AppKoin {
         singleOf(::ProjectRepositoryImpl) bind ProjectRepository::class
         singleOf(::DashboardRepositoryImpl) bind DashboardRepository::class
         singleOf(::TopicRepositoryImpl) bind TopicRepository::class
+        singleOf(::ComponentRepositoryImpl) bind ComponentRepository::class
     }
 
     // Module for view models
