@@ -8,11 +8,13 @@ import edu.pwr.iotmobile.androidimcs.data.ComponentType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
+import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.extensions.asEnum
 
 data class DashboardUiState(
     val draggedComponentId: Int? = null,
     val components: List<ComponentData> = emptyList(),
+    val topics: List<Topic> = emptyList(),
     val menuOptionsList: List<MenuOption> = emptyList(),
     val userProjectRole: UserProjectRole? = null,
 )

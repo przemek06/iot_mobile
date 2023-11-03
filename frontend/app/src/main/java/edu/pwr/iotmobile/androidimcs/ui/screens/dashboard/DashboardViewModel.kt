@@ -65,7 +65,7 @@ class DashboardViewModel(
         }
     }
 
-    fun onComponentClick(id: Int) {
+    fun onComponentClick(item: ComponentData, value: Any?) {
         // TODO: implement
     }
 

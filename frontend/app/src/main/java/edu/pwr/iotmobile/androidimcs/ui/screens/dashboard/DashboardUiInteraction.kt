@@ -6,7 +6,7 @@ import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
 
 interface DashboardUiInteraction {
     fun setAbsolutePosition(offset: Offset, id: Int)
-    fun onComponentClick(id: Int)
+    fun onComponentClick(item: ComponentData, value: Any?)
     fun setDraggedComponentId(id: Int?)
     fun onPlaceDraggedComponent(visibleItems: List<LazyStaggeredGridItemInfo>, windowWidth: Float)
     fun onAddNewComponent()
@@ -20,8 +20,8 @@ interface DashboardUiInteraction {
                 viewModel.setAbsolutePosition(offset, id)
             }
 
-            override fun onComponentClick(id: Int) {
-                viewModel.onComponentClick(id)
+            override fun onComponentClick(item: ComponentData, value: Any?) {
+                viewModel.onComponentClick(item, value)
             }
 
             override fun setDraggedComponentId(id: Int?) {

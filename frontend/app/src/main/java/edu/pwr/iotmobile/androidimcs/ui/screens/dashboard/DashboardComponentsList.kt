@@ -2,9 +2,8 @@
 
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.interaction.DragInteraction
@@ -21,8 +20,9 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,7 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -47,9 +46,9 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ToggleComponent
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
-import edu.pwr.iotmobile.androidimcs.ui.theme.LightPurple
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -57,8 +56,7 @@ import kotlin.math.roundToInt
 @Composable
 fun ComponentsList(
     uiState: DashboardUiState,
-    uiInteraction: DashboardUiInteraction,
-    navigation: DashboardNavigation
+    uiInteraction: DashboardUiInteraction
 ) {
     val list = uiState.components
     val gridState = rememberLazyStaggeredGridState()
@@ -117,8 +115,9 @@ fun ComponentsList(
                 key = item.id,
                 span = itemSpan
             ) {
-                Component(
+                ToggleComponent(
                     item = item,
+                    uiState = uiState,
                     uiInteraction = uiInteraction,
                     onPlaceItem = {
                         uiInteraction.onPlaceDraggedComponent(
@@ -134,11 +133,12 @@ fun ComponentsList(
 }
 
 @Composable
-private fun LazyStaggeredGridItemScope.Component(
+fun LazyStaggeredGridItemScope.ComponentWrapper(
     item: ComponentData,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    content: @Composable () -> Unit
 ) {
     var offset by remember { mutableStateOf(Offset.Zero) }
     var isDragged by remember { mutableStateOf(false) }
@@ -211,17 +211,22 @@ private fun LazyStaggeredGridItemScope.Component(
             )
         }
     ) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(color = LightPurple)
-            .clip(MaterialTheme.shapes.large)
-            .clickable { uiInteraction.onComponentClick(item.id) }
-        ) {
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = item.name,
-                style = MaterialTheme.typography.bodyLarge
+        Card(
+            modifier = Modifier
+//                .height(140.dp)
+                .clip(CardDefaults.shape),
+            border = BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.primary),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.background,
             )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(Dimensions.space10),
+            ) {
+                content()
+            }
         }
     }
 }
