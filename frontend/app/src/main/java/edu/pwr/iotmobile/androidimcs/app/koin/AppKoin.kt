@@ -4,6 +4,7 @@ import android.content.Context
 import edu.pwr.iotmobile.androidimcs.app.database.AppDatabase
 import edu.pwr.iotmobile.androidimcs.app.retrofit.AddCookiesInterceptor
 import edu.pwr.iotmobile.androidimcs.app.retrofit.AppRetrofit
+import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.event.EventImpl
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
@@ -52,10 +53,15 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 object AppKoin {
+
+    object Scope {
+        val COMPONENT_LIST = named("componentListScope")
+    }
 
     // Module for local and remote environments, e.g. Retrofit.
     private val environments = module {
@@ -111,13 +117,24 @@ object AppKoin {
         single { AddCookiesInterceptor(get()) }
     }
 
+    private val scopes = module {
+        scope(Scope.COMPONENT_LIST) {
+            scoped { params ->
+                ComponentsListState(
+                    componentListDto = params.get(),
+                )
+            }
+        }
+    }
+
     private val modules by lazy {
         listOf(
             environments,
             dataSources,
             repositories,
             viewModels,
-            misc
+            misc,
+            scopes
         )
     }
 

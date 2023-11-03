@@ -8,26 +8,46 @@ import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
+import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class DashboardViewModel : ViewModel() {
+class DashboardViewModel(
+    private val componentRepository: ComponentRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var _dashboardId: Int? = null
     private var userProjectRole: UserProjectRole? = UserProjectRole.EDITOR
+    private var componentListDto: ComponentListDto? = null
 
-    init {
-        _uiState.update {
-            it.copy(
-                components = generateComponents(),
-                menuOptionsList = generateMenuOptions(userProjectRole),
-                userProjectRole = userProjectRole
+    fun init(dashboardId: Int) {
+        if (dashboardId == _dashboardId) return
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val components = componentRepository.getComponentList(dashboardId)
+            componentListDto = ComponentListDto(
+                dashboardId = dashboardId,
+                components = components
             )
+
+            // TODO: components on ui
+            _uiState.update {
+                it.copy(
+                    components = generateComponents(),
+                    menuOptionsList = generateMenuOptions(userProjectRole),
+                    userProjectRole = userProjectRole
+                )
+            }
         }
     }
+
+    fun getComponentListDto(): ComponentListDto? = componentListDto
 
     fun setAbsolutePosition(offset: Offset, index: Int) {
         _uiState.update {
