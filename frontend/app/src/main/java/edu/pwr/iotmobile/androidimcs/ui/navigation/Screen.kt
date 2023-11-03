@@ -49,6 +49,7 @@ sealed class Screen(
 
     object Dashboard : Screen("dashboard/{arguments}")
     object AddComponent : Screen("addComponent")
+    object Invitations : Screen("invitations")
 }
 
 

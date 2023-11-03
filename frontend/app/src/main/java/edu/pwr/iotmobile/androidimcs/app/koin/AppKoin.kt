@@ -35,6 +35,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.admin.AdminViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.app.MainViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardViewModel
+import edu.pwr.iotmobile.androidimcs.ui.screens.invitations.InvitationsViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginViewModel
@@ -96,6 +97,7 @@ object AppKoin {
         viewModelOf(::DashboardViewModel)
         viewModelOf(::MainViewModel)
         viewModelOf(::AddComponentViewModel)
+        viewModelOf(::InvitationsViewModel)
     }
 
     // Module for other singular classes

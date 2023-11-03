@@ -19,6 +19,8 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordNav
 import edu.pwr.iotmobile.androidimcs.ui.screens.changepassword.ChangePasswordScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.invitations.InvitationsNavigation
+import edu.pwr.iotmobile.androidimcs.ui.screens.invitations.InvitationsScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
@@ -39,7 +41,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchScreen
 fun NavGraph(
     navController: NavHostController,
     innerPadding: PaddingValues = PaddingValues(10.dp),
-    startDestination: String = Screen.Login.path
+    startDestination: String = Screen.Invitations.path
 ) {
     NavHost(
         navController = navController,
@@ -135,6 +137,11 @@ fun NavGraph(
 
         composable(Screen.AddComponent.path) {
             AddComponentScreen()
+        }
+        composable(Screen.Invitations.path) {
+            InvitationsScreen(
+                navigation = InvitationsNavigation.default(navController)
+            )
         }
     }
 }
