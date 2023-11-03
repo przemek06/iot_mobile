@@ -2,7 +2,6 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
@@ -10,6 +9,7 @@ import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toComponentData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,10 +36,9 @@ class DashboardViewModel(
                 components = components
             )
 
-            // TODO: components on ui
-            _uiState.update {
-                it.copy(
-                    components = generateComponents(),
+            _uiState.update { ui ->
+                ui.copy(
+                    components = components.mapNotNull { it.toComponentData() },
                     menuOptionsList = generateMenuOptions(userProjectRole),
                     userProjectRole = userProjectRole
                 )
@@ -143,66 +142,66 @@ class DashboardViewModel(
         return closestIndex
     }
 
-    private fun generateComponents() = listOf(
-        ComponentData(
-            id = 1,
-            text = "a",
-            height = 80.dp
-        ),
-        ComponentData(
-            id = 2,
-            text = "b",
-            height = 80.dp
-        ),
-        ComponentData(
-            id = 3,
-            text = "c",
-            height = 300.dp,
-            isFullLine = true
-        ),
-        ComponentData(
-            id = 4,
-            text = "d",
-            height = 80.dp
-        ),
-        ComponentData(
-            id = 5,
-            text = "e",
-            height = 80.dp
-        ),
-        ComponentData(
-            id = 6,
-            text = "f",
-            height = 300.dp,
-            isFullLine = true
-        ),
-        ComponentData(
-            id = 7,
-            text = "g",
-            height = 80.dp
-        ),
-        ComponentData(
-            id = 8,
-            text = "h",
-            height = 80.dp
-        ),
-        ComponentData(
-            id = 9,
-            text = "i",
-            height = 300.dp,
-            isFullLine = true
-        ),
-        ComponentData(
-            id = 10,
-            text = "j",
-            height = 80.dp
-        ),
-        ComponentData(
-            id = 11,
-            text = "k",
-            height = 80.dp
-        ),
-    )
+//    private fun generateComponents() = listOf(
+//        ComponentData(
+//            id = 1,
+//            name = "a",
+//            height = 80.dp
+//        ),
+//        ComponentData(
+//            id = 2,
+//            name = "b",
+//            height = 80.dp
+//        ),
+//        ComponentData(
+//            id = 3,
+//            name = "c",
+//            height = 300.dp,
+//            isFullLine = true
+//        ),
+//        ComponentData(
+//            id = 4,
+//            name = "d",
+//            height = 80.dp
+//        ),
+//        ComponentData(
+//            id = 5,
+//            name = "e",
+//            height = 80.dp
+//        ),
+//        ComponentData(
+//            id = 6,
+//            name = "f",
+//            height = 300.dp,
+//            isFullLine = true
+//        ),
+//        ComponentData(
+//            id = 7,
+//            name = "g",
+//            height = 80.dp
+//        ),
+//        ComponentData(
+//            id = 8,
+//            name = "h",
+//            height = 80.dp
+//        ),
+//        ComponentData(
+//            id = 9,
+//            name = "i",
+//            height = 300.dp,
+//            isFullLine = true
+//        ),
+//        ComponentData(
+//            id = 10,
+//            name = "j",
+//            height = 80.dp
+//        ),
+//        ComponentData(
+//            id = 11,
+//            name = "k",
+//            height = 80.dp
+//        ),
+//    )
 
     private fun generateMenuOptions(role: UserProjectRole?) = when (role) {
         UserProjectRole.ADMIN, UserProjectRole.EDITOR -> listOf(

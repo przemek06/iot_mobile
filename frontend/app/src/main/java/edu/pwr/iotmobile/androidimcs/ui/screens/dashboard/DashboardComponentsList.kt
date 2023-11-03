@@ -219,7 +219,7 @@ private fun LazyStaggeredGridItemScope.Component(
         ) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
-                text = item.text,
+                text = item.name,
                 style = MaterialTheme.typography.bodyLarge
             )
         }
