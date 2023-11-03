@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.ComponentGenericType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
-import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDataDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
@@ -114,10 +114,10 @@ class AddComponentViewModel(
 
     // TODO: add to dashboard component list
 
-    private fun getComponentDtoData(): ComponentDataDto? {
+    private fun getComponentDtoData(): ComponentDto? {
         val locUiState = _uiState.value
         // TODO: think of something better
-        return ComponentDataDto(
+        return ComponentDto(
             componentType = ComponentGenericType.INPUT.name, // TODO
             type = locUiState.chosenComponentType?.name ?: return null,
             size = 1, // TODO

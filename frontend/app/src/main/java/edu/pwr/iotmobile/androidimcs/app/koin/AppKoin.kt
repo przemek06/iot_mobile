@@ -12,10 +12,12 @@ import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserLocalDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserSessionLocalDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserLocalDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserSessionLocalDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ComponentRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.DashboardRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ProjectRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.TopicRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ComponentRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.DashboardRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ProjectRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.TopicRemoteDataSourceImpl
@@ -66,6 +68,7 @@ object AppKoin {
         singleOf(::ProjectRemoteDataSourceImpl) bind ProjectRemoteDataSource::class
         singleOf(::DashboardRemoteDataSourceImpl) bind DashboardRemoteDataSource::class
         singleOf(::TopicRemoteDataSourceImpl) bind TopicRemoteDataSource::class
+        singleOf(::ComponentRemoteDataSourceImpl) bind ComponentRemoteDataSource::class
 
         // Local
         singleOf(::UserSessionLocalDataSourceImpl) bind UserSessionLocalDataSource::class
