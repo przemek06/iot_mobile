@@ -8,7 +8,8 @@ data class AddComponentUiState(
     val inputComponents: List<AddComponentViewModel.ComponentChoiceData> = emptyList(),
     val topics: List<Topic> = emptyList(),
     val settings: Map<AddComponentViewModel.SettingType, AddComponentViewModel.SettingData> = emptyMap(),
-    val newComponent: AddComponentViewModel.ComponentData = AddComponentViewModel.ComponentData()
+    val chosenComponentType: AddComponentViewModel.ComponentType? = null,
+    val chosenTopic: Topic? = null
 )
 
 enum class AddComponentPage {

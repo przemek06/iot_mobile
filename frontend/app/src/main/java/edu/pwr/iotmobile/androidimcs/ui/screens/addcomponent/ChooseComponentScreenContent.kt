@@ -58,7 +58,7 @@ fun ChooseComponentScreenContent(
 
         items(uiState.inputComponents) {
             ComponentItem(
-                isSelected = uiState.newComponent.type == it.type,
+                isSelected = uiState.chosenComponentType == it.type,
                 data = it,
                 uiInteraction = uiInteraction
             )

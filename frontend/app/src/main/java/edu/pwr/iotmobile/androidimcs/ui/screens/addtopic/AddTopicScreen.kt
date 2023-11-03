@@ -1,7 +1,9 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addtopic
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -108,11 +111,14 @@ private fun AddTopicScreenContent(
             }
 
             item {
-                Dimensions.space40.HeightSpacer()
-                ButtonCommon(
-                    text = stringResource(id = R.string.confirm),
-                    width = Dimensions.buttonWidth
-                ) { uiInteraction.addTopic(projectId = navigation.projectId) }
+                Dimensions.space30.HeightSpacer()
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    ButtonCommon(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = stringResource(id = R.string.confirm),
+                        width = Dimensions.buttonWidth
+                    ) { uiInteraction.addTopic(projectId = navigation.projectId) }
+                }
             }
         }
     }

@@ -17,7 +17,8 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 @Composable
 fun ChooseTopicScreenContent(
     uiState: AddComponentUiState,
-    uiInteraction: AddComponentUiInteraction
+    uiInteraction: AddComponentUiInteraction,
+    navigation: AddComponentNavigation
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
@@ -28,13 +29,13 @@ fun ChooseTopicScreenContent(
         ButtonCommon(
             text = stringResource(id = R.string.add_new_topic),
             type = ButtonCommonType.Secondary,
-            onClick = {}
+            onClick = { navigation.openAddNewTopic() }
         )
         Dimensions.space22.HeightSpacer()
         uiState.topics.forEach {
             RadioButtonWithText(
                 text = it.title,
-                isSelected = uiState.newComponent.topic?.id == it.id,
+                isSelected = uiState.chosenTopic?.id == it.id,
                 onClick = { uiInteraction.onChooseTopic(it) },
             )
         }

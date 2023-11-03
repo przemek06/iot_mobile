@@ -5,7 +5,9 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.ComponentGenericType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
+import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDataDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
@@ -35,8 +37,6 @@ class AddComponentViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var _projectId: Int? = null
-
-    // TODO: assign data from input fields to component data upon confirm click & send to backend
 
     fun init(projectId: Int) {
         if (_projectId == null || projectId != _projectId) {
@@ -89,21 +89,13 @@ class AddComponentViewModel(
 
     fun onChooseComponent(componentData: ComponentChoiceData) {
         _uiState.update {
-            it.copy(
-                newComponent = it.newComponent.copy(
-                    type = componentData.type
-                )
-            )
+            it.copy(chosenComponentType = componentData.type)
         }
     }
 
     fun onChooseTopic(topic: Topic) {
         _uiState.update {
-            it.copy(
-                newComponent = it.newComponent.copy(
-                    topic = topic
-                )
-            )
+            it.copy(chosenTopic= topic)
         }
     }
 
@@ -118,6 +110,25 @@ class AddComponentViewModel(
             newSettings.replace(type, inputField)
             ui.copy(settings = newSettings)
         }
+    }
+
+    // TODO: add to dashboard component list
+
+    private fun getComponentDtoData(): ComponentDataDto? {
+        val locUiState = _uiState.value
+        // TODO: think of something better
+        return ComponentDataDto(
+            componentType = ComponentGenericType.INPUT.name, // TODO
+            type = locUiState.chosenComponentType?.name ?: return null,
+            size = 1, // TODO
+            topicId = locUiState.chosenTopic?.id,
+            name = locUiState.settings[SettingType.Name]?.inputFieldData?.text,
+            defaultValue = locUiState.settings[SettingType.DefaultValue]?.inputFieldData?.text,
+            onSendValue = locUiState.settings[SettingType.OnClickSend]?.inputFieldData?.text ?: locUiState.settings[SettingType.OnToggleOnSend]?.inputFieldData?.text,
+            onSendAlternativeValue = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
+            maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,
+            minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text
+        )
     }
 
     private suspend fun getTopicsForProject(projectId: Int): List<Topic> {
@@ -153,7 +164,7 @@ class AddComponentViewModel(
             )
         )
 
-        val specificFields = when (uiState.value.newComponent.type) {
+        val specificFields = when (uiState.value.chosenComponentType) {
 
             ComponentType.Button -> mapOf(
                 SettingType.OnClickSend to SettingData(
@@ -233,17 +244,6 @@ class AddComponentViewModel(
     data class SettingData(
         @StringRes val title: Int,
         val inputFieldData: InputFieldData
-    )
-
-    data class ComponentData(
-        val type: ComponentType? = null,
-        val topic: Topic? = null,
-        val name: String = "",
-        val defaultValue: Any? = null,
-        val onSendValue: Any? = null,
-        val onSendAlternativeValue: Any? = null,
-        val maxValue: Any? = null,
-        val minValue: Any? = null,
     )
 
     enum class ComponentType {
