@@ -5,6 +5,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
@@ -30,7 +31,7 @@ class DashboardViewModel(
         if (dashboardId == _dashboardId) return
 
         viewModelScope.launch(Dispatchers.Default) {
-            val components = componentRepository.getComponentList(dashboardId)
+            val components = componentRepository.getComponentList(dashboardId).sortedBy { it.index }
             componentListDto = ComponentListDto(
                 dashboardId = dashboardId,
                 components = components
@@ -66,7 +67,16 @@ class DashboardViewModel(
     }
 
     fun onComponentClick(item: ComponentData, value: Any?) {
-        // TODO: implement
+        // TODO: implement - different behaviour based on type,
+        when (item.type) {
+
+            ComponentDetailedType.Button -> { /* send component value */ }
+
+            ComponentDetailedType.Toggle -> { /* if value == onSend send onAlternative -> else the other way */ }
+
+            else -> {}
+
+        }
     }
 
     fun onPlaceDraggedComponent(
@@ -141,67 +151,6 @@ class DashboardViewModel(
         }
         return closestIndex
     }
-
-//    private fun generateComponents() = listOf(
-//        ComponentData(
-//            id = 1,
-//            name = "a",
-//            height = 80.dp
-//        ),
-//        ComponentData(
-//            id = 2,
-//            name = "b",
-//            height = 80.dp
-//        ),
-//        ComponentData(
-//            id = 3,
-//            name = "c",
-//            height = 300.dp,
-//            isFullLine = true
-//        ),
-//        ComponentData(
-//            id = 4,
-//            name = "d",
-//            height = 80.dp
-//        ),
-//        ComponentData(
-//            id = 5,
-//            name = "e",
-//            height = 80.dp
-//        ),
-//        ComponentData(
-//            id = 6,
-//            name = "f",
-//            height = 300.dp,
-//            isFullLine = true
-//        ),
-//        ComponentData(
-//            id = 7,
-//            name = "g",
-//            height = 80.dp
-//        ),
-//        ComponentData(
-//            id = 8,
-//            name = "h",
-//            height = 80.dp
-//        ),
-//        ComponentData(
-//            id = 9,
-//            name = "i",
-//            height = 300.dp,
-//            isFullLine = true
-//        ),
-//        ComponentData(
-//            id = 10,
-//            name = "j",
-//            height = 80.dp
-//        ),
-//        ComponentData(
-//            id = 11,
-//            name = "k",
-//            height = 80.dp
-//        ),
-//    )
 
     private fun generateMenuOptions(role: UserProjectRole?) = when (role) {
         UserProjectRole.ADMIN, UserProjectRole.EDITOR -> listOf(
