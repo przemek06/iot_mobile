@@ -51,6 +51,7 @@ class SecurityConfig(
             authorizeRequests {
                 authorize("/user/**", hasAuthority(ERole.USER_ROLE.name))
                 authorize("/admin/**", hasAuthority(ERole.ADMIN_ROLE.name))
+                authorize("/integration/**", access = "hasIpAddress('127.0.0.1')")
                 authorize("/anon/**", permitAll)
                 authorize("/login", permitAll)
                 authorize("/logout", permitAll)
