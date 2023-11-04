@@ -58,7 +58,7 @@ class ProjectDeletedListener {
     fun sendNotificationsOnUserAction(pjp: ProceedingJoinPoint) {
         val id = userService.getActiveUserId()
         val projectIds = id?.let {
-            projectService.findAllProjectsByCreatedById(it).map { it2 -> it2.id ?: return }
+            projectService.findAllProjectsByCreatedById(it).mapNotNull { it2 -> it2.id  }
         }
         val projectRoles = projectIds?.flatMap { projectService.findAllProjectRolesByProjectId(it) }
         val invitations = projectIds?.flatMap { projectService.findAllPendingInvitationsByProjectId(it) }

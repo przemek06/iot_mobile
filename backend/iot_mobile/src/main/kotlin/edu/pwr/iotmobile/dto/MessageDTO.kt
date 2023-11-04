@@ -1,19 +1,25 @@
 package edu.pwr.iotmobile.dto
 
 import edu.pwr.iotmobile.entities.Message
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
 
 data class MessageDTO(
-    var topic: TopicDTO = TopicDTO(),
-    var message: String,
-    var type: String,
-    var tsSent: LocalDateTime=LocalDateTime.now(),
-    var id: Int?=null
+    @field:NotNull
+    val topic: TopicDTO = TopicDTO(),
+    @field:NotNull
+    @field:Size(max = 1024)
+    val message: String,
+    @field:NotNull
+    val connectionKey: String,
+    val tsSent: LocalDateTime=LocalDateTime.now(),
+    val id: Int?=null
 ){
     //TODO: project name to be added here
     fun toEntity(): Message{
         return Message(
-            topic.toEntity(), message, type, tsSent, id
+            topic.toEntity(), message, tsSent, id
         )
     }
 }

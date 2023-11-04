@@ -58,5 +58,4 @@ class ComponentRequestListener
             componentChangeService.processEntityChange(toSend)
         }
     }
-
 }
