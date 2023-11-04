@@ -1,14 +1,13 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addtopic
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,6 +21,7 @@ import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.extensions.firstUppercaseRestLowercase
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.RadioButtonWithText
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -76,7 +76,7 @@ private fun AddTopicScreenContent(
                     Dimensions.space8.HeightSpacer()
                     Text(
                         text = stringResource(id = it.value.descriptionId),
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Dimensions.space18.HeightSpacer()
@@ -103,43 +103,23 @@ private fun AddTopicScreenContent(
             }
 
             items(TopicDataType.values()) {
-                TopicRadio(
-                    topic = it,
-                    uiState = uiState,
-                    uiInteraction = uiInteraction
+                RadioButtonWithText(
+                    text = it.name.firstUppercaseRestLowercase(),
+                    isSelected = uiState.selectedTopic == it,
+                    onClick = { uiInteraction.selectTopic(it) },
                 )
             }
 
             item {
-                Dimensions.space40.HeightSpacer()
-                ButtonCommon(
-                    text = stringResource(id = R.string.confirm),
-                    width = Dimensions.buttonWidth
-                ) { uiInteraction.addTopic(projectId = navigation.projectId) }
+                Dimensions.space30.HeightSpacer()
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    ButtonCommon(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = stringResource(id = R.string.confirm),
+                        width = Dimensions.buttonWidth
+                    ) { uiInteraction.addTopic(projectId = navigation.projectId) }
+                }
             }
         }
-    }
-}
-
-@Composable
-private fun TopicRadio(
-    topic: TopicDataType,
-    uiState: AddTopicUiState,
-    uiInteraction: AddTopicUiInteraction
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = uiState.selectedTopic == topic,
-            onClick = { uiInteraction.selectTopic(topic) }
-        )
-        Text(
-            modifier = Modifier.weight(1f),
-            text = topic.name.firstUppercaseRestLowercase(),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground
-        )
     }
 }

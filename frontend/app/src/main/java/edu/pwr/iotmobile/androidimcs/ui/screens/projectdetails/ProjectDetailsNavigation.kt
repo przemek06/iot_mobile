@@ -9,7 +9,7 @@ import edu.pwr.iotmobile.androidimcs.ui.navigation.getArguments
 interface ProjectDetailsNavigation {
     val projectId: Int?
 
-    fun openDashboardScreen()
+    fun openDashboardScreen(dashboardId: Int, dashboardName: String)
     fun openAddTopic()
     fun onReturn()
 
@@ -21,9 +21,9 @@ interface ProjectDetailsNavigation {
                 override val projectId: Int?
                     get() = navBackStackEntry.getArguments().getOrNull(0)?.toInt()
 
-                override fun openDashboardScreen() {
+                override fun openDashboardScreen(dashboardId: Int, dashboardName: String) {
                     projectId?.let {
-                        navController.navigate(Screen.Dashboard.path.appendArguments(it))
+                        navController.navigate(Screen.Dashboard.path.appendArguments(it, dashboardId, dashboardName))
                     }
                 }
 

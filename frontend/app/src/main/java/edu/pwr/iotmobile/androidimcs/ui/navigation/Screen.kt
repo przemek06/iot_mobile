@@ -48,7 +48,7 @@ sealed class Screen(
     object Search : Screen("search")
 
     object Dashboard : Screen("dashboard/{arguments}")
-    object AddComponent : Screen("addComponent")
+    object AddComponent : Screen("addComponent/{arguments}")
 }
 
 

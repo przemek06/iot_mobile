@@ -1,4 +1,4 @@
-package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
+package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -6,35 +6,38 @@ import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
 import edu.pwr.iotmobile.androidimcs.ui.navigation.appendArguments
 import edu.pwr.iotmobile.androidimcs.ui.navigation.getArguments
 
-interface DashboardNavigation {
+interface AddComponentNavigation {
     val projectId: Int?
-    val dashboardId: Int?
-    val dashboardName: String?
 
     fun onReturn()
-    fun openAddComponentScreen()
+    fun openAddNewTopic()
 
     companion object {
         fun default(
             navController: NavController,
             navBackStackEntry: NavBackStackEntry
-        ) = object : DashboardNavigation {
+        ) = object : AddComponentNavigation {
             override val projectId: Int?
                 get() = navBackStackEntry.getArguments().getOrNull(0)?.toInt()
-            override val dashboardId: Int?
-                get() = navBackStackEntry.getArguments().getOrNull(1)?.toInt()
-            override val dashboardName: String?
-                get() = navBackStackEntry.getArguments().getOrNull(2)
 
             override fun onReturn() {
                 navController.popBackStack()
             }
 
-            override fun openAddComponentScreen() {
+            override fun openAddNewTopic() {
                 projectId?.let {
-                    navController.navigate(Screen.AddComponent.path.appendArguments(it))
+                    navController.navigate(Screen.AddTopic.path.appendArguments(it))
                 }
             }
+
+        }
+
+        fun empty() = object : AddComponentNavigation {
+            override val projectId: Int?
+                get() = null
+
+            override fun onReturn() {}
+            override fun openAddNewTopic() {}
 
         }
     }

@@ -11,12 +11,12 @@ import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData.Companion.toProjectData
+import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.Dashboard.Companion.toDashboard
-import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.Topic.Companion.toTopic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

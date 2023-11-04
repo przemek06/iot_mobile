@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,24 +32,29 @@ private val BOTTOM_BAR_HEIGHT = 80.dp
 private val BOTTOM_BAR_BUTTON_WIDTH = 120.dp
 
 @Composable
-fun AddComponentScreen() {
+fun AddComponentScreen(navigation: AddComponentNavigation) {
     val viewModel: AddComponentViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
-    val uiInteraction = AddComponentInteraction.default(viewModel)
+    val uiInteraction = AddComponentUiInteraction.default(viewModel)
 
-    AddComponentScreenContent(uiState, uiInteraction)
+    navigation.projectId?.let {
+        viewModel.init(it)
+    }
+
+    AddComponentScreenContent(uiState, uiInteraction, navigation)
 }
 
 @Composable
 private fun AddComponentScreenContent(
     uiState: AddComponentUiState,
-    uiInteraction: AddComponentInteraction
+    uiInteraction: AddComponentUiInteraction,
+    navigation: AddComponentNavigation
 ) {
-    NavigationWrapper(uiState, uiInteraction) {
+    NavigationWrapper(uiState, uiInteraction, navigation) {
         when (uiState.currentPage) {
-            AddComponentPage.ChooseComponent -> Text(text = "hello component")
-            AddComponentPage.ChooseTopic -> Text(text = "hello topic")
-            AddComponentPage.Settings -> Text(text = "settings")
+            AddComponentPage.ChooseComponent -> ChooseComponentScreenContent(uiState, uiInteraction)
+            AddComponentPage.ChooseTopic -> ChooseTopicScreenContent(uiState, uiInteraction, navigation)
+            AddComponentPage.Settings -> SettingsScreenContent(uiState, uiInteraction)
         }
     }
 }
@@ -58,7 +62,8 @@ private fun AddComponentScreenContent(
 @Composable
 private fun NavigationWrapper(
     uiState: AddComponentUiState,
-    uiInteraction: AddComponentInteraction,
+    uiInteraction: AddComponentUiInteraction,
+    navigation: AddComponentNavigation,
     content: @Composable () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -68,7 +73,7 @@ private fun NavigationWrapper(
         ) {
             TopBar(
                 text = stringResource(id = R.string.add_component),
-                onReturn = {/*TODO*/}
+                onReturn = navigation::onReturn
             )
             Dimensions.space14.HeightSpacer()
             Column(modifier = Modifier.padding(horizontal = Dimensions.space22)) {
@@ -86,7 +91,7 @@ private fun NavigationWrapper(
 @Composable
 private fun BottomNavigationBar(
     modifier: Modifier = Modifier,
-    uiInteraction: AddComponentInteraction,
+    uiInteraction: AddComponentUiInteraction,
     bottomNavData: AddComponentViewModel.BottomNavData
 ) {
     Box(
@@ -127,7 +132,8 @@ private fun Preview() {
     AndroidIMCSTheme {
         AddComponentScreenContent(
             uiState = AddComponentUiState(),
-            uiInteraction = AddComponentInteraction.empty()
+            uiInteraction = AddComponentUiInteraction.empty(),
+            navigation = AddComponentNavigation.empty()
         )
     }
 }
