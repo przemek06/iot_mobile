@@ -1,27 +1,23 @@
 package edu.pwr.iotmobile.entities
 
 import edu.pwr.iotmobile.dto.MessageDTO
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-class Message (
+class Message(
     @ManyToOne
     @JoinColumn(name = "topic_id")
     var topic: Topic,
     var message: String,
-    var type: String,
-    var tsSent: LocalDateTime=LocalDateTime.now(),
+    var tsSent: LocalDateTime,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int?=null
-){
+    var id: Int? = null
+) {
+    constructor() : this(Topic(), "", LocalDateTime.now())
+
     fun toDTO(): MessageDTO {
-        return MessageDTO(topic.toDTO(), message, type, tsSent)
+        return MessageDTO(topic.toDTO(), message, "", tsSent, id = id)
     }
 }

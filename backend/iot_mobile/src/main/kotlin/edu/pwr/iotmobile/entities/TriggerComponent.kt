@@ -20,6 +20,7 @@ class TriggerComponent(
     fun toDTO(): ComponentDTO {
         return ComponentDTO(
             id,
+            name,
             EComponentType.TRIGGER,
             type,
             size,

@@ -37,6 +37,7 @@ class RabbitListener(
                 logger.info(consumerTag+": "+body.toString(Charset.defaultCharset()))
             }
         }
+
         try {
             channel.basicConsume(queueName, true, queueName, consumer)
         } catch (_: Exception) {

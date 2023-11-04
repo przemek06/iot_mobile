@@ -15,15 +15,30 @@ class InputComponent(
     @ManyToOne
     @JoinColumn(name = "topic_id", nullable = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    var topic: Topic
+    var topic: Topic,
+    var onSendValue: String?,
+    var onSendAlternative: String?,
+    var minValue: String?,
+    var maxValue: String?
 ) : Component() {
-    constructor() : this(Topic()) {
+    constructor() : this(Topic(), "", "", "", "") {
     }
 
     fun toDTO(): ComponentDTO {
-        return ComponentDTO(id, EComponentType.OUTPUT, type, size, index, topic.id!!)
+        return ComponentDTO(
+            id,
+            name,
+            EComponentType.OUTPUT,
+            type,
+            size,
+            index,
+            topic.toDTO(),
+            onSendValue = onSendValue,
+            onSendAlternative = onSendAlternative,
+            minValue = minValue,
+            maxValue = maxValue
+        )
     }
-
 
 
 }

@@ -21,6 +21,6 @@ class OutputComponent(
     }
 
     fun toDTO(): ComponentDTO {
-        return ComponentDTO(id, EComponentType.OUTPUT, type, size, index, topic.id!!)
+        return ComponentDTO(id, name, EComponentType.OUTPUT, type, size, index, topic.toDTO())
     }
 }
