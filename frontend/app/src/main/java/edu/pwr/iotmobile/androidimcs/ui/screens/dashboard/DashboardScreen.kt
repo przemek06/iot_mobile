@@ -3,6 +3,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -13,7 +14,13 @@ import org.koin.androidx.compose.koinViewModel
 fun DashboardScreen(navigation: DashboardNavigation) {
     val viewModel = koinViewModel<DashboardViewModel>()
     val uiState by viewModel.uiState.collectAsState()
-    val uiInteraction = DashboardUiInteraction.default(viewModel)
+    val uiInteraction = DashboardUiInteraction.default(viewModel, navigation::openAddComponentScreen)
+
+    LaunchedEffect(Unit) {
+        navigation.dashboardId?.let {
+            viewModel.init(it)
+        }
+    }
 
     DashboardScreenContent(
         uiState =  uiState,
@@ -37,8 +44,7 @@ private fun DashboardScreenContent(
         )
         ComponentsList(
             uiState =  uiState,
-            uiInteraction = uiInteraction,
-            navigation = navigation
+            uiInteraction = uiInteraction
         )
     }
 }

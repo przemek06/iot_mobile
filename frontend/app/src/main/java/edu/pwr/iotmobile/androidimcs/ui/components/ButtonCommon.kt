@@ -26,7 +26,7 @@ enum class ButtonCommonType {
 @Composable
 fun ButtonCommon(
     modifier: Modifier = Modifier,
-    text: String,
+    text: String = "",
     type: ButtonCommonType = ButtonCommonType.Primary,
     width: Dp? = null,
     onClick: () -> Unit
