@@ -1,6 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.data.dto
 
-data class ComponentDataDto(
+data class ComponentDto(
     val id: Int? = null,
     val componentType: String,
     val type: String,

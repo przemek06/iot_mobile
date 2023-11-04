@@ -4,6 +4,7 @@ import android.content.Context
 import edu.pwr.iotmobile.androidimcs.app.database.AppDatabase
 import edu.pwr.iotmobile.androidimcs.app.retrofit.AddCookiesInterceptor
 import edu.pwr.iotmobile.androidimcs.app.retrofit.AppRetrofit
+import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.event.EventImpl
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
@@ -12,18 +13,22 @@ import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserLocalDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserSessionLocalDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserLocalDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserSessionLocalDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ComponentRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.DashboardRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ProjectRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.TopicRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ComponentRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.DashboardRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ProjectRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.TopicRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.UserRemoteDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.impl.ComponentRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.DashboardRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.ProjectRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.TopicRepositoryImpl
@@ -48,10 +53,15 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 object AppKoin {
+
+    object Scope {
+        val COMPONENT_LIST = named("componentListScope")
+    }
 
     // Module for local and remote environments, e.g. Retrofit.
     private val environments = module {
@@ -66,6 +76,7 @@ object AppKoin {
         singleOf(::ProjectRemoteDataSourceImpl) bind ProjectRemoteDataSource::class
         singleOf(::DashboardRemoteDataSourceImpl) bind DashboardRemoteDataSource::class
         singleOf(::TopicRemoteDataSourceImpl) bind TopicRemoteDataSource::class
+        singleOf(::ComponentRemoteDataSourceImpl) bind ComponentRemoteDataSource::class
 
         // Local
         singleOf(::UserSessionLocalDataSourceImpl) bind UserSessionLocalDataSource::class
@@ -78,6 +89,7 @@ object AppKoin {
         singleOf(::ProjectRepositoryImpl) bind ProjectRepository::class
         singleOf(::DashboardRepositoryImpl) bind DashboardRepository::class
         singleOf(::TopicRepositoryImpl) bind TopicRepository::class
+        singleOf(::ComponentRepositoryImpl) bind ComponentRepository::class
     }
 
     // Module for view models
@@ -105,13 +117,24 @@ object AppKoin {
         single { AddCookiesInterceptor(get()) }
     }
 
+    private val scopes = module {
+        scope(Scope.COMPONENT_LIST) {
+            scoped { params ->
+                ComponentsListState(
+                    componentListDto = params.get(),
+                )
+            }
+        }
+    }
+
     private val modules by lazy {
         listOf(
             environments,
             dataSources,
             repositories,
             viewModels,
-            misc
+            misc,
+            scopes
         )
     }
 

@@ -100,10 +100,9 @@ fun ComponentsList(
                 if (uiState.userProjectRole != null && uiState.userProjectRole != UserProjectRole.VIEWER) {
                     ButtonCommon(
                         text = stringResource(id = R.string.add_new_component),
-                        type = ButtonCommonType.Secondary
-                    ) {
-                        navigation.openAddComponentScreen()
-                    }
+                        type = ButtonCommonType.Secondary,
+                        onClick = uiInteraction::onAddNewComponent
+                    )
                     Dimensions.space30.HeightSpacer()
                 }
             }

@@ -2,6 +2,8 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
+import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
 import edu.pwr.iotmobile.androidimcs.ui.navigation.appendArguments
 import edu.pwr.iotmobile.androidimcs.ui.navigation.getArguments
@@ -12,7 +14,7 @@ interface DashboardNavigation {
     val dashboardName: String?
 
     fun onReturn()
-    fun openAddComponentScreen()
+    fun openAddComponentScreen(componentListDto: ComponentListDto)
 
     companion object {
         fun default(
@@ -30,9 +32,10 @@ interface DashboardNavigation {
                 navController.popBackStack()
             }
 
-            override fun openAddComponentScreen() {
+            override fun openAddComponentScreen(componentListDto: ComponentListDto) {
+                val scopeId = ComponentsListState.createScope(componentListDto)
                 projectId?.let {
-                    navController.navigate(Screen.AddComponent.path.appendArguments(it))
+                    navController.navigate(Screen.AddComponent.path.appendArguments(it, scopeId))
                 }
             }
 

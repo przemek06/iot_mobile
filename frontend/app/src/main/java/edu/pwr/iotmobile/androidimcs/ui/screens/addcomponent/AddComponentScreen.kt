@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,12 @@ fun AddComponentScreen(navigation: AddComponentNavigation) {
     navigation.projectId?.let {
         viewModel.init(it)
     }
+
+    val context = LocalContext.current
+    viewModel.event.CollectEvent(context) {
+        navigation.onReturn()
+    }
+    viewModel.toast.CollectToast(context)
 
     AddComponentScreenContent(uiState, uiInteraction, navigation)
 }
@@ -83,6 +90,7 @@ private fun NavigationWrapper(
         BottomNavigationBar(
             modifier = Modifier.align(Alignment.BottomStart),
             uiInteraction = uiInteraction,
+            navigation = navigation,
             bottomNavData = uiState.bottomNavData
         )
     }
@@ -92,6 +100,7 @@ private fun NavigationWrapper(
 private fun BottomNavigationBar(
     modifier: Modifier = Modifier,
     uiInteraction: AddComponentUiInteraction,
+    navigation: AddComponentNavigation,
     bottomNavData: AddComponentViewModel.BottomNavData
 ) {
     Box(
@@ -119,7 +128,7 @@ private fun BottomNavigationBar(
                 ButtonCommon(
                     text = stringResource(id = bottomNavData.nextButtonText),
                     width = BOTTOM_BAR_BUTTON_WIDTH,
-                    onClick = uiInteraction::navigateNext
+                    onClick = { uiInteraction.navigateNext(navigation.scopeID) }
                 )
             }
         }

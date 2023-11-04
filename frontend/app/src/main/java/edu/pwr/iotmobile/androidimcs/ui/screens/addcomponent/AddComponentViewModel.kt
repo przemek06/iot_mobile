@@ -7,17 +7,20 @@ import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.ComponentGenericType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
-import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDataDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
+import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
+import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.scope.ScopeID
 
 private val BottomNavDataList = listOf(
     AddComponentViewModel.BottomNavData(),
@@ -30,6 +33,7 @@ private val BottomNavDataList = listOf(
 
 class AddComponentViewModel(
     private val topicRepository: TopicRepository,
+    private val componentRepository: ComponentRepository,
     val event: Event,
     val toast: Toast
 ) : ViewModel() {
@@ -53,7 +57,7 @@ class AddComponentViewModel(
         }
     }
 
-    fun navigateNext() {
+    fun navigateNext(scopeID: ScopeID) {
         when (_uiState.value.currentPage) {
             AddComponentPage.ChooseComponent ->
                 _uiState.update { it.copy(
@@ -67,7 +71,7 @@ class AddComponentViewModel(
                     settings = generateSettings()
                 ) }
             AddComponentPage.Settings ->
-                { /*TODO: add new component*/ }
+                onConfirmComponent(scopeID)
         }
     }
 
@@ -112,12 +116,28 @@ class AddComponentViewModel(
         }
     }
 
-    // TODO: add to dashboard component list
+    private fun onConfirmComponent(scopeID: ScopeID) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val data = getComponentDtoData() ?: return@launch
+            val componentListDto = ComponentsListState.getScoped(scopeID)?.componentListDto ?: return@launch
+            val newDto = componentListDto.copy(
+                components = componentListDto.components + listOf(data)
+            )
+            kotlin.runCatching {
+                componentRepository.updateComponentList(newDto)
+            }.onSuccess {
+                event.event(ADD_COMPONENT_SUCCESS_EVENT)
+                toast.toast(SUCCESS_TOAST_MESSAGE)
+            }.onFailure {
+                toast.toast(FAILURE_TOAST_MESSAGE)
+            }
+        }
+    }
 
-    private fun getComponentDtoData(): ComponentDataDto? {
+    private fun getComponentDtoData(): ComponentDto? {
         val locUiState = _uiState.value
         // TODO: think of something better
-        return ComponentDataDto(
+        return ComponentDto(
             componentType = ComponentGenericType.INPUT.name, // TODO
             type = locUiState.chosenComponentType?.name ?: return null,
             size = 1, // TODO
@@ -263,5 +283,11 @@ class AddComponentViewModel(
         OnToggleOffSend,
         MaxValue,
         MinValue,
+    }
+
+    companion object {
+        const val ADD_COMPONENT_SUCCESS_EVENT = "addComponentSuccess"
+        const val SUCCESS_TOAST_MESSAGE = "Successfully added new component"
+        const val FAILURE_TOAST_MESSAGE = "Could not add new component"
     }
 }

@@ -5,9 +5,11 @@ import androidx.navigation.NavController
 import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
 import edu.pwr.iotmobile.androidimcs.ui.navigation.appendArguments
 import edu.pwr.iotmobile.androidimcs.ui.navigation.getArguments
+import org.koin.core.scope.ScopeID
 
 interface AddComponentNavigation {
     val projectId: Int?
+    val scopeID: ScopeID?
 
     fun onReturn()
     fun openAddNewTopic()
@@ -19,6 +21,8 @@ interface AddComponentNavigation {
         ) = object : AddComponentNavigation {
             override val projectId: Int?
                 get() = navBackStackEntry.getArguments().getOrNull(0)?.toInt()
+            override val scopeID: ScopeID?
+                get() = navBackStackEntry.getArguments().getOrNull(1)
 
             override fun onReturn() {
                 navController.popBackStack()
@@ -34,6 +38,8 @@ interface AddComponentNavigation {
 
         fun empty() = object : AddComponentNavigation {
             override val projectId: Int?
+                get() = null
+            override val scopeID: ScopeID?
                 get() = null
 
             override fun onReturn() {}

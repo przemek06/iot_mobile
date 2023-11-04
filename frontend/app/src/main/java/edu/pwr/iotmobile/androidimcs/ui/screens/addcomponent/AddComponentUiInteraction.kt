@@ -1,9 +1,10 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
+import org.koin.core.scope.ScopeID
 
 interface AddComponentUiInteraction {
-    fun navigateNext()
+    fun navigateNext(scopeID: ScopeID?)
     fun navigatePrevious()
     fun onChooseComponent(componentData: AddComponentViewModel.ComponentChoiceData)
     fun onChooseTopic(topic: Topic)
@@ -16,8 +17,10 @@ interface AddComponentUiInteraction {
         fun default(
             viewModel: AddComponentViewModel
         ) = object : AddComponentUiInteraction {
-            override fun navigateNext() {
-                viewModel.navigateNext()
+            override fun navigateNext(scopeID: ScopeID?) {
+                scopeID?.let {
+                    viewModel.navigateNext(scopeID)
+                }
             }
 
             override fun navigatePrevious() {
@@ -39,7 +42,7 @@ interface AddComponentUiInteraction {
         }
 
         fun empty() = object : AddComponentUiInteraction {
-            override fun navigateNext() {}
+            override fun navigateNext(scopeID: ScopeID?) {}
             override fun navigatePrevious() {}
             override fun onChooseComponent(componentData: AddComponentViewModel.ComponentChoiceData) {}
             override fun onChooseTopic(topic: Topic) {}
