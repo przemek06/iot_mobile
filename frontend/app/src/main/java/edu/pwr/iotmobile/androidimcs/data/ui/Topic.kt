@@ -7,6 +7,7 @@ data class Topic(
     val id: Int,
     val title: String,
     val name: String,
+    val currentValue: Any? = null,
     val dataType: TopicDataType
 ) {
     companion object {

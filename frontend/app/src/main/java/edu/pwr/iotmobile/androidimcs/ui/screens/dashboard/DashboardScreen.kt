@@ -44,8 +44,7 @@ private fun DashboardScreenContent(
         )
         ComponentsList(
             uiState =  uiState,
-            uiInteraction = uiInteraction,
-            navigation = navigation
+            uiInteraction = uiInteraction
         )
     }
 }

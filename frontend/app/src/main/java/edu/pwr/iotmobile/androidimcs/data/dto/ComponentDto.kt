@@ -4,7 +4,7 @@ data class ComponentDto(
     val id: Int? = null,
     val componentType: String,
     val type: String,
-    val size: Int,
+    val size: Int, // 1 or 2
     val index: Int = 0,
     val topicId: Int? = null,
     val name: String? = null,

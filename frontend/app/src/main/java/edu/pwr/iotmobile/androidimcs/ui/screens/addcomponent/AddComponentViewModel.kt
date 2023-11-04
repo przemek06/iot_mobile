@@ -5,7 +5,8 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.data.ComponentGenericType
+import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
+import edu.pwr.iotmobile.androidimcs.data.ComponentType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
@@ -120,9 +121,11 @@ class AddComponentViewModel(
         viewModelScope.launch(Dispatchers.Default) {
             val data = getComponentDtoData() ?: return@launch
             val componentListDto = ComponentsListState.getScoped(scopeID)?.componentListDto ?: return@launch
-            val newDto = componentListDto.copy(
-                components = componentListDto.components + listOf(data)
-            )
+
+            val newComponents = (componentListDto.components + listOf(data))
+                .mapIndexed { index, item -> item.copy(index = index) }
+            val newDto = componentListDto.copy(components = newComponents)
+
             kotlin.runCatching {
                 componentRepository.updateComponentList(newDto)
             }.onSuccess {
@@ -138,7 +141,7 @@ class AddComponentViewModel(
         val locUiState = _uiState.value
         // TODO: think of something better
         return ComponentDto(
-            componentType = ComponentGenericType.INPUT.name, // TODO
+            componentType = ComponentType.INPUT.name, // TODO
             type = locUiState.chosenComponentType?.name ?: return null,
             size = 1, // TODO
             topicId = locUiState.chosenTopic?.id,
@@ -186,7 +189,7 @@ class AddComponentViewModel(
 
         val specificFields = when (uiState.value.chosenComponentType) {
 
-            ComponentType.Button -> mapOf(
+            ComponentDetailedType.Button -> mapOf(
                 SettingType.OnClickSend to SettingData(
                     title = R.string.s33,
                     inputFieldData = InputFieldData(
@@ -195,7 +198,7 @@ class AddComponentViewModel(
                 )
             )
 
-            ComponentType.Toggle -> mapOf(
+            ComponentDetailedType.Toggle -> mapOf(
                 SettingType.OnToggleOnSend to SettingData(
                     title = R.string.s35,
                     inputFieldData = InputFieldData(
@@ -210,7 +213,7 @@ class AddComponentViewModel(
                 )
             )
 
-            ComponentType.Slider -> mapOf(
+            ComponentDetailedType.Slider -> mapOf(
                 SettingType.MaxValue to SettingData(
                     title = R.string.s37,
                     inputFieldData = InputFieldData(
@@ -236,17 +239,17 @@ class AddComponentViewModel(
         ComponentChoiceData(
             titleId = R.string.s41,
             iconRes = R.drawable.ic_button,
-            type = ComponentType.Button
+            type = ComponentDetailedType.Button
         ),
         ComponentChoiceData(
             titleId = R.string.s42,
             iconRes = R.drawable.ic_toggle,
-            type = ComponentType.Toggle
+            type = ComponentDetailedType.Toggle
         ),
         ComponentChoiceData(
             titleId = R.string.s43,
             iconRes = R.drawable.ic_slider,
-            type = ComponentType.Slider
+            type = ComponentDetailedType.Slider
         )
     )
 
@@ -258,22 +261,13 @@ class AddComponentViewModel(
     data class ComponentChoiceData(
         @StringRes val titleId: Int,
         @DrawableRes val iconRes: Int,
-        val type: ComponentType,
+        val type: ComponentDetailedType,
     )
 
     data class SettingData(
         @StringRes val title: Int,
         val inputFieldData: InputFieldData
     )
-
-    enum class ComponentType {
-        Button,
-        Toggle,
-        Slider,
-        Graph,
-//        LineGraph,
-//        SpeedGraph
-    }
 
     enum class SettingType {
         Name,
