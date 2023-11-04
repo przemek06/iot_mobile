@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.service
 
 import edu.pwr.iotmobile.dto.ProjectDeletedDTO
+import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.reactive.asFlow
@@ -12,7 +13,9 @@ import reactor.core.publisher.Sinks.Many
 
 
 @Service
-class ProjectDeletedNotificationService {
+class ProjectDeletedNotificationService(
+        val userService: UserService
+) {
 
     private var fluxSink: Many<ProjectDeletedDTO> = Sinks
         .many()
@@ -24,7 +27,12 @@ class ProjectDeletedNotificationService {
             .asFlux()
             .publish()
 
-    fun getInvitationFlow(userId: Int): Flow<ProjectDeletedDTO> {
+    fun getFlow(): Flow<ProjectDeletedDTO>  {
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
+        return getFlowByUserId(userId)
+    }
+
+    private fun getFlowByUserId(userId: Int): Flow<ProjectDeletedDTO> {
         return connectableFlux
             .autoConnect()
             .asFlow()

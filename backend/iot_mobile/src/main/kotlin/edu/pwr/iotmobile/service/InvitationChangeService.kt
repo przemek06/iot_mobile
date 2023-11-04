@@ -2,12 +2,9 @@ package edu.pwr.iotmobile.service
 
 import edu.pwr.iotmobile.dto.InvitationAlertDTO
 import edu.pwr.iotmobile.error.exception.NoAuthenticationException
-import jakarta.annotation.PostConstruct
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
