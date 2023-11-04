@@ -15,16 +15,15 @@ import java.nio.charset.Charset
 @Service
 @Slf4j
 class RabbitListener(
-    private val rabbitChannel: RabbitChannel,
-
-    ) {
+    private val rabbitChannel: RabbitChannel
+) {
     val logger: Logger = LoggerFactory.getLogger("RabbitListener")
     val channel = rabbitChannel.createChannel() ?: throw ChannelException()
     //TODO: plan how to handle incoming message
     /**
      * Register new consumer for existing topic
      */
-    fun registerConsumer(queueName: String){
+    fun registerConsumer(queueName: String) {
 
         val consumer = object : DefaultConsumer(channel) {
             @Throws(IOException::class)
@@ -44,7 +43,7 @@ class RabbitListener(
         }
     }
 
-    fun cancelConsumer(consumerTag: String){
+    fun cancelConsumer(consumerTag: String) {
         channel.basicCancel(consumerTag)
     }
 }

@@ -8,7 +8,7 @@ data class ComponentDto(
     val index: Int = 0,
     val topicId: Int? = null,
     val name: String? = null,
-    val defaultValue: Any? = null,
+    val defaultValue: Any? = null, // TODO: delete
     val onSendValue: Any? = null,
     val onSendAlternativeValue: Any? = null,
     val maxValue: Any? = null,
