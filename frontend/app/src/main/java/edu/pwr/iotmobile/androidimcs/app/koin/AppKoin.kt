@@ -4,6 +4,7 @@ import android.content.Context
 import edu.pwr.iotmobile.androidimcs.app.database.AppDatabase
 import edu.pwr.iotmobile.androidimcs.app.retrofit.AddCookiesInterceptor
 import edu.pwr.iotmobile.androidimcs.app.retrofit.AppRetrofit
+import edu.pwr.iotmobile.androidimcs.app.rsocket.WebSocketClient
 import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.event.EventImpl
@@ -67,6 +68,7 @@ object AppKoin {
     private val environments = module {
         single { AppDatabase.create(androidApplication()) }
         single { AppRetrofit.create(get()) }
+        single { WebSocketClient.create(get()) }
     }
 
     // Module for local and remote data sources

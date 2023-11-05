@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
@@ -9,16 +10,18 @@ import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
+import edu.pwr.iotmobile.androidimcs.model.listener.ComponentChangeWebSocketListener
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toComponentData
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 
 class DashboardViewModel(
-    private val componentRepository: ComponentRepository
+    private val componentRepository: ComponentRepository,
+    private val client: OkHttpClient
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
@@ -27,10 +30,22 @@ class DashboardViewModel(
     private var userProjectRole: UserProjectRole? = UserProjectRole.EDITOR
     private var componentListDto: ComponentListDto? = null
 
+    private var componentsListener: ComponentChangeWebSocketListener? = null
+
+    override fun onCleared() {
+        componentsListener?.closeWebSocket()
+    }
+
     fun init(dashboardId: Int) {
         if (dashboardId == _dashboardId) return
 
-        viewModelScope.launch(Dispatchers.Default) {
+        componentsListener = ComponentChangeWebSocketListener(
+            client = client,
+            dashboardId = dashboardId,
+            onComponentChangeMessage = { s -> onComponentChangeMessage(s) }
+        )
+
+        viewModelScope.launch {
             val components = componentRepository.getComponentList(dashboardId).sortedBy { it.index }
             componentListDto = ComponentListDto(
                 dashboardId = dashboardId,
@@ -46,6 +61,17 @@ class DashboardViewModel(
             }
         }
     }
+
+
+    //// WebSocket //////
+
+    private fun onComponentChangeMessage(text: String) {
+        Log.d("Web", "onComponentChangeMessage called")
+        Log.d("Web", text)
+        return
+    }
+
+    /////////////////////
 
     fun getComponentListDto(): ComponentListDto? = componentListDto
 
