@@ -20,5 +20,13 @@ data class Topic(
                 dataType = valueType
             )
         }
+
+        fun Topic.toDto(projectId: Int) = TopicDto(
+            id = id,
+            projectId = projectId,
+            name = title,
+            uniqueName = name,
+            valueType = dataType
+        )
     }
 }

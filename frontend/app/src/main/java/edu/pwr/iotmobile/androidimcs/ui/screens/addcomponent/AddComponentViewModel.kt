@@ -11,6 +11,7 @@ import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
+import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
@@ -144,9 +145,8 @@ class AddComponentViewModel(
             componentType = ComponentType.INPUT.name, // TODO
             type = locUiState.chosenComponentType?.name ?: return null,
             size = 1, // TODO
-            topicId = locUiState.chosenTopic?.id,
+            topic = locUiState.chosenTopic?.toDto(_projectId ?: return null),
             name = locUiState.settings[SettingType.Name]?.inputFieldData?.text,
-            defaultValue = locUiState.settings[SettingType.DefaultValue]?.inputFieldData?.text,
             onSendValue = locUiState.settings[SettingType.OnClickSend]?.inputFieldData?.text ?: locUiState.settings[SettingType.OnToggleOnSend]?.inputFieldData?.text,
             onSendAlternativeValue = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
             maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,

@@ -9,6 +9,7 @@ import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
+import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.extensions.asEnum
 
 data class DashboardUiState(
@@ -29,9 +30,8 @@ data class ComponentData(
     val componentType: ComponentType,
     val type: ComponentDetailedType,
 
-    val topicId: Int? = null,
+    val topic: Topic? = null,
 
-    val defaultValue: Any? = null,
     val onSendValue: Any? = null,
     val onSendAlternativeValue: Any? = null,
     val maxValue: Any? = null,
@@ -44,8 +44,7 @@ data class ComponentData(
                 name = name ?: "",
                 componentType = componentType.asEnum<ComponentType>() ?: return null,
                 type = type.asEnum<ComponentDetailedType>() ?: return null,
-                topicId = topicId,
-                defaultValue = defaultValue,
+                topic = topic?.toTopic(),
                 onSendValue = onSendValue,
                 onSendAlternativeValue = onSendAlternativeValue,
                 maxValue = maxValue,

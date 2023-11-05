@@ -6,13 +6,12 @@ data class ComponentDto(
     val type: String,
     val size: Int, // 1 or 2
     val index: Int = 0,
-    val topicId: Int? = null,
+    val topic: TopicDto? = null,
     val name: String? = null,
-    val defaultValue: Any? = null,
-    val onSendValue: Any? = null,
-    val onSendAlternativeValue: Any? = null,
-    val maxValue: Any? = null,
-    val minValue: Any? = null,
+    val onSendValue: String? = null,
+    val onSendAlternativeValue: String? = null,
+    val maxValue: String? = null,
+    val minValue: String? = null,
     val actionDestinationDTO: ActionDestinationDTO? = null,
     val eventSourceDTO: EventSourceDTO? = null
 )

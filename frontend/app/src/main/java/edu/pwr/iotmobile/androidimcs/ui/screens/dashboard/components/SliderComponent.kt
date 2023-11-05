@@ -23,8 +23,8 @@ fun LazyStaggeredGridItemScope.SliderComponent(
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
 ) {
-    val topic = uiState.topics.firstOrNull { it.id == item.topicId }
-    val value = topic?.currentValue ?: item.defaultValue
+    // TODO: get current value from other place than topic
+    val value = item.topic?.currentValue ?: item.onSendValue
 
     ComponentWrapper(
         item = item,
