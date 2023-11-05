@@ -65,9 +65,9 @@ class DashboardViewModel(
 
     //// WebSocket //////
 
-    private fun onComponentChangeMessage(text: String) {
+    private fun onComponentChangeMessage(data: ComponentListDto) {
         Log.d("Web", "onComponentChangeMessage called")
-        Log.d("Web", text)
+        Log.d("Web", data.toString())
         return
     }
 

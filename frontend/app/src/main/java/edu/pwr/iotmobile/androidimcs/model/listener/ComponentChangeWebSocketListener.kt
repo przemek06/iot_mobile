@@ -1,5 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.model.listener
 
+import com.google.gson.Gson
+import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -13,7 +15,7 @@ import okhttp3.WebSocketListener
 class ComponentChangeWebSocketListener(
     client: OkHttpClient,
     dashboardId: Int,
-    onComponentChangeMessage: (text: String) -> Unit
+    onComponentChangeMessage: (data: ComponentListDto) -> Unit
 ) {
     private val request = Request.Builder()
         .url("ws://192.168.66.46:8080/components") // Replace with your server URL and WebSocket endpoint
@@ -30,7 +32,8 @@ class ComponentChangeWebSocketListener(
             // Handle incoming messages from the server
             // You will receive an infinite stream of messages here
             // Update your UI or perform any other necessary tasks
-            onComponentChangeMessage(text)
+            val obj = Gson().fromJson(text, ComponentListDto::class.java)
+            onComponentChangeMessage(obj)
             return
         }
 
