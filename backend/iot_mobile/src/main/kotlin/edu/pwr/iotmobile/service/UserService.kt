@@ -4,6 +4,7 @@ import edu.pwr.iotmobile.dto.EmailDTO
 import edu.pwr.iotmobile.dto.PasswordDTO
 import edu.pwr.iotmobile.dto.UserDTO
 import edu.pwr.iotmobile.dto.UserInfoDTO
+import edu.pwr.iotmobile.entities.User
 import edu.pwr.iotmobile.enums.ERole
 import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.error.exception.TokenCodeIncorrectException
@@ -70,6 +71,10 @@ class UserService(
         val user = userRepository.findUserByEmail(email.address) ?: throw UserNotFoundException()
         val token = verificationTokenService.createVerificationToken(user)
         mailService.sendUserVerificationMail(user, token.code)
+    }
+
+    fun findUserByEmail(email: String) : User? {
+        return userRepository.findUserByEmail(email)
     }
 
     @Transactional
