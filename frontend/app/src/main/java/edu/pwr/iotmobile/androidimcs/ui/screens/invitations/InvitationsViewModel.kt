@@ -2,15 +2,20 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.invitations
 
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.data.InvitationData
 import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
+import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 val mockUser = User(
     id = 1,
@@ -21,6 +26,7 @@ val mockUser = User(
 )
 
 class InvitationsViewModel(
+    private val projectRepository: ProjectRepository,
     private val userRepository: UserRepository,
     val event: Event,
     val toast: Toast
@@ -30,27 +36,51 @@ class InvitationsViewModel(
     val uiState = _uiState.asStateFlow()
 
     fun init() {
-        _uiState.update {
-            it.copy(invitations = listOf(
-                InvitationData(
-                    user = mockUser,
-                    projectName = "project1"
-                ),
-                InvitationData(
-                    user = mockUser,
-                    projectName = "project2"
-                )
-            ))
-        }
+        getInvitations()
     }
 
     fun getInvitations() {
-        // TODO: need repo for it
+        viewModelScope.launch {
+            val invitationDtos = projectRepository.findAllPendingInvitationsForActiveUser()
+
+            val deferredInvitations = invitationDtos.map { dto ->
+                async {
+                    val project = projectRepository.getProjectById(dto.projectId)
+                    val user = userRepository.getUserInfoById(dto.userId).getOrNull()
+
+                    if (project != null && user != null) {
+                        InvitationData(
+                            id = dto.id,
+                            projectName = project.name,
+                            userName = user.name
+                        )
+                    } else {
+                        null
+                    }
+                }
+            }
+
+            val invitations = deferredInvitations.awaitAll().filterNotNull()
+
+            _uiState.update {
+                it.copy(invitations = invitations)
+            }
+        }
     }
-    fun acceptInvitation() {
-        // TODO: need repo for it
+    fun acceptInvitation(id: Int) {
+        viewModelScope.launch {
+            val result = projectRepository.acceptInvitation(id)
+
+            if(result.isSuccess) {
+                _uiState.update {
+                    it.copy(invitations = it.invitations.filter {
+                            invitation -> invitation.id != id
+                    })
+                }
+            }
+        }
     }
     fun declineInvitation() {
-        // TODO: need repo for it
+        // TODO:
     }
 }

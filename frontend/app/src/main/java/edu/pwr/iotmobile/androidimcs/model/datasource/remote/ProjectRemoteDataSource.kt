@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.model.datasource.remote
 
+import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
@@ -39,4 +40,17 @@ interface ProjectRemoteDataSource {
     suspend fun findActiveUserProjectRole(
         @Path("id") id: Int
     ): Response<ProjectRoleDto>
+
+    @GET("/user/project/invitation/pending/active")
+    suspend fun findAllPendingInvitationsForActiveUser(): Response<List<InvitationDto>>
+
+    @GET("/user/project/invitation/accept/{id}")
+    suspend fun acceptInvitation(
+        @Path("id") id: Int
+    ): Response<InvitationDto>
+
+    @GET("/user/project/invitation/reject/{id}")
+    suspend fun rejectInvitation(
+        @Path("id") id: Int
+    ): Response<InvitationDto>
 }

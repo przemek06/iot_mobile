@@ -55,17 +55,33 @@ private fun InvitationsScreenContent(
         TopBar(text = stringResource(id = R.string.show_invitations)) {
             navigation.goBack()
         }
-        LazyColumn(
-            modifier = Modifier
-                .padding(Dimensions.space22)
-        ) {
-            items(uiState.invitations) {
-                InvitationCard(
-                    invitation = it,
-                    uiInteraction = uiInteraction
-                )
-                Spacer(modifier = Modifier)
+        if(uiState.invitations.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(Dimensions.space22)
+            ) {
+                item {
+                    Text(
+                        text = stringResource(id = R.string.invitations_1),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                items(uiState.invitations) {
+                    InvitationCard(
+                        invitation = it,
+                        uiInteraction = uiInteraction
+                    )
+                    Spacer(modifier = Modifier)
+                }
             }
+        }
+        else {
+            Text(
+                text = stringResource(id = R.string.invitations_2),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }
