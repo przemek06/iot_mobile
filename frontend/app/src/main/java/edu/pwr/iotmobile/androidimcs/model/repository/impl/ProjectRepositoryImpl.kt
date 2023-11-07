@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
 import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDto
+import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
@@ -87,5 +88,14 @@ class ProjectRepositoryImpl(
             Result.success(body)
         else
             Result.failure(Exception("Rejecting invitation failed"))
+    }
+
+    override suspend fun createInvitation(invitationDtoSend: InvitationDtoSend): Result<InvitationDto> {
+        val result = remoteDataSource.createInvitation(invitationDtoSend)
+        val body = result.body()
+        return if (result.isSuccessful && body != null)
+            Result.success(body)
+        else
+            Result.failure(Exception("Create invitation failed"))
     }
 }

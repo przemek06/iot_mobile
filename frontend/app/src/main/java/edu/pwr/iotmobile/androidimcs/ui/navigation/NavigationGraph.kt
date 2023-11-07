@@ -42,7 +42,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchScreen
 fun NavGraph(
     navController: NavHostController,
     innerPadding: PaddingValues = PaddingValues(10.dp),
-    startDestination: String = Screen.Invitations.path
+    startDestination: String = Screen.Login.path
 ) {
     NavHost(
         navController = navController,

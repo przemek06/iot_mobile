@@ -25,6 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.StatData
+import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
+import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
@@ -45,14 +47,16 @@ fun AccountScreen(navigation: AccountNavigation) {
 
     AccountScreenContent(
         uiState = uiState,
-        uiInteraction = AccountUiInteraction.default(viewModel)
+        uiInteraction = AccountUiInteraction.default(viewModel),
+        navigation = navigation
     )
 }
 
 @Composable
 private fun AccountScreenContent(
     uiState: AccountUiState,
-    uiInteraction: AccountUiInteraction
+    uiInteraction: AccountUiInteraction,
+    navigation: AccountNavigation
 ) {
     val isDisplayNameDialogVisible = remember { mutableStateOf(false) }
     val isLogOutDialogVisible = remember { mutableStateOf(false) }
@@ -115,9 +119,6 @@ private fun AccountScreenContent(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Dimensions.space22.HeightSpacer()
-            }
-
-            item {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -141,22 +142,24 @@ private fun AccountScreenContent(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Dimensions.space40.HeightSpacer()
-            }
-
-            item {
                 Text(
-                    text = stringResource(id = R.string.stats),
+                    text = stringResource(id = R.string.your_invitations_1),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Dimensions.space10.HeightSpacer()
-            }
-
-            items(uiState.statList) {
-                Stat(it)
-            }
-
-            item {
+                Text(
+                    text = stringResource(id = R.string.your_invitations_2),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Dimensions.space10.HeightSpacer()
+                ButtonCommon(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally),
+                    text = stringResource(id = R.string.your_invitations_3),
+                    type = ButtonCommonType.Secondary
+                ) { navigation.openInvitations() }
                 Dimensions.space40.HeightSpacer()
                 Text(
                     text = stringResource(id = R.string.manage_account),
@@ -164,50 +167,21 @@ private fun AccountScreenContent(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Dimensions.space10.HeightSpacer()
-            }
-
-            item {
                 Option(
                     text = stringResource(id = uiState.changePasswordOption.titleId),
                     isBold = uiState.changePasswordOption.isBold,
                     onClick = uiState.changePasswordOption.onClick
                 )
-            }
-            item {
                 Option(
                     text = stringResource(id = R.string.log_out),
                     onClick = { isLogOutDialogVisible.value = true }
                 )
-            }
-            item {
                 Option(
                     text = stringResource(id = R.string.delete_account),
                     onClick = { isDeleteAccountDialogVisible.value = true }
                 )
             }
         }
-    }
-}
-
-@Composable
-fun Stat(statData: StatData) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = stringResource(id =statData.label),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Dimensions.space10.WidthSpacer()
-        Text(
-            text = statData.value,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground
-        )
     }
 }
 

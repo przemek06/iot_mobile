@@ -1,6 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.invitations
 
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.data.InvitationData
@@ -80,7 +79,7 @@ class InvitationsViewModel(
             }
         }
     }
-    fun declineInvitation() {
+    fun declineInvitation(id: Int) {
         // TODO:
     }
 }

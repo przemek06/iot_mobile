@@ -11,6 +11,7 @@ interface ProjectDetailsNavigation {
 
     fun openDashboardScreen(dashboardId: Int, dashboardName: String)
     fun openAddTopic()
+    fun openSearchInviteUsers()
     fun onReturn()
 
     companion object {
@@ -18,25 +19,28 @@ interface ProjectDetailsNavigation {
             navController: NavHostController,
             navBackStackEntry: NavBackStackEntry
         ) = object : ProjectDetailsNavigation {
-                override val projectId: Int?
-                    get() = navBackStackEntry.getArguments().getOrNull(0)?.toInt()
+            override val projectId: Int?
+                get() = navBackStackEntry.getArguments().getOrNull(0)?.toInt()
 
-                override fun openDashboardScreen(dashboardId: Int, dashboardName: String) {
-                    projectId?.let {
-                        navController.navigate(Screen.Dashboard.path.appendArguments(it, dashboardId, dashboardName))
-                    }
+            override fun openDashboardScreen(dashboardId: Int, dashboardName: String) {
+                projectId?.let {
+                    navController.navigate(Screen.Dashboard.path.appendArguments(it, dashboardId, dashboardName))
                 }
+            }
 
-                override fun openAddTopic() {
-                    projectId?.let {
-                        navController.navigate(Screen.AddTopic.path.appendArguments(it))
-                    }
+            override fun openAddTopic() {
+                projectId?.let {
+                    navController.navigate(Screen.AddTopic.path.appendArguments(it))
                 }
+            }
 
-                override fun onReturn() {
-                    navController.popBackStack()
-                }
+            override fun openSearchInviteUsers() {
 
             }
+
+            override fun onReturn() {
+                navController.popBackStack()
+            }
+        }
     }
 }

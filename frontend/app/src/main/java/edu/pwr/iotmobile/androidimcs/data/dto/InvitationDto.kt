@@ -6,3 +6,8 @@ data class InvitationDto(
     val userId: Int,
     val status: String,
 )
+
+data class InvitationDtoSend(
+    val projectId: Int,
+    val userId: Int
+)

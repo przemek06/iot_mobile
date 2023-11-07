@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.model.datasource.remote
 
 import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDto
+import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
@@ -53,4 +54,9 @@ interface ProjectRemoteDataSource {
     suspend fun rejectInvitation(
         @Path("id") id: Int
     ): Response<InvitationDto>
+
+    @POST("/user/project/invitation")
+    suspend fun createInvitation(
+        @Body invitationDtoSend: InvitationDtoSend
+    ) : Response<InvitationDto>
 }

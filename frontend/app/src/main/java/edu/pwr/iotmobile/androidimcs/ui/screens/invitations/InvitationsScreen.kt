@@ -94,7 +94,7 @@ fun InvitationCard(
 
     val annotatedString = buildAnnotatedString {
         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-            append(invitation.user.displayName)
+            append(invitation.userName)
         }
         append(stringResource(id = R.string.is_inviting))
         withStyle(style = SpanStyle(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)) {
@@ -110,11 +110,11 @@ fun InvitationCard(
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             ButtonCommon(text = stringResource(id = R.string.accept)) {
-                uiInteraction.acceptInvitation()
+                uiInteraction.acceptInvitation(invitation.id)
             }
             Dimensions.space22.WidthSpacer()
             ButtonCommon(text = stringResource(id = R.string.decline)) {
-                uiInteraction.declineInvitation()
+                uiInteraction.declineInvitation(invitation.id)
             }
         }
     }
