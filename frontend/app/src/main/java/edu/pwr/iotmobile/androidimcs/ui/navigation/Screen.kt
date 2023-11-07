@@ -45,7 +45,7 @@ sealed class Screen(
     object ActivateAccount : Screen("activateAccount/{arguments}")
     object ChangePassword : Screen("changePassword")
     object Admin : Screen("admin")
-    object Search : Screen("search")
+    object Search : Screen("search/{arguments}")
 
     object Dashboard : Screen("dashboard/{arguments}")
     object AddComponent : Screen("addComponent/{arguments}")

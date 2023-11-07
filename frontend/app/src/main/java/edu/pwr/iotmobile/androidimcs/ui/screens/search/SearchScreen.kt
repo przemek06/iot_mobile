@@ -33,7 +33,7 @@ fun SearchScreen(navigation: SearchNavigation) {
     val uiInteraction = SearchUiInteraction.default(viewModel)
 
     LaunchedEffect(Unit) {
-        viewModel.init(SearchViewModel.SearchMode.BLOCK_USERS)
+        viewModel.init(SearchMode.BLOCK_USERS)
     }
 
     SearchScreenContent(

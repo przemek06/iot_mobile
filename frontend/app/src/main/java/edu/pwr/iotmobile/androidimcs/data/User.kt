@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.data
 
 import edu.pwr.iotmobile.androidimcs.UserStore
+import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
 import edu.pwr.iotmobile.androidimcs.extensions.asEnum
 
 data class User(
@@ -13,6 +14,16 @@ data class User(
 ) {
     companion object {
         fun UserStore.toUser(): User? {
+            return User(
+                id = id,
+                displayName = name,
+                email = email,
+                role = role.asEnum<UserRole>() ?: return null,
+                isBlocked = isBlocked,
+                isActive = isActive
+            )
+        }
+        fun UserInfoDto.toUser(): User? {
             return User(
                 id = id,
                 displayName = name,

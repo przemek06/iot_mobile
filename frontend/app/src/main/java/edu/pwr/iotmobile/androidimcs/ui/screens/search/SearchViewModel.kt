@@ -1,12 +1,19 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.search
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.User
+import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
 import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
+import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 val mockUser = User(
     id = 1,
@@ -16,7 +23,11 @@ val mockUser = User(
     isBlocked = true
 )
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(
+    private val userRepository: UserRepository,
+    private val projectRepository: ProjectRepository,
+    private val toast: Toast
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState.default())
     val uiState = _uiState.asStateFlow()
@@ -31,8 +42,11 @@ class SearchViewModel : ViewModel() {
         }
     }
 
-    fun init(mode: SearchMode) {
-        val data = when(mode) {
+    fun init(
+        mode: SearchMode,
+        navigation: SearchNavigation
+    ) {
+        val data = when(navigation.mode) {
             SearchMode.ADD_ADMIN -> ScreenData(
                 topBarText = R.string.add_admin,
                 buttonText = R.string.add_admin,
@@ -49,16 +63,32 @@ class SearchViewModel : ViewModel() {
                 dialogTitle = R.string.search_block_1,
                 dialogTitleAlternative = R.string.search_block_2,
                 dialogButton2Function = {
-                    blockUser(it)
+                    toggleBlockUser(it)
                     setDialogInvisible()
                 },
                 dialogButton2FunctionAlternative = {
-                    unblockUser(it)
+                    toggleBlockUser(it)
                     setDialogInvisible()
                 },
                 alternative = {
                     it.isBlocked
                 }
+            )
+            SearchMode.INVITE_USERS -> ScreenData(
+                topBarText = R.string.invite_users,
+                buttonText = R.string.invite,
+                dialogTitle = R.string.sure_invite,
+                dialogButton2Function = {
+                    inviteUser(
+                        userId = it.id,
+                        projectId = navigation.projectId
+                    )
+                },
+                getUsersFunction = { getAllUsers() }
+            )
+            SearchMode.NONE -> ScreenData(
+                topBarText = R.string.nothing,
+                buttonText = R.string.nothing
             )
         }
         _uiState.update {
@@ -95,21 +125,41 @@ class SearchViewModel : ViewModel() {
         }
     }
     fun addAdmin(user: User) {
-        _uiState.update { it.copy() }
+
     }
-    fun blockUser(user: User) {
-        _uiState.update {
-            it.copy(searchedUsers = it.users.map { it.copy(isBlocked = true) })
+    fun toggleBlockUser(user: User) {
+
+    }
+    private fun inviteUser(userId: Int, projectId: Int?) {
+        viewModelScope.launch {
+            projectId?.let { projectId ->
+                val result = projectRepository.createInvitation(InvitationDtoSend(
+                    projectId = projectId,
+                    userId = userId
+                ))
+                if(result.isSuccess) {
+                    toast.toast("Invited user")
+                    return@launch
+                }
+            }
+            toast.toast("Failure")
         }
     }
-    fun unblockUser(user: User) {
-        _uiState.update {
-            it.copy(searchedUsers = it.users.map { it.copy(isBlocked = false) })
+
+    private fun getAllUsers() {
+        viewModelScope.launch {
+            val result = userRepository.getAllUserInfo()
+            result.onSuccess { list ->
+                val users = list.mapNotNull { it.toUser() }
+                _uiState.update { state ->
+                    state.copy(
+                        users = users,
+                        searchedUsers = users
+                    )
+                }
+            }
+            result.onFailure { toast.toast("Cannot list users") }
         }
-    }
-    enum class SearchMode(val mode: String) {
-        ADD_ADMIN("AddAdmin"),
-        BLOCK_USERS("BlockUsers")
     }
 
     data class ScreenData(
@@ -120,6 +170,14 @@ class SearchViewModel : ViewModel() {
         val dialogTitleAlternative: Int = R.string.nothing,
         val dialogButton2Function: (user: User) -> Unit = {},
         val dialogButton2FunctionAlternative: (user: User) -> Unit = {},
-        val alternative: (user: User) -> Boolean = { false }
+        val alternative: (user: User) -> Boolean = { false },
+        val getUsersFunction: () -> Unit = {}
     )
+}
+
+enum class SearchMode {
+    ADD_ADMIN,
+    BLOCK_USERS,
+    INVITE_USERS,
+    NONE
 }
