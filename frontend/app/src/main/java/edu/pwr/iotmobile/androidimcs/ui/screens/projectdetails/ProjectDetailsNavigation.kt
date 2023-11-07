@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
 import edu.pwr.iotmobile.androidimcs.ui.navigation.appendArguments
 import edu.pwr.iotmobile.androidimcs.ui.navigation.getArguments
+import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchMode
 
 interface ProjectDetailsNavigation {
     val projectId: Int?
@@ -35,7 +36,9 @@ interface ProjectDetailsNavigation {
             }
 
             override fun openSearchInviteUsers() {
-
+                projectId?.let {
+                    navController.navigate(Screen.Search.path.appendArguments(SearchMode.INVITE_USERS, it))
+                }
             }
 
             override fun onReturn() {

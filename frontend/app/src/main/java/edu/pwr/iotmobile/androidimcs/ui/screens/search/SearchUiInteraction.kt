@@ -9,8 +9,7 @@ interface SearchUiInteraction {
     fun setDialogVisible()
     fun setDialogInvisible()
     fun addAdmin(user: User)
-    fun blockUser(user: User)
-    fun unblockUser(user: User)
+    fun toggleBlockUser(user: User)
 
     companion object {
         fun default(viewModel: SearchViewModel) = object : SearchUiInteraction {
@@ -33,11 +32,9 @@ interface SearchUiInteraction {
             override fun addAdmin(user: User) {
                 viewModel.addAdmin(user)
             }
-            override fun blockUser(user: User) {
-                viewModel.blockUser(user)
-            }
-            override fun unblockUser(user: User) {
-                viewModel.unblockUser(user)
+
+            override fun toggleBlockUser(user: User) {
+                viewModel.toggleBlockUser(user)
             }
         }
     }

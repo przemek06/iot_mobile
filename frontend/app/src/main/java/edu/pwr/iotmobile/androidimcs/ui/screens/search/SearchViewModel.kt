@@ -15,13 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-val mockUser = User(
-    id = 1,
-    displayName = "Alan Walker",
-    email = "alan@walker.com",
-    role = UserRole.USER_ROLE,
-    isBlocked = true
-)
 
 class SearchViewModel(
     private val userRepository: UserRepository,
@@ -32,18 +25,7 @@ class SearchViewModel(
     private val _uiState = MutableStateFlow(SearchUiState.default())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        val users = listOf(mockUser, mockUser, mockUser, mockUser)
-        _uiState.update {
-            it.copy(
-                users = users,
-                searchedUsers = users
-            )
-        }
-    }
-
     fun init(
-        mode: SearchMode,
         navigation: SearchNavigation
     ) {
         val data = when(navigation.mode) {
@@ -91,6 +73,7 @@ class SearchViewModel(
                 buttonText = R.string.nothing
             )
         }
+        data.getUsersFunction()
         _uiState.update {
             it.copy(data = data)
         }
