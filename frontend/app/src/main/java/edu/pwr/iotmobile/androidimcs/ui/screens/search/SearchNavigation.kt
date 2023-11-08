@@ -20,7 +20,7 @@ interface SearchNavigation {
             override val mode: SearchMode
                 get() = navBackStackEntry.getArguments().getOrElse(0) { "NONE" }.asEnum<SearchMode>() ?: SearchMode.NONE
             override val projectId: Int?
-                get() = TODO("Not yet implemented")
+                get() = navBackStackEntry.getArguments().getOrNull(1)?.toIntOrNull()
 
             override fun goBack() {
                 navController.popBackStack()

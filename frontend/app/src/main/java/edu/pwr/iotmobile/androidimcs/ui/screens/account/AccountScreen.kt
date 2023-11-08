@@ -79,7 +79,10 @@ private fun AccountScreenContent(
             closeButtonText = stringResource(id = R.string.no),
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isLogOutDialogVisible.value = false },
-            onConfirm = { isLogOutDialogVisible.value = false }
+            onConfirm = {
+                uiInteraction.logout(navigation)
+                isLogOutDialogVisible.value = false
+            }
         )
     }
     if (isDeleteAccountDialogVisible.value) {

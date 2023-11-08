@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.invitations
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.data.InvitationData

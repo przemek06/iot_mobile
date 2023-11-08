@@ -34,6 +34,8 @@ fun InvitationsScreen(navigation: InvitationsNavigation) {
     val uiState by viewModel.uiState.collectAsState()
     val uiInteraction = InvitationsUiInteraction.default(viewModel)
 
+    viewModel.init()
+
     InvitationsScreenContent(
         uiState = uiState,
         uiInteraction = uiInteraction,
