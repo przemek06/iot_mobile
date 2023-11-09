@@ -58,15 +58,39 @@ class InvitationsViewModel(
             val result = projectRepository.acceptInvitation(id)
 
             if(result.isSuccess) {
+                val invitations = projectRepository.findAllPendingInvitationsForActiveUser()
                 _uiState.update {
-                    it.copy(invitations = it.invitations.filter {
-                            invitation -> invitation.id != id
+                    it.copy(invitations = invitations.map { dto ->
+                        InvitationData(
+                            id = dto.id,
+                            projectName = dto.project.name
+                        )
                     })
                 }
+                toast.toast("Invitation accepted")
+                return@launch
             }
+            toast.toast("Failed")
         }
     }
     fun declineInvitation(id: Int) {
-        // TODO:
+        viewModelScope.launch {
+            val result = projectRepository.rejectInvitation(id)
+
+            if(result.isSuccess) {
+                val invitations = projectRepository.findAllPendingInvitationsForActiveUser()
+                _uiState.update {
+                    it.copy(invitations = invitations.map { dto ->
+                        InvitationData(
+                            id = dto.id,
+                            projectName = dto.project.name
+                        )
+                    })
+                }
+                toast.toast("Invitation accepted")
+                return@launch
+            }
+            toast.toast("Failed")
+        }
     }
 }

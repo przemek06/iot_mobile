@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,11 +20,14 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.InvitationData
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
+import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
+import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import edu.pwr.iotmobile.androidimcs.ui.theme.WidthSpacer
 import org.koin.androidx.compose.koinViewModel
 
@@ -68,6 +72,7 @@ private fun InvitationsScreenContent(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onBackground
                     )
+                    Dimensions.space22.HeightSpacer()
                 }
                 items(uiState.invitations) {
                     InvitationCard(
@@ -95,8 +100,8 @@ fun InvitationCard(
 ) {
 
     val annotatedString = buildAnnotatedString {
-        append(stringResource(id = R.string.is_inviting))
-        withStyle(style = SpanStyle(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)) {
+        append(stringResource(id = R.string.is_inviting) + " ")
+        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
             append(invitation.projectName)
         }
     }
@@ -107,14 +112,20 @@ fun InvitationCard(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
+        Dimensions.space22.HeightSpacer()
         Row(verticalAlignment = Alignment.CenterVertically) {
             ButtonCommon(text = stringResource(id = R.string.accept)) {
                 uiInteraction.acceptInvitation(invitation.id)
             }
             Dimensions.space22.WidthSpacer()
-            ButtonCommon(text = stringResource(id = R.string.decline)) {
+            ButtonCommon(
+                text = stringResource(id = R.string.decline),
+                type = ButtonCommonType.Alternative
+            ) {
                 uiInteraction.declineInvitation(invitation.id)
             }
         }
+        Dimensions.space22.HeightSpacer()
+        Divider(thickness = Dimensions.space2)
     }
 }

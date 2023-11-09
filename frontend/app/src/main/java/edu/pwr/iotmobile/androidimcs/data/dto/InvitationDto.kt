@@ -8,6 +8,6 @@ data class InvitationDto(
 )
 
 data class InvitationDtoSend(
-    val projectId: Int,
+    val project: ProjectDto,
     val userId: Int
 )

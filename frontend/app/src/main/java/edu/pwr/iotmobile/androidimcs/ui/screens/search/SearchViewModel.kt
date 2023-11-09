@@ -7,6 +7,7 @@ import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
 import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
@@ -117,7 +118,11 @@ class SearchViewModel(
         viewModelScope.launch {
             projectId?.let { projectId ->
                 val result = projectRepository.createInvitation(InvitationDtoSend(
-                    projectId = projectId,
+                    project = ProjectDto(
+                        id = projectId,
+                        name = "",
+                        createdBy = 0
+                    ),
                     userId = userId
                 ))
                 if(result.isSuccess) {
