@@ -3,8 +3,10 @@ package edu.pwr.iotmobile.androidimcs.model.datasource.remote
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -39,4 +41,9 @@ interface ProjectRemoteDataSource {
     suspend fun findActiveUserProjectRole(
         @Path("id") id: Int
     ): Response<ProjectRoleDto>
+
+    @DELETE("/user/project/{id}")
+    suspend fun deleteProjectById(
+        @Path("id") projectId: Int
+    ): Response<ResponseBody>
 }

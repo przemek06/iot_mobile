@@ -61,7 +61,7 @@ fun TopicsScreenContent(
                 ErasableBlock(
                     primaryText = it.title + ": " + it.name,
                     secondaryText = it.dataType.name.firstUppercaseRestLowercase(),
-                    onErase = {}
+                    onErase = { uiInteraction.deleteTopic(it.id) }
                 )
             }
             Dimensions.space14.HeightSpacer()

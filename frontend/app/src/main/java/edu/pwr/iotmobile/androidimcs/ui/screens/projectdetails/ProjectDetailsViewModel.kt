@@ -55,7 +55,7 @@ class ProjectDetailsViewModel(
     override fun onCleared() {
         projectDeletedListener?.closeWebSocket()
     }
-    
+
     fun init(navigation: ProjectDetailsNavigation) {
         // Only update UI if project id changed.
         if (projectId == null || projectId != navigation.projectId) {
@@ -64,6 +64,7 @@ class ProjectDetailsViewModel(
             val localProjectId = navigation.projectId ?: return
             projectId = localProjectId
 
+            projectDeletedListener?.closeWebSocket()
             // Connect to project deleted listener
             projectDeletedListener = ProjectDeletedWebSocketListener(
                 client = client,
@@ -131,18 +132,6 @@ class ProjectDetailsViewModel(
                 updateDashboards()
             }.onFailure {
                 Log.d(TAG, "Add dashboard error")
-            }
-        }
-    }
-
-    fun deleteDashboard(id: Int) {
-        viewModelScope.launch(Dispatchers.Default) {
-            kotlin.runCatching {
-                dashboardRepository.deleteDashboard(id)
-            }.onSuccess {
-                updateDashboards()
-            }.onFailure {
-                Log.d(TAG, "Delete dashboard error")
             }
         }
     }
@@ -225,6 +214,19 @@ class ProjectDetailsViewModel(
         }
     }
 
+    private fun deleteProject() {
+        viewModelScope.launch {
+            val localProjectId = projectId ?: return@launch
+            kotlin.runCatching {
+                projectRepository.deleteProject(localProjectId)
+            }.onSuccess {
+                updateDashboards()
+            }.onFailure {
+                Log.d(TAG, "Delete project error")
+            }
+        }
+    }
+
     private fun getUserRoleDescription(role: UserProjectRole) = when (role) {
         UserProjectRole.ADMIN -> R.string.admin_desc
         UserProjectRole.EDITOR -> R.string.modify_desc
@@ -274,7 +276,7 @@ class ProjectDetailsViewModel(
         UserProjectRole.ADMIN -> listOf(
             MenuOption(
                 titleId = R.string.delete_project,
-                onClick = {/*TODO*/}
+                onClick = { deleteProject() }
             )
         )
         else -> emptyList()

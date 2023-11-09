@@ -10,18 +10,27 @@ import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
+import edu.pwr.iotmobile.androidimcs.helpers.event.Event
+import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.listener.ComponentChangeWebSocketListener
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toComponentData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
+private const val TAG = "DashboardViewModel"
+
 class DashboardViewModel(
     private val componentRepository: ComponentRepository,
-    private val client: OkHttpClient
+    private val dashboardRepository: DashboardRepository,
+    private val client: OkHttpClient,
+    val toast: Toast,
+    val event: Event
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
@@ -39,6 +48,7 @@ class DashboardViewModel(
     fun init(dashboardId: Int) {
         if (dashboardId == _dashboardId) return
 
+        componentsListener?.closeWebSocket()
         componentsListener = ComponentChangeWebSocketListener(
             client = client,
             dashboardId = dashboardId,
@@ -178,6 +188,20 @@ class DashboardViewModel(
         return closestIndex
     }
 
+    private fun deleteDashboard() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val dashboardId = _dashboardId ?: return@launch
+            kotlin.runCatching {
+                dashboardRepository.deleteDashboard(dashboardId)
+            }.onSuccess {
+                toast.toast("Successfully deleted dashboard!")
+                event.event(DASHBOARD_DELETED_EVENT)
+            }.onFailure {
+                Log.d(TAG, "Delete dashboard error")
+            }
+        }
+    }
+
     private fun generateMenuOptions(role: UserProjectRole?) = when (role) {
         UserProjectRole.ADMIN, UserProjectRole.EDITOR -> listOf(
             MenuOption(
@@ -186,9 +210,13 @@ class DashboardViewModel(
             ),
             MenuOption(
                 titleId = R.string.s21,
-                onClick = {/*TODO*/}
+                onClick = { deleteDashboard() }
             )
         )
         else -> emptyList()
+    }
+
+    companion object {
+        const val DASHBOARD_DELETED_EVENT = "dashboardDeleted"
     }
 }

@@ -60,4 +60,12 @@ class ProjectRepositoryImpl(
         else
             null
     }
+
+    override suspend fun deleteProject(id: Int): Result<Unit> {
+        val result = remoteDataSource.deleteProjectById(id)
+        return if (result.isSuccessful)
+            Result.success(Unit)
+        else
+            Result.failure(Exception("Delete project failed"))
+    }
 }

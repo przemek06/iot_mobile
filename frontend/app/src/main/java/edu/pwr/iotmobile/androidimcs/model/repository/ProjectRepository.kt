@@ -12,4 +12,5 @@ interface ProjectRepository {
     suspend fun getUsersByProjectId(id: Int): List<UserInfoDto>
     suspend fun getProjectById(id: Int): ProjectDto?
     suspend fun getUserProjectRole(id: Int): ProjectRoleDto?
+    suspend fun deleteProject(id: Int): Result<Unit>
 }

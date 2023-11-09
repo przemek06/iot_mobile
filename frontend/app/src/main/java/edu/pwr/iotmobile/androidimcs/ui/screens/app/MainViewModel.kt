@@ -33,6 +33,7 @@ class MainViewModel(
 
                 if (user != null) {
                     // User has logged in
+                    invitationAlertWebSocketListener?.closeWebSocket()
                     invitationAlertWebSocketListener = InvitationAlertWebSocketListener(
                         client = client,
                         onNewInvitation = { data -> onNewInvitation(data) }

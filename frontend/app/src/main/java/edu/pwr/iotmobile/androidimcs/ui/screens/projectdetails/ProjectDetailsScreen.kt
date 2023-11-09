@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
@@ -43,6 +44,12 @@ fun ProjectDetailsScreen(
     LaunchedEffect(Unit) {
         viewModel.init(navigation)
     }
+
+    val context = LocalContext.current
+    viewModel.event.CollectEvent(context) {
+        navigation.onReturn()
+    }
+    viewModel.toast.CollectToast(context)
 
     ProjectDetailsScreenContent(
         uiState = uiState,
@@ -74,7 +81,7 @@ private fun ProjectDetailsScreenContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Project 1",
+                    text = uiState.projectData.name,
                     style = MaterialTheme.typography.titleSmall
                 )
                 if (uiState.userProjectRole != UserProjectRole.VIEWER) {
