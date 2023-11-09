@@ -19,7 +19,8 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
         TokenNotFoundException::class,
         ProjectNotFoundException::class,
         InvitationNotFoundException::class,
-        QueueException::class
+        QueueException::class,
+        DiscordNotFoundException::class
     )
     fun handleNotFound(ex: Exception): ResponseEntity<String> {
         logError(ex)
