@@ -82,7 +82,7 @@
     <string name="log_out">Log out</string>
     <string name="delete_account">Delete account</string>
     <string name="show_invitations">Show invitations</string>
-    <string name="is_inviting"> is inviting you to project </string>
+    <string name="is_inviting">You are invited to join project </string>
     <string name="block_users">Block users</string>
     <string name="block">Block</string>
     <string name="unblock">Unblock</string>

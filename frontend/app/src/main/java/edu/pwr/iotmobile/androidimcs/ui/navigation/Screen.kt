@@ -48,11 +48,8 @@ sealed class Screen(
     object Search : Screen("search/{arguments}")
 
     object Dashboard : Screen("dashboard/{arguments}")
-<<<<<<< HEAD
     object AddComponent : Screen("addComponent/{arguments}")
-=======
-    object AddComponent : Screen("addComponent")
->>>>>>> f8ead55 (invitations screen)
+
     object Invitations : Screen("invitations")
 }
 

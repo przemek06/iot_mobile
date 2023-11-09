@@ -43,24 +43,10 @@ class InvitationsViewModel(
         viewModelScope.launch {
             val invitationDtos = projectRepository.findAllPendingInvitationsForActiveUser()
 
-            val deferredInvitations = invitationDtos.map { dto ->
-                async {
-                    val project = projectRepository.getProjectById(dto.projectId)
-                    val user = userRepository.getUserInfoById(dto.userId).getOrNull()
-
-                    if (project != null && user != null) {
-                        InvitationData(
-                            id = dto.id,
-                            projectName = project.name,
-                            userName = user.name
-                        )
-                    } else {
-                        null
-                    }
-                }
-            }
-
-            val invitations = deferredInvitations.awaitAll().filterNotNull()
+            val invitations = invitationDtos.map { InvitationData(
+                id = it.id,
+                projectName = it.project.name
+            ) }
 
             _uiState.update {
                 it.copy(invitations = invitations)

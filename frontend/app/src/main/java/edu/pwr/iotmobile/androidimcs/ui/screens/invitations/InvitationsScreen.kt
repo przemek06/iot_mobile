@@ -95,9 +95,6 @@ fun InvitationCard(
 ) {
 
     val annotatedString = buildAnnotatedString {
-        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-            append(invitation.userName)
-        }
         append(stringResource(id = R.string.is_inviting))
         withStyle(style = SpanStyle(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)) {
             append(invitation.projectName)
