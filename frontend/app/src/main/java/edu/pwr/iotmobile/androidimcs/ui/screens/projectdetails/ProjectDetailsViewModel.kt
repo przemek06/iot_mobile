@@ -213,7 +213,7 @@ class ProjectDetailsViewModel(
             MenuOption(
                 titleId = R.string.invite_users,
                 isBold = true,
-                onClick = { /*TODO*/}
+                onClick = { navigation.openSearchInviteUsers() }
             ),
             MenuOption(
                 titleId = R.string.edit_roles,
