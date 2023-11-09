@@ -41,6 +41,8 @@
     <string name="nothing"> </string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
     <string name="cancel">Cancel</string>
     <string name="return_text">Return</string>
     <string name="search">Search</string>
@@ -63,6 +65,9 @@
 
     <string name="username">Username</string>
     <string name="stats">Stats</string>
+    <string name="your_invitations_1">Your invitations</string>
+    <string name="your_invitations_2">You have new pending invitations</string>
+    <string name="your_invitations_3">Show invitations</string>
     <string name="dashboards_total">Dashboards in total</string>
     <string name="accessed_dashboards">Accessed dashboards</string>
     <string name="created_topics_groups">Created topics groups</string>
@@ -76,6 +81,8 @@
     <string name="change_password">Change password</string>
     <string name="log_out">Log out</string>
     <string name="delete_account">Delete account</string>
+    <string name="show_invitations">Show invitations</string>
+    <string name="is_inviting">You are invited to join project </string>
     <string name="block_users">Block users</string>
     <string name="block">Block</string>
     <string name="unblock">Unblock</string>
@@ -94,9 +101,14 @@
     <string name="admin_4">Show banned users</string>
     <string name="admin_5">Add admin</string>
 
+    <string name="invite">Invite</string>
+    <string name="sure_invite">Are you sure you want to invite %s</string>
     <string name="search_admin_1">Are you sure you want to add user %s as Admin?</string>
     <string name="search_block_1">Are you sure you want ban user %s</string>
     <string name="search_block_2">Are you sure you want unban user %s</string>
+
+    <string name="invitations_1">Your pending invitations</string>
+    <string name="invitations_2">You have no pending invitations</string>
 
     <string name="login">Login</string>
     <string name="register">Register</string>
