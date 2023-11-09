@@ -9,16 +9,14 @@ import jakarta.validation.constraints.NotNull
 data class InvitationDTO(
     val id: Int? = null,
     @field:NotNull
-    val projectId: Int,
+    val project: ProjectDTO,
     @field:NotNull
     val userId: Int,
     val status: EInvitationStatus? = null,
 ) {
     fun toEntity(status: EInvitationStatus = EInvitationStatus.PENDING) : Invitation {
-        val project = Project()
-        project.id = projectId
         val user = User()
         user.id = userId
-        return Invitation(project, user, status, id = id)
+        return Invitation(project.toEntity(), user, status, id = id)
     }
 }

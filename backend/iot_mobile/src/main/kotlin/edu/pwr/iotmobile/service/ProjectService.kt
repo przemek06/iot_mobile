@@ -187,21 +187,21 @@ class ProjectService(
     }
 
     fun createInvitation(invitation: InvitationDTO): InvitationDTO {
-        if (!isActiveUserProjectAdmin(invitation.projectId))
+        if (!isActiveUserProjectAdmin(invitation.project.id ?: throw InvalidStateException()))
             throw NotAllowedException()
 
         if (!userService.userExistsById(invitation.userId)) {
             throw UserNotFoundException()
         }
 
-        if (!projectRepository.existsById(invitation.projectId)) {
+        if (!projectRepository.existsById(invitation.project.id)) {
             throw ProjectNotFoundException()
         }
 
-        if (pendingInvitationExists(invitation.userId, invitation.projectId))
+        if (pendingInvitationExists(invitation.userId, invitation.project.id))
             throw InvitationAlreadyExistsException()
 
-        if (userAlreadyInProject(invitation.userId, invitation.projectId))
+        if (userAlreadyInProject(invitation.userId, invitation.project.id))
             throw UserAlreadyInProjectException()
 
         val toSave = invitation.toEntity()

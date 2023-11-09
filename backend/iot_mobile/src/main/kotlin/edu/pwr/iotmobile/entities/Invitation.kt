@@ -25,6 +25,6 @@ class Invitation (
     constructor() : this(Project(), User(), EInvitationStatus.PENDING)
 
     fun toDTO() : InvitationDTO {
-        return InvitationDTO(id, project.id!!, user.id!!, status)
+        return InvitationDTO(id, project.toDTO(), user.id!!, status)
     }
 }
