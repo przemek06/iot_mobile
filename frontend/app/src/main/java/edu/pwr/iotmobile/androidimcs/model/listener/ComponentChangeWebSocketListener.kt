@@ -18,7 +18,7 @@ class ComponentChangeWebSocketListener(
     onComponentChangeMessage: (data: ComponentListDto) -> Unit
 ) {
     private val request = Request.Builder()
-        .url("ws://192.168.66.46:8080/components") // Replace with your server URL and WebSocket endpoint
+        .url("ws://172.20.10.8:8080/components") // Replace with your server URL and WebSocket endpoint
         .build()
 
     private val webSocket = client.newWebSocket(request, object : WebSocketListener() {

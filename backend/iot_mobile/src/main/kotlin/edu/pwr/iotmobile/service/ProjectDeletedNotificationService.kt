@@ -1,12 +1,11 @@
 package edu.pwr.iotmobile.service
 
 import edu.pwr.iotmobile.dto.ProjectDeletedDTO
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.reactive.asFlow
+import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.ConnectableFlux
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
 import reactor.core.publisher.Sinks.Many
 
@@ -24,11 +23,15 @@ class ProjectDeletedNotificationService {
             .asFlux()
             .publish()
 
-    fun getInvitationFlow(userId: Int): Flow<ProjectDeletedDTO> {
+    @PostConstruct
+    fun init() {
+        connectableFlux.connect()
+    }
+
+    fun getProjectDeletedFlow(userId: Int, projectId: Int): Flux<ProjectDeletedDTO> {
         return connectableFlux
             .autoConnect()
-            .asFlow()
-            .filter { it.userId == userId }
+            .filter { it.userId == userId && it.projectId == projectId }
     }
 
     @Transactional
