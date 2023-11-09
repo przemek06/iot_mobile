@@ -9,10 +9,13 @@ import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDeletedDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData.Companion.toProjectData
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
+import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
+import edu.pwr.iotmobile.androidimcs.model.listener.ProjectDeletedWebSocketListener
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
@@ -22,6 +25,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 
 private const val TAG = "ProjectDetVM"
 
@@ -36,7 +40,9 @@ class ProjectDetailsViewModel(
     private val dashboardRepository: DashboardRepository,
     private val topicRepository: TopicRepository,
     private val projectRepository: ProjectRepository,
-    val toast: Toast
+    val toast: Toast,
+    val event: Event,
+    private val client: OkHttpClient
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProjectDetailsUiState.default())
     val uiState = _uiState.asStateFlow()
@@ -44,6 +50,12 @@ class ProjectDetailsViewModel(
     private var projectId: Int? = null
     private var userProjectRole: UserProjectRole? = UserProjectRole.ADMIN
 
+    private var projectDeletedListener: ProjectDeletedWebSocketListener? = null
+
+    override fun onCleared() {
+        projectDeletedListener?.closeWebSocket()
+    }
+    
     fun init(navigation: ProjectDetailsNavigation) {
         // Only update UI if project id changed.
         if (projectId == null || projectId != navigation.projectId) {
@@ -51,6 +63,13 @@ class ProjectDetailsViewModel(
             // Set private project id field
             val localProjectId = navigation.projectId ?: return
             projectId = localProjectId
+
+            // Connect to project deleted listener
+            projectDeletedListener = ProjectDeletedWebSocketListener(
+                client = client,
+                projectId = localProjectId,
+                onProjectDeleted = { d -> onProjectDeleted(d) }
+            )
 
             viewModelScope.launch {
 
@@ -78,6 +97,13 @@ class ProjectDetailsViewModel(
                     )
                 }
             }
+        }
+    }
+
+    private fun onProjectDeleted(data: ProjectDeletedDto) {
+        viewModelScope.launch {
+            toast.toast("Project ${data.projectId} has been deleted.")
+            event.event(PROJECT_DELETED_EVENT)
         }
     }
 
@@ -284,5 +310,9 @@ class ProjectDetailsViewModel(
         Dashboards(labelId = R.string.dashboards, index = 0),
         Topics(labelId = R.string.topics, index = 1),
         Group(labelId = R.string.group, index = 2)
+    }
+
+    companion object {
+        val PROJECT_DELETED_EVENT = "projectDeleted"
     }
 }

@@ -14,7 +14,7 @@ import okhttp3.WebSocketListener
  */
 class InvitationAlertWebSocketListener(
     client: OkHttpClient,
-    onNewInvitation: (i: InvitationAlertDto) -> Unit
+    onNewInvitation: (data: InvitationAlertDto) -> Unit
 ) {
     private val request = Request.Builder()
         .url("ws://172.20.10.8:8080/components") // Replace with your server URL and WebSocket endpoint

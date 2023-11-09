@@ -15,7 +15,7 @@ import okhttp3.WebSocketListener
 class ProjectDeletedWebSocketListener(
     client: OkHttpClient,
     projectId: Int,
-    onProjectDeleted: (i: ProjectDeletedDto) -> Unit
+    onProjectDeleted: (data: ProjectDeletedDto) -> Unit
 ) {
     private val request = Request.Builder()
         .url("ws://172.20.10.8:8080/components") // Replace with your server URL and WebSocket endpoint
