@@ -5,9 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
-import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
-import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDeletedDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
@@ -28,13 +26,6 @@ import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
 private const val TAG = "ProjectDetVM"
-
-val mockUser = User(
-    id = 1,
-    displayName = "Alan Walker",
-    email = "alan@walker.com",
-    role = UserRole.USER_ROLE
-)
 
 class ProjectDetailsViewModel(
     private val dashboardRepository: DashboardRepository,
@@ -144,6 +135,27 @@ class ProjectDetailsViewModel(
                 updateTopics()
             }.onFailure {
                 Log.d(TAG, "Delete topic error")
+            }
+        }
+    }
+
+    fun regenerateConnectionKey() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val localProjectId = projectId ?: return@launch
+            kotlin.runCatching {
+                projectRepository.regenerateConnectionKey(localProjectId)
+            }.onSuccess { result ->
+                if (result.isSuccess) {
+                    result.getOrNull()?.let { projectDto ->
+                        _uiState.update {
+                            it.copy(projectData = projectDto.toProjectData() ?: return@launch)
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "Regenerate key failed")
+                }
+            }.onFailure {
+                Log.d(TAG, "Regenerate key error")
             }
         }
     }

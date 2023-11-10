@@ -9,6 +9,7 @@ interface ProjectDetailsUiInteraction {
     fun onTextChangeDashboard(text: String)
     fun addNewDashboard(name: String)
     fun deleteTopic(id: Int)
+    fun regenerateConnectionKey()
 
     companion object {
         fun default(
@@ -42,6 +43,10 @@ interface ProjectDetailsUiInteraction {
 
             override fun deleteTopic(id: Int) {
                 viewModel.deleteTopic(id)
+            }
+
+            override fun regenerateConnectionKey() {
+                viewModel.regenerateConnectionKey()
             }
         }
     }

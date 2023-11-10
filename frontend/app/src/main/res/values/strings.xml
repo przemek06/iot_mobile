@@ -156,4 +156,9 @@
     <string name="s41">Button</string>
     <string name="s42">Toggle</string>
     <string name="s43">Slider</string>
+    <string name="s44">Connection string:</string>
+    <string name="s45">Connection details</string>
+    <string name="s46">Regenerate</string>
+    <string name="s47">Link:</string>
+    <string name="s48">Use this connection key on your IoT device in order to authorize the connection.</string>
 </resources>
