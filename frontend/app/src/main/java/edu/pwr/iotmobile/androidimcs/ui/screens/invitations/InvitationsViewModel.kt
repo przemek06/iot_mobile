@@ -1,0 +1,96 @@
+package edu.pwr.iotmobile.androidimcs.ui.screens.invitations
+
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import edu.pwr.iotmobile.androidimcs.data.InvitationData
+import edu.pwr.iotmobile.androidimcs.data.User
+import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.helpers.event.Event
+import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
+import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+val mockUser = User(
+    id = 1,
+    displayName = "Alan Walker",
+    email = "alan@walker.com",
+    role = UserRole.USER_ROLE,
+    isBlocked = true
+)
+
+class InvitationsViewModel(
+    private val projectRepository: ProjectRepository,
+    private val userRepository: UserRepository,
+    val event: Event,
+    val toast: Toast
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(InvitationsUiState.default())
+    val uiState = _uiState.asStateFlow()
+
+    fun init() {
+        getInvitations()
+    }
+
+    fun getInvitations() {
+        viewModelScope.launch {
+            val invitationDtos = projectRepository.findAllPendingInvitationsForActiveUser()
+
+            val invitations = invitationDtos.map { InvitationData(
+                id = it.id,
+                projectName = it.project.name
+            ) }
+
+            _uiState.update {
+                it.copy(invitations = invitations)
+            }
+        }
+    }
+    fun acceptInvitation(id: Int) {
+        viewModelScope.launch {
+            val result = projectRepository.acceptInvitation(id)
+
+            if(result.isSuccess) {
+                val invitations = projectRepository.findAllPendingInvitationsForActiveUser()
+                _uiState.update {
+                    it.copy(invitations = invitations.map { dto ->
+                        InvitationData(
+                            id = dto.id,
+                            projectName = dto.project.name
+                        )
+                    })
+                }
+                toast.toast("Invitation accepted")
+                return@launch
+            }
+            toast.toast("Failed")
+        }
+    }
+    fun declineInvitation(id: Int) {
+        viewModelScope.launch {
+            val result = projectRepository.rejectInvitation(id)
+
+            if(result.isSuccess) {
+                val invitations = projectRepository.findAllPendingInvitationsForActiveUser()
+                _uiState.update {
+                    it.copy(invitations = invitations.map { dto ->
+                        InvitationData(
+                            id = dto.id,
+                            projectName = dto.project.name
+                        )
+                    })
+                }
+                toast.toast("Invitation accepted")
+                return@launch
+            }
+            toast.toast("Failed")
+        }
+    }
+}

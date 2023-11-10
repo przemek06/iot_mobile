@@ -20,7 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AccountViewModel(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val toast: Toast
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AccountUiState.default())
@@ -75,7 +76,7 @@ class AccountViewModel(
 
                 val result = userRepository.updateActiveUser(UserDto(
                     email = userDtoInfo.email,
-                    password = "12345678", // TODO: xD? 
+                    password = "12345678", // TODO: xD?
                     name = userDtoInfo.name
                 ))
 
@@ -98,38 +99,22 @@ class AccountViewModel(
         }
     }
 
-    fun logout() {
-        viewModelScope.launch {
-            val result = userRepository.logout()
-        }
-    }
-
     fun onTextChange(text: String) {
         _uiState.update {
             it.copy(inputField = it.inputField.copy(text = text))
         }
     }
 
-    fun generateStats(
-        dashboardsTotal: Int,
-        accessedDashboards: Int,
-        createdTopicsGroups: Int
-    ): List<StatData> {
-        return listOf(
-            StatData(
-                label = R.string.dashboards_total,
-                value = dashboardsTotal.toString()
-            ),
-            StatData(
-                label = R.string.accessed_dashboards,
-                value = accessedDashboards.toString()
-            ),
-            StatData(
-                label = R.string.created_topics_groups,
-                value = createdTopicsGroups.toString()
-            )
-        )
+    fun logout(navigation: AccountNavigation) {
+        viewModelScope.launch {
+            val result = userRepository.logOut()
+            result.onSuccess {
+                toast.toast("Logged out")
+                navigation.openLogin()
+            }
+            result.onFailure {
+                toast.toast("Couldn't log out")
+            }
+        }
     }
-
-
 }

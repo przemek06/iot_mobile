@@ -6,6 +6,7 @@ interface AccountUiInteraction {
     fun deleteAccount()
     fun logout()
     fun onTextChange(text: String)
+    fun logout(navigation: AccountNavigation)
 
     companion object {
         fun default(
@@ -22,6 +23,10 @@ interface AccountUiInteraction {
             }
             override fun onTextChange(text: String) {
                 viewModel.onTextChange(text = text)
+            }
+
+            override fun logout(navigation: AccountNavigation) {
+                viewModel.logout(navigation)
             }
         }
     }

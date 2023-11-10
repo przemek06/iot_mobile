@@ -25,6 +25,16 @@ data class User(
         }
         fun UserInfoDto.toUser(): User? {
             return User(
+                id = id,
+                displayName = name,
+                email = email,
+                role = role.asEnum<UserRole>() ?: return null,
+                isBlocked = isBlocked,
+                isActive = isActive
+            )
+        }
+        fun UserInfoDto.toUser(): User? {
+            return User(
                 id = this.id,
                 displayName = this.name,
                 email = this.email,
