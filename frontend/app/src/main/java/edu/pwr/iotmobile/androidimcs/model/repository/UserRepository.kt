@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     suspend fun login(email: String, password: String): LoginUserResult
+    suspend fun logout(): Result<Unit>
     suspend fun register(userDto: UserDto): RegisterUserResult
     // TODO: suspend fun sendActivateCodeEmail(email: String): Result<Unit>
     /**
      * Returns User if logged in, null otherwise.
      */
     suspend fun getLoggedInUser(): Flow<User?>
-    suspend fun logOut(): Result<Unit>
     suspend fun getUserInfoById(id: Int): Result<UserInfoDto>
     suspend fun getAllUserInfo(): Result<List<UserInfoDto>>
     suspend fun verifyUser(code: String): ActivateAccountResult

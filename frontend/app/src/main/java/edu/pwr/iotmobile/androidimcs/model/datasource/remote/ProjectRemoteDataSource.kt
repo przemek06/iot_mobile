@@ -45,12 +45,12 @@ interface ProjectRemoteDataSource {
     @GET("/user/project/invitation/pending/active")
     suspend fun findAllPendingInvitationsForActiveUser(): Response<List<InvitationDto>>
 
-    @GET("/user/project/invitation/accept/{id}")
+    @PUT("/user/project/invitation/accept/{id}")
     suspend fun acceptInvitation(
         @Path("id") id: Int
     ): Response<InvitationDto>
 
-    @GET("/user/project/invitation/reject/{id}")
+    @PUT("/user/project/invitation/reject/{id}")
     suspend fun rejectInvitation(
         @Path("id") id: Int
     ): Response<InvitationDto>
