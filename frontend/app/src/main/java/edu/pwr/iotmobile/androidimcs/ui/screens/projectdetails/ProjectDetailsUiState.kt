@@ -2,12 +2,11 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
-import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
-import edu.pwr.iotmobile.androidimcs.data.dto.TopicDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
 import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData
+import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 
 data class ProjectDetailsUiState(
     val selectedTabIndex: Int,
@@ -54,25 +53,6 @@ data class ProjectDetailsUiState(
             isInfoVisible = isInfoVisible,
             projectData = projectData
         )
-    }
-}
-
-data class Topic(
-    val id: Int,
-    val title: String,
-    val name: String,
-    val dataType: TopicDataType
-) {
-    companion object {
-        fun TopicDto.toTopic(): Topic? {
-            val locId = id ?: return null
-            return Topic(
-                id = locId,
-                title = name,
-                name = uniqueName ?: "", // TODO: will be not null
-                dataType = valueType
-            )
-        }
     }
 }
 

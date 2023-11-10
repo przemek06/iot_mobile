@@ -139,4 +139,21 @@
     <string name="s24">Enter a unique name</string>
     <string name="s25">Unique name</string>
     <string name="s26">Previous</string>
+    <string name="s27">Choose component type</string>
+    <string name="s28">Choose topic</string>
+    <string name="s29">Settings</string>
+    <string name="s30">Input components</string>
+    <string name="s31">Output components</string>
+    <string name="s32">Trigger components</string>
+    <string name="s33">On click send</string>
+    <string name="s34">value</string>
+    <string name="s35">On toggle on send</string>
+    <string name="s36">On toggle off send</string>
+    <string name="s37">Max value</string>
+    <string name="s38">Min value</string>
+    <string name="s39">Select title</string>
+    <string name="s40">Select default value</string>
+    <string name="s41">Button</string>
+    <string name="s42">Toggle</string>
+    <string name="s43">Slider</string>
 </resources>

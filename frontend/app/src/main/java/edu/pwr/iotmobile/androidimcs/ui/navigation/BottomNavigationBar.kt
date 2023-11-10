@@ -34,6 +34,7 @@ private val SCREENS_WITHOUT_BOTTOM_BAR = listOf(
     Screen.ForgotPassword.path,
     Screen.ChangePassword.path,
     Screen.AddComponent.path,
+    Screen.AddTopic.path,
 )
 @Composable
 fun BottomNavigationBar(

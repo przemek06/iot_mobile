@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ProjectRepository : JpaRepository<Project, Int> {
+    fun findAllByCreatedById(userId: Int) : List<Project>
 }
