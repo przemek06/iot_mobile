@@ -2,6 +2,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.changepassword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.pwr.iotmobile.androidimcs.data.dto.PasswordBody
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,14 +38,7 @@ class ChangePasswordViewModel(
                 }
                 return@launch
             }
-
-            val userDtoInfo = userRepository.getActiveUserInfo().getOrElse { return@launch }
-            val newUserDto = UserDto(
-                email = userDtoInfo.email,
-                password = password,
-                name = userDtoInfo.name
-            )
-            val result = userRepository.updateActiveUser(newUserDto)
+            val result = userRepository.updateActiveUserPassword(PasswordBody(password))
 
             if(result.isSuccess) {
                 navigation.goBack()

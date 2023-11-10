@@ -91,7 +91,10 @@ private fun AccountScreenContent(
             closeButtonText = stringResource(id = R.string.no),
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isDeleteAccountDialogVisible.value = false },
-            onConfirm = { isDeleteAccountDialogVisible.value = false },
+            onConfirm = {
+                uiInteraction.deleteAccount(navigation)
+                isDeleteAccountDialogVisible.value = false
+            },
             content = { AccountDeletionContent() }
         )
     }

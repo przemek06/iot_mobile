@@ -72,10 +72,17 @@ class UserRepositoryImpl(
         val resultCode = response.code()
         Log.d(TAG, "logout result code: $resultCode")
 
-        return if (response.isSuccessful)
+        return try {
+            // Delete user from local db
+            userLocalDataSource.updateData { store ->
+                store.toBuilder().clear().build()
+            }
+            // Delete user session
+            userSessionLocalDataSource.removeUserSessionCookie()
             Result.success(Unit)
-        else
-            Result.failure(Exception("Logout failed"))
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to remove user session."))
+        }
     }
 
     override suspend fun register(userDto: UserDto): RegisterUserResult {
@@ -93,22 +100,6 @@ class UserRepositoryImpl(
         userLocalDataSource
             .getData()
             .map { it.toUser() }
-
-    override suspend fun logOut(): Result<Unit> {
-        // TODO: add remote log out
-
-        return try {
-            // Delete user from local db
-            userLocalDataSource.updateData { store ->
-                store.toBuilder().clear().build()
-            }
-            // Delete user session
-            userSessionLocalDataSource.removeUserSessionCookie()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(Exception("Failed to remove user session."))
-        }
-    }
 
     override suspend fun getUserInfoById(id: Int): Result<UserInfoDto> {
         val response = remoteDataSource.getUserInfoById(id)

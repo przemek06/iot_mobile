@@ -33,12 +33,9 @@ class AccountViewModel(
             titleId = R.string.change_password
         ) { navigation.openChangePassword() }
 
-        val stats = generateStats(0, 0, 0)
-
         viewModelScope.launch {
             val result = userRepository.getActiveUserInfo()
-            val userInfoDto = result.getOrNull() ?: return@launch
-            val user = userInfoDto.toUser()
+            val user = result.getOrNull()?.toUser() ?: return@launch
 
             _uiState.update {
                 it.copy(user = user)
@@ -47,44 +44,34 @@ class AccountViewModel(
 
         _uiState.update {
             it.copy(
-                changePasswordOption = changePasswordOption,
-                statList = stats
+                changePasswordOption = changePasswordOption
             )
         }
     }
     fun setDisplayName(displayName: String) {
 
-        /*
-        * checkData()
-        if (_uiState.value.inputFields.any { it.value.isError }) return
-
-        viewModelScope.launch {
-            val userDto = _uiState.value.inputFields.toDto() ?: return@launch
-            val result = userRepository.register(userDto)
-            Log.d("register", "result: ${result.name}")
-            when (result) {
-                RegisterUserResult.Success -> event.event(REGISTER_SUCCESS_EVENT)
-                RegisterUserResult.AccountExists -> toast.toast("Account with this email already exists.")
-                RegisterUserResult.Failure -> toast.toast("Error - could not register.")
-            }
-        }*/
-
         if(displayName.isNotBlank()){
             viewModelScope.launch {
 
-                val userDtoInfo = userRepository.getActiveUserInfo().getOrElse { return@launch }
-
                 val result = userRepository.updateActiveUser(UserDto(
-                    email = userDtoInfo.email,
+                    email = uiState.value.user.email,
                     password = "12345678", // TODO: xD?
-                    name = userDtoInfo.name
+                    name = displayName
                 ))
 
-//                if(result.isSuccess){
-//                    _uiState.update {
-//                        it.copy(user = userDtoInfo.toUser())
-//                    }
-//                }
+                result.onSuccess {
+
+                    val user = userRepository
+                        .getActiveUserInfo()
+                        .getOrNull()
+                        ?.toUser() ?: return@launch
+
+                    _uiState.update {
+                        it.copy(user = user)
+                    }
+
+                    toast.toast("Updated display name")
+                }
             }
         } else {
             _uiState.update {
@@ -93,9 +80,17 @@ class AccountViewModel(
         }
     }
 
-    fun deleteAccount() {
+    fun deleteAccount(navigation: AccountNavigation) {
         viewModelScope.launch {
-            userRepository.deleteActiveUser()
+            val result = userRepository.deleteActiveUser()
+
+            result.onSuccess {
+                toast.toast("Deleted account")
+                navigation.openLogin()
+                return@launch
+            }
+            toast.toast("Failed deleting account")
+
         }
     }
 
@@ -107,7 +102,7 @@ class AccountViewModel(
 
     fun logout(navigation: AccountNavigation) {
         viewModelScope.launch {
-            val result = userRepository.logOut()
+            val result = userRepository.logout()
             result.onSuccess {
                 toast.toast("Logged out")
                 navigation.openLogin()
