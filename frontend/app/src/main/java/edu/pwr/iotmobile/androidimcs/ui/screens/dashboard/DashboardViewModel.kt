@@ -108,7 +108,19 @@ class DashboardViewModel(
 
             ComponentDetailedType.Button -> { /* send component value */ }
 
-            ComponentDetailedType.Toggle -> { /* if value == onSend send onAlternative -> else the other way */ }
+            ComponentDetailedType.Toggle -> {
+                /* if value == onSend send onAlternative -> else the other way */
+                val checked = value as Boolean
+                val newValue = if (checked) item.onSendAlternativeValue else item.onSendValue
+                val newItems = uiState.value.components.map {
+                    if (it.id == item.id)
+                        it.copy(topic = it.topic?.copy(currentValue = newValue))
+                    else it
+                }
+                _uiState.update {
+                    it.copy(components = newItems)
+                }
+            }
 
             else -> {}
 
@@ -136,6 +148,9 @@ class DashboardViewModel(
             val newOrderedList = currentUiState.components.toMutableList()
             newOrderedList.removeAt(itemIndex)
             newOrderedList.add(closestIndex, item)
+            newOrderedList.mapIndexed { index, data ->
+                data.copy(index = index)
+            }
 
             _uiState.update {
                 it.copy(
@@ -143,6 +158,8 @@ class DashboardViewModel(
                     components = newOrderedList
                 )
             }
+
+            // TODO: send new component list
         }
     }
 

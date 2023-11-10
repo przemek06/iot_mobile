@@ -31,12 +31,12 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
     ) {
         Text(
             text = item.name,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Box(modifier = Modifier.fillMaxSize()) {
             Switch(
-                modifier = Modifier
-                    .align(Alignment.Center),
+                modifier = Modifier.align(Alignment.Center),
                 checked = item.onSendValue == item.topic?.currentValue,  // TODO: get current value from other place than topic
                 onCheckedChange = {
                     uiInteraction.onComponentClick(item, it)

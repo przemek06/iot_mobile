@@ -30,12 +30,12 @@ fun LazyStaggeredGridItemScope.ButtonComponent(
     ) {
         Text(
             text = item.name,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Box(modifier = Modifier.fillMaxSize()) {
             ButtonCommon(
-                modifier = Modifier
-                    .align(Alignment.Center),
+                modifier = Modifier.align(Alignment.Center),
                 width = 80.dp,
                 onClick = { uiInteraction.onComponentClick(item, item.onSendValue) },
             )

@@ -24,6 +24,8 @@ data class ComponentData(
     val id: Int,
     val name: String,
     val height: Dp = 140.dp,
+    val index: Int,
+
     val absolutePosition: Offset = Offset.Zero,
     val isFullLine: Boolean = false,
 
@@ -42,6 +44,7 @@ data class ComponentData(
             return ComponentData(
                 id = id ?: return null,
                 name = name ?: "",
+                index = index,
                 componentType = componentType.asEnum<ComponentType>() ?: return null,
                 type = type.asEnum<ComponentDetailedType>() ?: return null,
                 topic = topic?.toTopic(),
