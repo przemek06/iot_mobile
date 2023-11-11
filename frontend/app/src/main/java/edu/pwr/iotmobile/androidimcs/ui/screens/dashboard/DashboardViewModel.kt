@@ -16,6 +16,7 @@ import edu.pwr.iotmobile.androidimcs.model.listener.ComponentChangeWebSocketList
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toComponentData
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -78,7 +79,11 @@ class DashboardViewModel(
     private fun onComponentChangeMessage(data: ComponentListDto) {
         Log.d("Web", "onComponentChangeMessage called")
         Log.d("Web", data.toString())
-        return
+        _uiState.update {
+            it.copy(
+                components = data.components.mapNotNull { it.toComponentData() }
+            )
+        }
     }
 
     /////////////////////
@@ -159,7 +164,12 @@ class DashboardViewModel(
                 )
             }
 
-            // TODO: send new component list
+            val dto = componentListDto?.copy(
+                components = newOrderedList.map { it.toDto() }.toList()
+            )
+            dto?.let {
+                componentRepository.updateComponentList(dto)
+            }
         }
     }
 

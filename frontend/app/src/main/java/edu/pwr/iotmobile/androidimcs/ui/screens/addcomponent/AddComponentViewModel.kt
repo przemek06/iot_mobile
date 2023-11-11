@@ -145,7 +145,7 @@ class AddComponentViewModel(
             componentType = ComponentType.INPUT.name, // TODO
             type = locUiState.chosenComponentType?.name ?: return null,
             size = 1, // TODO
-            topic = locUiState.chosenTopic?.toDto(_projectId ?: return null),
+            topic = locUiState.chosenTopic?.toDto(),
             name = locUiState.settings[SettingType.Name]?.inputFieldData?.text,
             onSendValue = locUiState.settings[SettingType.OnClickSend]?.inputFieldData?.text ?: locUiState.settings[SettingType.OnToggleOnSend]?.inputFieldData?.text,
             onSendAlternativeValue = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
