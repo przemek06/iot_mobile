@@ -7,7 +7,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -66,7 +65,9 @@ fun BottomNavigationBar(
                 enter = slideInVertically(initialOffsetY = { s -> s } ),
                 exit = slideOutVertically(targetOffsetY = { t -> t } )
             ) {
-                NavigationBar(modifier = Modifier.height(Dimensions.space60)) {
+                NavigationBar(
+//                    modifier = Modifier.height(Dimensions.space60)
+                ) {
                     bottomNavItems.forEach { screen ->
                         val iconSize =
                             if (screen.path == Screen.Projects.path) Dimensions.space30
