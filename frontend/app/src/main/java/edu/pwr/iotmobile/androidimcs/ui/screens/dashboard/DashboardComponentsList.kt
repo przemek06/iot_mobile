@@ -256,7 +256,7 @@ fun LazyStaggeredGridItemScope.ComponentWrapper(
     ) {
         Card(
             modifier = Modifier
-//                .height(140.dp)
+                .height(140.dp)
                 .clip(CardDefaults.shape),
             border = BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.primary),
             colors = CardDefaults.cardColors(
