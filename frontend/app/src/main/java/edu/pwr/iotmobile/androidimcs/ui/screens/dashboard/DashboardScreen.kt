@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import org.koin.androidx.compose.koinViewModel
 
@@ -21,6 +22,12 @@ fun DashboardScreen(navigation: DashboardNavigation) {
             viewModel.init(it)
         }
     }
+
+    val context = LocalContext.current
+    viewModel.event.CollectEvent(context) {
+        navigation.onReturn()
+    }
+    viewModel.toast.CollectToast(context)
 
     DashboardScreenContent(
         uiState =  uiState,

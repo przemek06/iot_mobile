@@ -8,6 +8,8 @@ interface ProjectDetailsUiInteraction {
     fun setInfoInvisible()
     fun onTextChangeDashboard(text: String)
     fun addNewDashboard(name: String)
+    fun deleteTopic(id: Int)
+    fun regenerateConnectionKey()
 
     companion object {
         fun default(
@@ -37,6 +39,14 @@ interface ProjectDetailsUiInteraction {
 
             override fun addNewDashboard(name: String) {
                 viewModel.addDashboard(name)
+            }
+
+            override fun deleteTopic(id: Int) {
+                viewModel.deleteTopic(id)
+            }
+
+            override fun regenerateConnectionKey() {
+                viewModel.regenerateConnectionKey()
             }
         }
     }
