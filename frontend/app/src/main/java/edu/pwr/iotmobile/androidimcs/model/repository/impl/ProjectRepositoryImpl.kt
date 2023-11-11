@@ -19,10 +19,11 @@ class ProjectRepositoryImpl(
             Result.failure(Exception("Create project failed"))
     }
 
-    override suspend fun regenerateConnectionKey(projectId: Int): Result<Unit> {
+    override suspend fun regenerateConnectionKey(projectId: Int): Result<ProjectDto> {
         val result = remoteDataSource.regenerateConnectionKey(projectId)
-        return if (result.isSuccessful)
-            Result.success(Unit)
+        val body = result.body()
+        return if (result.isSuccessful && body != null)
+            Result.success(body)
         else
             Result.failure(Exception("Regenerate connection key failed"))
     }
@@ -61,6 +62,14 @@ class ProjectRepositoryImpl(
             body
         else
             null
+    }
+
+    override suspend fun deleteProject(id: Int): Result<Unit> {
+        val result = remoteDataSource.deleteProjectById(id)
+        return if (result.isSuccessful)
+            Result.success(Unit)
+        else
+            Result.failure(Exception("Delete project failed"))
     }
 
     override suspend fun findAllPendingInvitationsForActiveUser(): List<InvitationDto> {

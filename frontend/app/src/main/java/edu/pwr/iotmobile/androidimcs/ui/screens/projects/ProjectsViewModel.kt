@@ -71,7 +71,10 @@ class ProjectsViewModel(
                 projectRepository.getProjects()
             }.onSuccess { projects ->
                 _uiState.update { ui ->
-                    ui.copy(projects = projects.mapNotNull { it.toProjectData() })
+                    ui.copy(
+                        projects = projects.mapNotNull { it.toProjectData() },
+                        inputFiled = ui.inputFiled.copy(text = "")
+                    )
                 }
             }.onFailure {
                 Log.d(TAG, "Get projects error")

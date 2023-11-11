@@ -23,8 +23,6 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
 ) {
-    // TODO: it would be good to have it from item
-    val topic = uiState.topics.firstOrNull { it.id == item.topicId }
     ComponentWrapper(
         item = item,
         uiInteraction = uiInteraction,
@@ -33,13 +31,13 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
     ) {
         Text(
             text = item.name,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Box(modifier = Modifier.fillMaxSize()) {
             Switch(
-                modifier = Modifier
-                    .align(Alignment.Center),
-                checked = item.onSendValue == topic?.currentValue,
+                modifier = Modifier.align(Alignment.Center),
+                checked = item.onSendValue == item.topic?.currentValue,  // TODO: get current value from other place than topic
                 onCheckedChange = {
                     uiInteraction.onComponentClick(item, it)
                 }

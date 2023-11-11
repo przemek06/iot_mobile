@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
@@ -9,16 +10,28 @@ import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
+import edu.pwr.iotmobile.androidimcs.helpers.event.Event
+import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
+import edu.pwr.iotmobile.androidimcs.model.listener.ComponentChangeWebSocketListener
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toComponentData
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+
+private const val TAG = "DashboardViewModel"
 
 class DashboardViewModel(
-    private val componentRepository: ComponentRepository
+    private val componentRepository: ComponentRepository,
+    private val dashboardRepository: DashboardRepository,
+    private val client: OkHttpClient,
+    val toast: Toast,
+    val event: Event
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
@@ -27,10 +40,23 @@ class DashboardViewModel(
     private var userProjectRole: UserProjectRole? = UserProjectRole.EDITOR
     private var componentListDto: ComponentListDto? = null
 
+    private var componentsListener: ComponentChangeWebSocketListener? = null
+
+    override fun onCleared() {
+        componentsListener?.closeWebSocket()
+    }
+
     fun init(dashboardId: Int) {
         if (dashboardId == _dashboardId) return
 
-        viewModelScope.launch(Dispatchers.Default) {
+        componentsListener?.closeWebSocket()
+        componentsListener = ComponentChangeWebSocketListener(
+            client = client,
+            dashboardId = dashboardId,
+            onComponentChangeMessage = { s -> onComponentChangeMessage(s) }
+        )
+
+        viewModelScope.launch {
             val components = componentRepository.getComponentList(dashboardId).sortedBy { it.index }
             componentListDto = ComponentListDto(
                 dashboardId = dashboardId,
@@ -46,6 +72,21 @@ class DashboardViewModel(
             }
         }
     }
+
+
+    //// WebSocket //////
+
+    private fun onComponentChangeMessage(data: ComponentListDto) {
+        Log.d("Web", "onComponentChangeMessage called")
+        Log.d("Web", data.toString())
+        _uiState.update {
+            it.copy(
+                components = data.components.mapNotNull { it.toComponentData() }
+            )
+        }
+    }
+
+    /////////////////////
 
     fun getComponentListDto(): ComponentListDto? = componentListDto
 
@@ -72,7 +113,19 @@ class DashboardViewModel(
 
             ComponentDetailedType.Button -> { /* send component value */ }
 
-            ComponentDetailedType.Toggle -> { /* if value == onSend send onAlternative -> else the other way */ }
+            ComponentDetailedType.Toggle -> {
+                /* if value == onSend send onAlternative -> else the other way */
+                val checked = value as Boolean
+                val newValue = if (checked) item.onSendAlternativeValue else item.onSendValue
+                val newItems = uiState.value.components.map {
+                    if (it.id == item.id)
+                        it.copy(topic = it.topic?.copy(currentValue = newValue))
+                    else it
+                }
+                _uiState.update {
+                    it.copy(components = newItems)
+                }
+            }
 
             else -> {}
 
@@ -100,12 +153,22 @@ class DashboardViewModel(
             val newOrderedList = currentUiState.components.toMutableList()
             newOrderedList.removeAt(itemIndex)
             newOrderedList.add(closestIndex, item)
+            newOrderedList.mapIndexed { index, data ->
+                data.copy(index = index)
+            }
 
             _uiState.update {
                 it.copy(
                     draggedComponentId = null,
                     components = newOrderedList
                 )
+            }
+
+            val dto = componentListDto?.copy(
+                components = newOrderedList.map { it.toDto() }.toList()
+            )
+            dto?.let {
+                componentRepository.updateComponentList(dto)
             }
         }
     }
@@ -152,6 +215,20 @@ class DashboardViewModel(
         return closestIndex
     }
 
+    private fun deleteDashboard() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val dashboardId = _dashboardId ?: return@launch
+            kotlin.runCatching {
+                dashboardRepository.deleteDashboard(dashboardId)
+            }.onSuccess {
+                toast.toast("Successfully deleted dashboard!")
+                event.event(DASHBOARD_DELETED_EVENT)
+            }.onFailure {
+                Log.d(TAG, "Delete dashboard error")
+            }
+        }
+    }
+
     private fun generateMenuOptions(role: UserProjectRole?) = when (role) {
         UserProjectRole.ADMIN, UserProjectRole.EDITOR -> listOf(
             MenuOption(
@@ -160,9 +237,13 @@ class DashboardViewModel(
             ),
             MenuOption(
                 titleId = R.string.s21,
-                onClick = {/*TODO*/}
+                onClick = { deleteDashboard() }
             )
         )
         else -> emptyList()
+    }
+
+    companion object {
+        const val DASHBOARD_DELETED_EVENT = "dashboardDeleted"
     }
 }

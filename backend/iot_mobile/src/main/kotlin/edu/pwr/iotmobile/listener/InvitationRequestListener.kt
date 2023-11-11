@@ -3,7 +3,7 @@ package edu.pwr.iotmobile.listener
 import edu.pwr.iotmobile.dto.InvitationAlertDTO
 import edu.pwr.iotmobile.dto.InvitationDTO
 import edu.pwr.iotmobile.enums.EInvitationStatus
-import edu.pwr.iotmobile.service.InvitationChangeService
+import edu.pwr.iotmobile.service.InvitationAlertService
 import edu.pwr.iotmobile.service.ProjectService
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.AfterReturning
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 @Component
 class InvitationRequestListener {
     @Autowired
-    private lateinit var invitationChangeService: InvitationChangeService
+    private lateinit var invitationAlertService: InvitationAlertService
 
     @Autowired
     lateinit var projectService: ProjectService
@@ -36,7 +36,7 @@ class InvitationRequestListener {
         val userId = dto.userId
         val userInvitations = projectService.findAllInvitationsByUserId(userId)
         val anyPendingInvitation = userInvitations.any { it.status == EInvitationStatus.PENDING }
-        invitationChangeService.processEntityChange(InvitationAlertDTO(userId, anyPendingInvitation))
+        invitationAlertService.processEntityChange(InvitationAlertDTO(userId, anyPendingInvitation))
     }
 
 }

@@ -7,6 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
@@ -23,8 +27,8 @@ fun LazyStaggeredGridItemScope.SliderComponent(
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
 ) {
-    val topic = uiState.topics.firstOrNull { it.id == item.topicId }
-    val value = topic?.currentValue ?: item.defaultValue
+    // TODO: get current value from other place than topic
+    val value = item.topic?.currentValue ?: item.onSendValue
 
     ComponentWrapper(
         item = item,
@@ -34,14 +38,17 @@ fun LazyStaggeredGridItemScope.SliderComponent(
     ) {
         Text(
             text = item.name,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Box(modifier = Modifier.fillMaxSize()) {
             value?.let { value ->
+                var currentValue by remember { mutableFloatStateOf(value as Float) }
                 Slider(
                     modifier = Modifier.align(Alignment.Center),
-                    value = value as Float,
-                onValueChange = { uiInteraction.onComponentClick(item, it) }
+                    value = currentValue,
+                    onValueChange = { currentValue = it } ,
+                    onValueChangeFinished = { uiInteraction.onComponentClick(item, currentValue) }
                 )
             }
         }
