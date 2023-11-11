@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -80,6 +81,15 @@ fun BottomNavigationBar(
                                         contentDescription = stringResource(id = screen.description),
                                         colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onBackground)
                                     )
+                            },
+                            label = {
+                                screen.label?.let {
+                                    Text(
+                                        text = stringResource(id = it),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
                             },
                             alwaysShowLabel = true,
                             selected = currentDestination?.hierarchy?.any { it.route == screen.path } == true,

@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.model.listener
 
 import com.google.gson.Gson
+import edu.pwr.iotmobile.androidimcs.BuildConfig
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -18,7 +19,7 @@ class ComponentChangeWebSocketListener(
     onComponentChangeMessage: (data: ComponentListDto) -> Unit
 ) {
     private val request = Request.Builder()
-        .url("ws://172.20.10.8:8080/components") // Replace with your server URL and WebSocket endpoint
+        .url("ws://${BuildConfig.APP_NETWORK}:8080/components") // Replace with your server URL and WebSocket endpoint
         .build()
 
     private val webSocket = client.newWebSocket(request, object : WebSocketListener() {

@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.app.retrofit
 
+import edu.pwr.iotmobile.androidimcs.BuildConfig
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.UserSessionLocalDataSource
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
@@ -13,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 
 object AppRetrofit {
-    private const val BASE_URL = "http://172.20.10.8:8080/"
+    private val BASE_URL = "http://${BuildConfig.APP_NETWORK}:8080/"
 
     fun create(
         cookiesInterceptor: AddCookiesInterceptor

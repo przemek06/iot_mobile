@@ -176,7 +176,7 @@ private fun ShowAccessDialog(
     if (isVisible) {
         InfoDialog(
             title = stringResource(id = R.string.s45),
-            buttonFunction = onCloseDialog
+            onCloseDialog = onCloseDialog
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -188,11 +188,14 @@ private fun ShowAccessDialog(
                     }
                 )
                 Dimensions.space10.HeightSpacer()
-                ButtonCommon(
-                    text = stringResource(id = R.string.s46),
-                    onClick = uiInteraction::regenerateConnectionKey
-                )
-                Dimensions.space10.HeightSpacer()
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    ButtonCommon(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = stringResource(id = R.string.s46),
+                        onClick = uiInteraction::regenerateConnectionKey
+                    )
+                }
+                Dimensions.space22.HeightSpacer()
                 Text(
                     text = stringResource(id = R.string.s48),
                     style = MaterialTheme.typography.bodyMedium,
@@ -210,7 +213,8 @@ private fun CopyText(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             modifier = Modifier.padding(end = Dimensions.space4),

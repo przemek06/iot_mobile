@@ -165,7 +165,10 @@ class ProjectDetailsViewModel(
             val dashboards = getDashboards()
             if (dashboards.isNotEmpty()) {
                 _uiState.update { ui ->
-                    ui.copy(dashboards = dashboards)
+                    ui.copy(
+                        dashboards = dashboards,
+                        inputFieldDashboard = ui.inputFieldDashboard.copy(text = "")
+                    )
                 }
             }
         }

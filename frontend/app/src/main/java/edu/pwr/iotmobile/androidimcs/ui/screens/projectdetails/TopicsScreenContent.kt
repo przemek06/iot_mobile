@@ -12,7 +12,10 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -20,11 +23,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.extensions.firstUppercaseRestLowercase
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.InfoDialog
+import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 
@@ -34,7 +39,14 @@ fun TopicsScreenContent(
     uiInteraction: ProjectDetailsUiInteraction,
     navigation: ProjectDetailsNavigation
 ) {
+    var dialogTopic by remember { mutableStateOf<Topic?>(null) }
     TopicAccessDialog(uiState, uiInteraction)
+    DeleteTopicDialog(
+        isVisible = dialogTopic != null,
+        topic = dialogTopic,
+        uiInteraction = uiInteraction,
+        onCloseDialog = { dialogTopic = null }
+    )
     LazyColumn {
         if (uiState.userProjectRole != UserProjectRole.VIEWER) {
             item {
@@ -61,7 +73,7 @@ fun TopicsScreenContent(
                 ErasableBlock(
                     primaryText = it.title + ": " + it.name,
                     secondaryText = it.dataType.name.firstUppercaseRestLowercase(),
-                    onErase = { uiInteraction.deleteTopic(it.id) }
+                    onErase = { dialogTopic = it }
                 )
             }
             Dimensions.space14.HeightSpacer()
@@ -77,7 +89,7 @@ private fun TopicAccessDialog(
     if(uiState.isInfoVisible) {
         InfoDialog(
             title = stringResource(id = R.string.how_to_access_1),
-            buttonFunction = { uiInteraction.setInfoInvisible() }
+            onCloseDialog = { uiInteraction.setInfoInvisible() }
         ) {
             Text(
                 text = stringResource(id = R.string.how_to_access_2),
@@ -87,6 +99,30 @@ private fun TopicAccessDialog(
             Dimensions.space22.HeightSpacer()
             Text(
                 text = stringResource(id = R.string.how_to_access_3),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeleteTopicDialog(
+    isVisible: Boolean,
+    topic: Topic?,
+    uiInteraction: ProjectDetailsUiInteraction,
+    onCloseDialog: () -> Unit
+) {
+    if(isVisible && topic != null) {
+        SimpleDialog(
+            title = stringResource(id = R.string.s49, topic.name),
+            closeButtonText = stringResource(id = R.string.no),
+            confirmButtonText = stringResource(id = R.string.yes),
+            onCloseDialog = onCloseDialog,
+            onConfirm = { uiInteraction.deleteTopic(topic.id) }
+        ) {
+            Text(
+                text = stringResource(id = R.string.delete_account_desc2) + ".",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )

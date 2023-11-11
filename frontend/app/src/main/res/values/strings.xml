@@ -161,4 +161,5 @@
     <string name="s46">Regenerate</string>
     <string name="s47">Link:</string>
     <string name="s48">Use this connection key on your IoT device in order to authorize the connection.</string>
+    <string name="s49">Are you sure you want to delete this topic (%s)?</string>
 </resources>
