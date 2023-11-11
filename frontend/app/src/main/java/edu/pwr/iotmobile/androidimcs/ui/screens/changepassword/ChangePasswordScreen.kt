@@ -83,7 +83,7 @@ private fun ChangePasswordScreenContent(
             )
             Dimensions.space40.HeightSpacer()
             ButtonCommon(text = stringResource(id = R.string.confirm)) {
-                navigation.goBack()
+                uiInteraction.onConfirm(navigation = navigation)
             }
         }
     }

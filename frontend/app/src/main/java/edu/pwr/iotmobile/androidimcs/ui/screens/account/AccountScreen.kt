@@ -91,7 +91,10 @@ private fun AccountScreenContent(
             closeButtonText = stringResource(id = R.string.no),
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isDeleteAccountDialogVisible.value = false },
-            onConfirm = { isDeleteAccountDialogVisible.value = false },
+            onConfirm = {
+                uiInteraction.deleteAccount(navigation)
+                isDeleteAccountDialogVisible.value = false
+            },
             content = { AccountDeletionContent() }
         )
     }
@@ -117,7 +120,7 @@ private fun AccountScreenContent(
                 )
 
                 Text(
-                    text = uiState.email,
+                    text = uiState.user.email,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -140,7 +143,7 @@ private fun AccountScreenContent(
                 }
 
                 Text(
-                    text = uiState.displayName,
+                    text = uiState.user.displayName,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )

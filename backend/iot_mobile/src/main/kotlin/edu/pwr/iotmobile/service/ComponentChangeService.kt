@@ -9,6 +9,7 @@ import kotlinx.coroutines.reactive.asFlow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.ConnectableFlux
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
 
 @Service
@@ -24,8 +25,15 @@ class ComponentChangeService {
             .asFlux()
             .publish()
 
-    fun getEntityChangeFlow(): Flow<ComponentListDTO> {
-        return connectableFlux.autoConnect().asFlow()
+    @PostConstruct
+    fun init() {
+        connectableFlux.connect()
+    }
+
+    fun getEntityChangeFlow(dashboardId: Int): Flux<ComponentListDTO> {
+        return connectableFlux
+            .autoConnect()
+            .filter { it.dashboardId == dashboardId }
     }
 
     @Transactional

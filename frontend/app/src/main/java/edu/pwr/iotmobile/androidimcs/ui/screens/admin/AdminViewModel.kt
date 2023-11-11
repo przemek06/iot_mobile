@@ -14,7 +14,7 @@ class AdminViewModel : ViewModel() {
 
     fun init(navigation: AdminNavigation) {
 
-        var adminOptions = listOf<MenuOption>(
+        var adminOptions = listOf(
             MenuOption(
                 titleId = R.string.admin_3,
                 onClick = { navigation.openBanUsers() }

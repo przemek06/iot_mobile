@@ -20,6 +20,8 @@ import org.koin.androidx.compose.koinViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // TODO: get client + repo -> listen to invitations + send value to AppContent (red dot)
         setContent {
             AndroidIMCSTheme {
                 Surface(
@@ -31,6 +33,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    // TODO: on cośtam dispose of rSOcket
 }
 
 @Composable

@@ -1,5 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.data.dto
 
+import edu.pwr.iotmobile.androidimcs.data.User
+
 data class UserInfoDto(
     val id: Int,
     val email: String,
@@ -17,5 +19,16 @@ data class UserInfoDto(
             isBlocked = false,
             isActive = false
         )
+
+        fun User.toDto(): UserInfoDto {
+            return UserInfoDto(
+                id = this.id,
+                email = this.email,
+                role = this.role.name,
+                name = this.displayName,
+                isBlocked = this.isBlocked,
+                isActive = this.isActive
+            )
+        }
     }
 }
