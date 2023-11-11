@@ -24,6 +24,9 @@ interface UserRemoteDataSource {
         @FieldMap params: Map<String,String>
     ): Response<ResponseBody> // nie zwraca usera
 
+    @POST("/logout")
+    suspend fun logoutUser(): Response<ResponseBody>
+
     @POST("/anon/users")
     suspend fun registerUser(
         @Body userDto: UserDto

@@ -1,5 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.model.datasource.remote
 
+import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDto
+import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
@@ -46,4 +48,22 @@ interface ProjectRemoteDataSource {
     suspend fun deleteProjectById(
         @Path("id") projectId: Int
     ): Response<ResponseBody>
+
+    @GET("/user/project/invitation/pending/active")
+    suspend fun findAllPendingInvitationsForActiveUser(): Response<List<InvitationDto>>
+
+    @PUT("/user/project/invitation/accept/{id}")
+    suspend fun acceptInvitation(
+        @Path("id") id: Int
+    ): Response<InvitationDto>
+
+    @PUT("/user/project/invitation/reject/{id}")
+    suspend fun rejectInvitation(
+        @Path("id") id: Int
+    ): Response<InvitationDto>
+
+    @POST("/user/project/invitation")
+    suspend fun createInvitation(
+        @Body invitationDtoSend: InvitationDtoSend
+    ) : Response<InvitationDto>
 }
