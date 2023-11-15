@@ -37,7 +37,7 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
         Box(modifier = Modifier.fillMaxSize()) {
             Switch(
                 modifier = Modifier.align(Alignment.Center),
-                checked = item.onSendValue == item.topic?.currentValue,  // TODO: get current value from other place than topic
+                checked = item.onSendValue == item.topic?.currentValue,
                 onCheckedChange = {
                     uiInteraction.onComponentClick(item, it)
                 }

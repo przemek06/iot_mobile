@@ -38,10 +38,10 @@ data class ComponentData(
 
     val topic: Topic? = null,
 
-    val onSendValue: Any? = null,
-    val onSendAlternativeValue: Any? = null,
-    val maxValue: Any? = null,
-    val minValue: Any? = null,
+    val onSendValue: String? = null,
+    val onSendAlternativeValue: String? = null,
+    val maxValue: String? = null,
+    val minValue: String? = null,
 
     val actionDestinationDTO: ActionDestinationDTO? = null,
     val eventSourceDTO: EventSourceDTO? = null

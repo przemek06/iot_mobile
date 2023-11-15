@@ -108,8 +108,7 @@ fun ComponentsList(
                 }
             }
         }
-        for (i in 0..list.lastIndex) {
-            val item = list.getOrNull(i) ?: break
+        for (item in uiState.components) {
             val itemSpan =
                 if (item.isFullLine) StaggeredGridItemSpan.FullLine
                 else StaggeredGridItemSpan.SingleLane
@@ -256,7 +255,7 @@ fun LazyStaggeredGridItemScope.ComponentWrapper(
     ) {
         Card(
             modifier = Modifier
-//                .height(140.dp)
+                .height(140.dp)
                 .clip(CardDefaults.shape),
             border = BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.primary),
             colors = CardDefaults.cardColors(
