@@ -108,8 +108,7 @@ fun ComponentsList(
                 }
             }
         }
-        for (i in 0..list.lastIndex) {
-            val item = list.getOrNull(i) ?: break
+        for (item in uiState.components) {
             val itemSpan =
                 if (item.isFullLine) StaggeredGridItemSpan.FullLine
                 else StaggeredGridItemSpan.SingleLane

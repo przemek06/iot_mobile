@@ -8,7 +8,7 @@ data class Topic(
     val title: String,
     val projectId: Int,
     val name: String,
-    val currentValue: Any? = null,
+    val currentValue: String? = null,
     val dataType: TopicDataType
 ) {
     companion object {
@@ -18,7 +18,7 @@ data class Topic(
                 id = locId,
                 projectId = projectId,
                 title = name,
-                name = uniqueName ?: "", // TODO: will be not null
+                name = uniqueName ?: "",
                 dataType = valueType
             )
         }

@@ -118,8 +118,10 @@ class DashboardViewModel(
                 val checked = value as Boolean
                 val newValue = if (checked) item.onSendAlternativeValue else item.onSendValue
                 val newItems = uiState.value.components.map {
-                    if (it.id == item.id)
-                        it.copy(topic = it.topic?.copy(currentValue = newValue))
+                    if (it.id == item.id) {
+                        Log.d("click", "item found")
+                        item.copy(topic = item.topic?.copy(currentValue = newValue))
+                    }
                     else it
                 }
                 _uiState.update {
