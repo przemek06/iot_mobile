@@ -15,8 +15,11 @@ import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.listener.ComponentChangeWebSocketListener
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.MessageRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toDto
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toMessageDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +32,8 @@ private const val TAG = "DashboardViewModel"
 class DashboardViewModel(
     private val componentRepository: ComponentRepository,
     private val dashboardRepository: DashboardRepository,
+    private val messageRepository: MessageRepository,
+    private val projectRepository: ProjectRepository,
     private val client: OkHttpClient,
     val toast: Toast,
     val event: Event
@@ -37,6 +42,7 @@ class DashboardViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var _dashboardId: Int? = null
+    private var _projectId: Int? = null
     private var userProjectRole: UserProjectRole? = UserProjectRole.EDITOR
     private var componentListDto: ComponentListDto? = null
 
@@ -46,8 +52,9 @@ class DashboardViewModel(
         componentsListener?.closeWebSocket()
     }
 
-    fun init(dashboardId: Int) {
+    fun init(dashboardId: Int, projectId: Int?) {
         if (dashboardId == _dashboardId) return
+        _projectId = projectId
 
         componentsListener?.closeWebSocket()
         componentsListener = ComponentChangeWebSocketListener(
@@ -109,9 +116,9 @@ class DashboardViewModel(
 
     fun onComponentClick(item: ComponentData, value: Any?) {
         // TODO: implement - different behaviour based on type,
-        when (item.type) {
+        val message = when (item.type) {
 
-            ComponentDetailedType.Button -> { /* send component value */ }
+            ComponentDetailedType.Button -> { item.onSendValue }
 
             ComponentDetailedType.Toggle -> {
                 /* if value == onSend send onAlternative -> else the other way */
@@ -127,10 +134,28 @@ class DashboardViewModel(
                 _uiState.update {
                     it.copy(components = newItems)
                 }
+                newValue
             }
 
-            else -> {}
+            else -> value
 
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val connectionKey = getConnectionKey()
+            val messageDto = item.toMessageDto(
+                value = message.toString(),
+                connectionKey = connectionKey
+            )
+            if (messageDto == null) {
+                toast.toast("Could not send message.")
+                return@launch
+            }
+
+            val result = messageRepository.sendMessage(messageDto)
+            if (!result.isSuccess){
+                toast.toast("Could not send message.")
+            }
         }
     }
 
@@ -216,6 +241,14 @@ class DashboardViewModel(
             }
         }
         return closestIndex
+    }
+
+    private suspend fun getConnectionKey(): String? {
+        _projectId?.let {
+            val project = projectRepository.getProjectById(it)
+            return project?.connectionKey
+        }
+        return null
     }
 
     private fun deleteDashboard() {

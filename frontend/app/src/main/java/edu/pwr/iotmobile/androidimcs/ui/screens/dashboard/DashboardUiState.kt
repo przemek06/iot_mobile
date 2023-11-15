@@ -10,6 +10,7 @@ import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.dto.EventSourceDTO
+import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
@@ -80,6 +81,14 @@ data class ComponentData(
                 minValue = minValue.toString(),
                 actionDestinationDTO = actionDestinationDTO,
                 eventSourceDTO = eventSourceDTO,
+            )
+        }
+
+        fun ComponentData.toMessageDto(value: String, connectionKey: String?): MessageDto? {
+            return MessageDto(
+                topic = topic?.toDto() ?: return null,
+                message = value,
+                connectionKey = connectionKey ?: return null
             )
         }
     }
