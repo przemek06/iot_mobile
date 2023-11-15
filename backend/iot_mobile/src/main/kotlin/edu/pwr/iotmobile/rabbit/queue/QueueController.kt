@@ -61,9 +61,9 @@ class QueueController(
      * Add new listener
      */
     @GetMapping("/subscribe/{queueName}")
-    fun subscribeQueue(@PathVariable queueName: String):ResponseEntity<String> {
-            rabbitListener.registerConsumer(queueName)
-        return ResponseEntity.ok("Added new listener to queue $queueName")
+    fun subscribeQueue(@PathVariable queueNames: List<String>):ResponseEntity<String> {
+            rabbitListener.registerConsumer(queueNames)
+        return ResponseEntity.ok("Added new listener to queue $queueNames")
     }
 
     /**

@@ -119,7 +119,10 @@
             <artifactId>spring-rabbit</artifactId>
             <version>3.0.8</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
