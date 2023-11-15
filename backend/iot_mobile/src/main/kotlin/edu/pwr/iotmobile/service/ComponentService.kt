@@ -29,18 +29,31 @@ class ComponentService(
         if (!projectService.isEditor(userId, projectId)) {
             throw NotAllowedException()
         }
+        val existingComponents = componentRepository
+            .findAllByDashboardId(componentListDTO.dashboardId)
 
-        deleteAllInDashboard(componentListDTO.dashboardId)
-        val toSave = componentListDTO.toEntityList()
+        val newComponentIds = componentListDTO
+            .components
+            .mapNotNull { it.id }
+
+        val toDeleteIds = existingComponents
+            .filter { it.id !in newComponentIds }
+            .mapNotNull { it.id }
+
+        val toPreserve = existingComponents.filter { it.id in newComponentIds }
+
+        componentRepository.deleteAllById(toDeleteIds)
+
+        val toSave = componentListDTO
+            .toEntityList()
+            .filter { it.id == null }
+
         val saved = componentRepository.saveAll(toSave)
+        saved.addAll(toPreserve)
 
         val savedDTO = entitiesToDTOs(saved)
 
         return ComponentListDTO(componentListDTO.dashboardId, savedDTO)
-    }
-
-    fun deleteAllInDashboard(dashboardId: Int) {
-        componentRepository.deleteAllByDashboardId(dashboardId)
     }
 
     fun findAllByDashboardId(dashboardId: Int): ComponentListDTO {
