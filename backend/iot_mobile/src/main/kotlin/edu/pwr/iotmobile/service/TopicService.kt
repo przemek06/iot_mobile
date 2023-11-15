@@ -24,9 +24,8 @@ class TopicService(
         if (topicRepository.existsByUniqueNameAndProjectId(topic.uniqueName, topic.projectId))
             throw TopicAlreadyExistsException()
 
-        queueService.addQueue(topic.name)
-
         val toSave = topic.toEntityOnCreation()
+        queueService.addQueue(toSave.uniqueName)
         return topicRepository.save(toSave).toDTO()
     }
 
