@@ -34,7 +34,7 @@ def post_project(json, cookies):
     return response.status_code, elapsed_time       
 
 def create_projects_test(cookies):
-    jsons = generate_project_jsons(1000)
+    jsons = generate_project_jsons(2000)
 
     with ThreadPoolExecutor(max_workers=100) as executor:
         futures = [executor.submit(post_project, json, cookies) for json in jsons]
