@@ -118,8 +118,10 @@ class DashboardViewModel(
                 val checked = value as Boolean
                 val newValue = if (checked) item.onSendAlternativeValue else item.onSendValue
                 val newItems = uiState.value.components.map {
-                    if (it.id == item.id)
-                        it.copy(topic = it.topic?.copy(currentValue = newValue))
+                    if (it.id == item.id) {
+                        Log.d("click", "item found")
+                        item.copy(topic = item.topic?.copy(currentValue = newValue))
+                    }
                     else it
                 }
                 _uiState.update {
@@ -194,12 +196,13 @@ class DashboardViewModel(
         val draggedComponent = components.firstOrNull { it.id == draggedComponentId } ?: return null
         val itemIndex = components.indexOf(draggedComponent)
 
-        for (it in visibleItems) {
+        for (it in visibleItems.subList(1, visibleItems.size)) {
+            val currentItemIndex = it.index-1
             // Do not consider the original position of the currently dragged item.
-            if (it.index == itemIndex) continue
+            if (currentItemIndex == itemIndex) continue
 
             // Calculate the current distance squared.
-            val currComponent = components.getOrNull(it.index) ?: return null
+            val currComponent = components.getOrNull(currentItemIndex) ?: return null
             val width = if (draggedComponent.isFullLine) windowWidth else windowWidth/2
             val draggedCenterPos = draggedComponent.absolutePosition + Offset(width/2, draggedComponent.height.value/2)
             val currCenterPos = currComponent.absolutePosition + Offset(width/2, currComponent.height.value/2)
@@ -209,7 +212,7 @@ class DashboardViewModel(
             // the closest index.
             if (currDiff < diff) {
                 diff = currDiff
-                closestIndex = it.index
+                closestIndex = currentItemIndex
             }
         }
         return closestIndex

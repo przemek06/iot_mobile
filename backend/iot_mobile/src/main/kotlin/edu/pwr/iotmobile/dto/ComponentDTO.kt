@@ -64,6 +64,7 @@ data class ComponentDTO(
     private fun assignCommonFields(entity: Component, dashboardId: Int): Component {
         entity.id = id
         entity.size = size
+        entity.name = name
         entity.type = type
         entity.index = index
         val dashboard = Dashboard()
