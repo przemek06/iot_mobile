@@ -56,7 +56,6 @@ class ComponentService(
 
         toSave.addAll(toPreserve)
         val saved = componentRepository.saveAll(toSave)
-        println(saved)
 
         val savedDTO = entitiesToDTOs(saved)
 
