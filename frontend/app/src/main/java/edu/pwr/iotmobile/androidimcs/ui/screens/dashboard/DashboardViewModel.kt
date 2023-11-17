@@ -10,6 +10,7 @@ import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
+import edu.pwr.iotmobile.androidimcs.data.dto.TopicMessagesDto
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.listener.ComponentChangeWebSocketListener
@@ -70,11 +71,14 @@ class DashboardViewModel(
                 components = components
             )
 
+            val lastMessages = getLastMessages()
+
             _uiState.update { ui ->
                 ui.copy(
                     components = components.mapNotNull { it.toComponentData() },
                     menuOptionsList = generateMenuOptions(userProjectRole),
-                    userProjectRole = userProjectRole
+                    userProjectRole = userProjectRole,
+                    currentMessages = lastMessages
                 )
             }
         }
@@ -88,7 +92,7 @@ class DashboardViewModel(
         Log.d("Web", data.toString())
         _uiState.update {
             it.copy(
-                components = data.components.mapNotNull { it.toComponentData() }
+                components = data.components.sortedBy { it.index }.mapNotNull { it.toComponentData() }
             )
         }
     }
@@ -152,9 +156,14 @@ class DashboardViewModel(
                 return@launch
             }
 
-            val result = messageRepository.sendMessage(messageDto)
-            if (!result.isSuccess){
-                toast.toast("Could not send message.")
+            kotlin.runCatching {
+                messageRepository.sendMessage(messageDto)
+            }.onSuccess {
+                if (!it.isSuccess) {
+                    toast.toast("Could not send message.")
+                }
+            }.onFailure {
+                toast.toast("Error while sending message.")
             }
         }
     }
@@ -164,6 +173,7 @@ class DashboardViewModel(
         windowWidth: Float
     ) {
         viewModelScope.launch {
+            val locComponentListDto = componentListDto
             val currentUiState = uiState.value
             val draggedComponentId = currentUiState.draggedComponentId ?: return@launch
 
@@ -180,19 +190,19 @@ class DashboardViewModel(
             val newOrderedList = currentUiState.components.toMutableList()
             newOrderedList.removeAt(itemIndex)
             newOrderedList.add(closestIndex, item)
-            newOrderedList.mapIndexed { index, data ->
+            val newList = newOrderedList.mapIndexed { index, data ->
                 data.copy(index = index)
             }
 
             _uiState.update {
                 it.copy(
                     draggedComponentId = null,
-                    components = newOrderedList
+                    components = newList
                 )
             }
 
-            val dto = componentListDto?.copy(
-                components = newOrderedList.map { it.toDto() }.toList()
+            val dto = locComponentListDto?.copy(
+                components = newList.map { it.toDto() }.toList()
             )
             dto?.let {
                 componentRepository.updateComponentList(dto)
@@ -241,6 +251,11 @@ class DashboardViewModel(
             }
         }
         return closestIndex
+    }
+
+    private suspend fun getLastMessages(): List<TopicMessagesDto> {
+        val id = _dashboardId ?: return emptyList()
+        return messageRepository.getLastMessagesForDashboard(id)
     }
 
     private suspend fun getConnectionKey(): String? {

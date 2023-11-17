@@ -11,12 +11,12 @@ import retrofit2.http.Path
 interface MessageRemoteDataSource {
 
     @POST("/user/messages")
-    fun sendMessage(
+    suspend fun sendMessage(
         @Body message: MessageDto
     ): Response<MessageDto>
 
     @GET("/user/messages/{dashboardId}/{n}")
-    fun getLastMessagesForDashboard(
+    suspend fun getLastMessagesForDashboard(
         @Path("dashboardId") dashboardId: Int,
         @Path("n") numberOfMessages: Int
     ): Response<List<TopicMessagesDto>>

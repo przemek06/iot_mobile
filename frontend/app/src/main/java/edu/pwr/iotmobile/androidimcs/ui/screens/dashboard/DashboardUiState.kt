@@ -11,6 +11,7 @@ import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.dto.EventSourceDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
+import edu.pwr.iotmobile.androidimcs.data.dto.TopicMessagesDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
@@ -22,6 +23,7 @@ data class DashboardUiState(
     val topics: List<Topic> = emptyList(),
     val menuOptionsList: List<MenuOption> = emptyList(),
     val userProjectRole: UserProjectRole? = null,
+    val currentMessages: List<TopicMessagesDto> = emptyList(),
 )
 
 data class ComponentData(

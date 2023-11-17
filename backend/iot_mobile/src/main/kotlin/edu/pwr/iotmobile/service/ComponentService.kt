@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ComponentService(
-    val componentRepository: ComponentRepository,
-    val userService: UserService,
-    val projectService: ProjectService,
-    val dashboardService: DashboardService
+        val componentRepository: ComponentRepository,
+        val userService: UserService,
+        val projectService: ProjectService,
+        val dashboardService: DashboardService
 ) {
 
     @Transactional
@@ -30,27 +30,36 @@ class ComponentService(
             throw NotAllowedException()
         }
         val existingComponents = componentRepository
-            .findAllByDashboardId(componentListDTO.dashboardId)
+                .findAllByDashboardId(componentListDTO.dashboardId)
 
         val newComponentIds = componentListDTO
-            .components
-            .mapNotNull { it.id }
+                .components
+                .mapNotNull { it.id }
 
         val toDeleteIds = existingComponents
-            .filter { it.id !in newComponentIds }
-            .mapNotNull { it.id }
+                .filter { it.id !in newComponentIds }
+                .mapNotNull { it.id }
 
         val toPreserve = existingComponents.filter { it.id in newComponentIds }
 
+        toPreserve.forEach {
+            it.index = componentListDTO
+                    .components.find { it2 -> it2.id == it.id }
+                    ?.index ?: throw InvalidStateException()
+        }
+
         componentRepository.deleteAllById(toDeleteIds)
 
+        // new components to save
         val toSave = componentListDTO
-            .toEntityList()
-            .filter { it.id == null }
+                .toEntityList()
+                .filter { it.id == null }
+                .toMutableList()
 
         val saved = componentRepository.saveAll(toSave)
-        saved.addAll(toPreserve)
+        val updated = componentRepository.saveAll(toPreserve)
 
+        saved.addAll(updated)
         val savedDTO = entitiesToDTOs(saved)
 
         return ComponentListDTO(componentListDTO.dashboardId, savedDTO)
