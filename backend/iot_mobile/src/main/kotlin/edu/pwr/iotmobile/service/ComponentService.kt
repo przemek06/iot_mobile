@@ -41,15 +41,21 @@ class ComponentService(
             .mapNotNull { it.id }
 
         val toPreserve = existingComponents.filter { it.id in newComponentIds }
+        toPreserve.forEach {
+            it.index = componentListDTO.components
+                .find { it2 -> it2.id == it.id }
+                ?.index ?: throw InvalidStateException()
+        }
 
         componentRepository.deleteAllById(toDeleteIds)
 
         val toSave = componentListDTO
             .toEntityList()
             .filter { it.id == null }
+            .toMutableList()
 
+        toSave.addAll(toPreserve)
         val saved = componentRepository.saveAll(toSave)
-        saved.addAll(toPreserve)
 
         val savedDTO = entitiesToDTOs(saved)
 
