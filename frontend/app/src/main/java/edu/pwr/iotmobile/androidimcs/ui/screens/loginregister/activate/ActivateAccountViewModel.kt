@@ -39,6 +39,7 @@ class ActivateAccountViewModel(
                     }
                     delay(3000)
                     event.event(ACTIVATE_ACCOUNT_SUCCESS_EVENT)
+                    toast.toast("Successfully activated account!")
                 }
                 ActivateAccountResult.IncorrectCode -> _uiState.update {
                     val updatedInputField = code.copy(isError = true)

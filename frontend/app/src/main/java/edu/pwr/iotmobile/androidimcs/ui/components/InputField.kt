@@ -2,6 +2,7 @@
 
 package edu.pwr.iotmobile.androidimcs.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
@@ -17,8 +18,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import edu.pwr.iotmobile.androidimcs.extensions.conditional
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InputField(
+    modifier: Modifier = Modifier,
     text: String,
     label: String,
     width: Dp? = null,
@@ -31,7 +34,7 @@ fun InputField(
     onValueChange: (v: String) -> Unit
 ) {
     Column(
-        modifier = Modifier.conditional(width != null) {
+        modifier = modifier.conditional(width != null) {
             width?.let { width(it) } ?: run { this }
         }
     ) {

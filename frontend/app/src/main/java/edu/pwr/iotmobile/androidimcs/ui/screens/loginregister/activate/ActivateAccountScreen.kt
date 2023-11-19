@@ -44,19 +44,22 @@ fun ActivateAccountScreen(navigation: ActivateAccountNavigation) {
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        navigation.onReturn()
+        if (navigation.type == ActivateAccountType.AfterLogin)
+            navigation.onReturn()
+        else if (navigation.type == ActivateAccountType.AfterRegistration)
+            navigation.openLogin()
     }
     viewModel.toast.CollectToast(context)
 
-    if (uiState.isAccountActivated) {
-        ActivateAccountSuccessScreenContent()
-    } else {
+//    if (uiState.isAccountActivated) {
+//        ActivateAccountSuccessScreenContent()
+//    } else {
         ActivateAccountScreenContent(
             uiState = uiState,
             uiInteraction = uiInteraction,
             navigation = navigation
         )
-    }
+//    }
 }
 
 @Composable

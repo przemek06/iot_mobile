@@ -2,6 +2,8 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
@@ -175,14 +177,12 @@ class AddComponentViewModel(
         val defaultFields = mapOf(
             SettingType.Name to SettingData(
                 title = R.string.s39,
+                description = R.string.s50,
                 inputFieldData = InputFieldData(
-                    label = R.string.name
-                )
-            ),
-            SettingType.DefaultValue to SettingData(
-                title = R.string.s40,
-                inputFieldData = InputFieldData(
-                    label = R.string.s34
+                    label = R.string.name,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences
+                    )
                 )
             )
         )
@@ -192,6 +192,7 @@ class AddComponentViewModel(
             ComponentDetailedType.Button -> mapOf(
                 SettingType.OnClickSend to SettingData(
                     title = R.string.s33,
+                    description = R.string.s51,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
@@ -201,12 +202,14 @@ class AddComponentViewModel(
             ComponentDetailedType.Toggle -> mapOf(
                 SettingType.OnToggleOnSend to SettingData(
                     title = R.string.s35,
+                    description = R.string.s52,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
                 ),
                 SettingType.OnToggleOffSend to SettingData(
                     title = R.string.s36,
+                    description = R.string.s53,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
@@ -216,12 +219,14 @@ class AddComponentViewModel(
             ComponentDetailedType.Slider -> mapOf(
                 SettingType.MaxValue to SettingData(
                     title = R.string.s37,
+                    description = R.string.s54,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
                 ),
                 SettingType.MinValue to SettingData(
                     title = R.string.s38,
+                    description = R.string.s55,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
@@ -266,12 +271,12 @@ class AddComponentViewModel(
 
     data class SettingData(
         @StringRes val title: Int,
+        @StringRes val description: Int? = null,
         val inputFieldData: InputFieldData
     )
 
     enum class SettingType {
         Name,
-        DefaultValue,
         OnClickSend,
         OnToggleOnSend,
         OnToggleOffSend,

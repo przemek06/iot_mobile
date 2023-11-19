@@ -1,5 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login
 
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
@@ -60,6 +62,9 @@ class LoginViewModel(
     private fun generateInputFields() = mapOf(
         InputFieldType.Email to InputFieldData(
             label = R.string.email,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email
+            )
         ),
         InputFieldType.Password to InputFieldData(
             label = R.string.password,

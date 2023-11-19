@@ -174,4 +174,10 @@
     <string name="s47">Link:</string>
     <string name="s48">Use this connection key on your IoT device in order to authorize the connection.</string>
     <string name="s49">Are you sure you want to delete this topic (%s)?</string>
+    <string name="s50">Enter the name of the component.</string>
+    <string name="s51">The value which is sent when the button is pressed.</string>
+    <string name="s52">The value which is sent when the toggle is turned on.</string>
+    <string name="s53">The value which is sent when the toggle is turned off.</string>
+    <string name="s54">The maximum value of the slider.</string>
+    <string name="s55">The minimum value of the slider.</string>
 </resources>

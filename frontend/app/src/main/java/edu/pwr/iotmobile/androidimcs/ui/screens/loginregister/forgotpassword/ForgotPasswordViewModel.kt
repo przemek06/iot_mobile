@@ -1,6 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword
 
 import android.util.Patterns
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
@@ -124,7 +126,10 @@ class ForgotPasswordViewModel(
     private fun generateInputFields() = mapOf(
         InputFieldType.Email to InputFieldData(
             label = R.string.email,
-            errorMessage = R.string.s11
+            errorMessage = R.string.s11,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email
+            )
         ),
         InputFieldType.Code to InputFieldData(
             label = R.string.code,
