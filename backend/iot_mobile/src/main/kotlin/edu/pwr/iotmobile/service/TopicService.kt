@@ -1,10 +1,8 @@
 package edu.pwr.iotmobile.service
 
 import edu.pwr.iotmobile.dto.TopicDTO
-import edu.pwr.iotmobile.error.exception.NoAuthenticationException
-import edu.pwr.iotmobile.error.exception.NotAllowedException
-import edu.pwr.iotmobile.error.exception.TopicAlreadyExistsException
-import edu.pwr.iotmobile.error.exception.TopicUsedException
+import edu.pwr.iotmobile.entities.Topic
+import edu.pwr.iotmobile.error.exception.*
 import edu.pwr.iotmobile.rabbit.queue.QueueService
 import edu.pwr.iotmobile.repositories.TopicRepository
 import org.springframework.stereotype.Service
@@ -16,6 +14,14 @@ class TopicService(
     val projectService: ProjectService,
     val queueService: QueueService
 ) {
+
+    fun findTopic(topicId: Int) : Topic {
+        return topicRepository
+            .findById(topicId)
+            .orElseThrow{ TopicNotFoundException() }
+
+    }
+
     fun createTopic(topic: TopicDTO) : TopicDTO {
         val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
         if (!projectService.isEditor(userId, topic.projectId))
