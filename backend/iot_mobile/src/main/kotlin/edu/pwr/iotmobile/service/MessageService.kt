@@ -29,7 +29,7 @@ class MessageService (
     fun sendMessage(message: MessageDTO): MessageDTO {
         try{
             val saved = messageRepository.save(message.toEntity())
-            rabbitTemplate.convertAndSend(message.topic.name, message.topic.name, message.message)
+            rabbitTemplate.convertAndSend(message.topic.uniqueName, message.topic.uniqueName, message.message)
             return saved.toDTO()
         } catch (_: Exception) {
             throw QueueException()

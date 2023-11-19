@@ -29,7 +29,7 @@ class IncomingMessageService {
     fun getEntityChangeFlow(queueList: List<String>): Flux<MessageDTO> {
         return connectableFlux
             .autoConnect()
-            .filter{queueList.contains(it.topic.name)}
+            .filter{queueList.contains(it.topic.uniqueName)}
     }
 
     @Transactional
