@@ -9,7 +9,7 @@ data class ComponentDto(
     val topic: TopicDto? = null,
     val name: String? = null,
     val onSendValue: String? = null,
-    val onSendAlternativeValue: String? = null,
+    val onSendAlternative: String? = null,
     val maxValue: String? = null,
     val minValue: String? = null,
     val actionDestinationDTO: ActionDestinationDTO? = null,

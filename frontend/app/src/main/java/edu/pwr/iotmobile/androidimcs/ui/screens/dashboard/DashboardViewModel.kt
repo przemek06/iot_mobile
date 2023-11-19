@@ -10,10 +10,12 @@ import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
+import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
 import edu.pwr.iotmobile.androidimcs.data.dto.TopicMessagesDto
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.listener.ComponentChangeWebSocketListener
+import edu.pwr.iotmobile.androidimcs.model.listener.MessageReceivedWebSocketListener
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.MessageRepository
@@ -48,6 +50,7 @@ class DashboardViewModel(
     private var componentListDto: ComponentListDto? = null
 
     private var componentsListener: ComponentChangeWebSocketListener? = null
+    private var messageReceivedListener: MessageReceivedWebSocketListener? = null
 
     override fun onCleared() {
         componentsListener?.closeWebSocket()
@@ -69,6 +72,14 @@ class DashboardViewModel(
             componentListDto = ComponentListDto(
                 dashboardId = dashboardId,
                 components = components
+            )
+
+            val topics = components.mapNotNull { it.topic?.uniqueName }
+            messageReceivedListener?.closeWebSocket()
+            messageReceivedListener = MessageReceivedWebSocketListener(
+                client = client,
+                topicNames = topics,
+                onMessageReceived = { m -> onMessageReceived(m) }
             )
 
             val lastMessages = getLastMessages()
@@ -95,6 +106,16 @@ class DashboardViewModel(
                 components = data.components.sortedBy { it.index }.mapNotNull { it.toComponentData() }
             )
         }
+    }
+
+    private fun onMessageReceived(data: MessageDto) {
+        Log.d("Web", "onMessageReceived called")
+        Log.d("Web", data.toString())
+//        _uiState.update {
+//            it.copy(
+//                components = data.components.sortedBy { it.index }.mapNotNull { it.toComponentData() }
+//            )
+//        }
     }
 
     /////////////////////
@@ -149,12 +170,15 @@ class DashboardViewModel(
             val connectionKey = getConnectionKey()
             val messageDto = item.toMessageDto(
                 value = message.toString(),
-                connectionKey = connectionKey
+                connectionKey = connectionKey,
             )
             if (messageDto == null) {
                 toast.toast("Could not send message.")
                 return@launch
             }
+
+            Log.d("mess", "messageDto")
+            Log.d("mess", messageDto.toString())
 
             kotlin.runCatching {
                 messageRepository.sendMessage(messageDto)

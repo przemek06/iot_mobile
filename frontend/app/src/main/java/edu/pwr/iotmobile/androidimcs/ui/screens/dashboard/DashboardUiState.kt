@@ -16,6 +16,7 @@ import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.extensions.asEnum
+import java.time.LocalDateTime
 
 data class DashboardUiState(
     val draggedComponentId: Int? = null,
@@ -60,7 +61,7 @@ data class ComponentData(
                 type = type.asEnum<ComponentDetailedType>() ?: return null,
                 topic = topic?.toTopic(),
                 onSendValue = onSendValue,
-                onSendAlternativeValue = onSendAlternativeValue,
+                onSendAlternativeValue = onSendAlternative,
                 maxValue = maxValue,
                 minValue = minValue,
                 actionDestinationDTO = actionDestinationDTO,
@@ -78,7 +79,7 @@ data class ComponentData(
                 type = type.name,
                 topic = topic?.toDto(),
                 onSendValue = onSendValue.toString(),
-                onSendAlternativeValue = onSendAlternativeValue.toString(),
+                onSendAlternative = onSendAlternativeValue.toString(),
                 maxValue = maxValue.toString(),
                 minValue = minValue.toString(),
                 actionDestinationDTO = actionDestinationDTO,
@@ -90,7 +91,8 @@ data class ComponentData(
             return MessageDto(
                 topic = topic?.toDto() ?: return null,
                 message = value,
-                connectionKey = connectionKey ?: return null
+                connectionKey = connectionKey ?: return null,
+                tsSent = LocalDateTime.now().toString()
             )
         }
     }
