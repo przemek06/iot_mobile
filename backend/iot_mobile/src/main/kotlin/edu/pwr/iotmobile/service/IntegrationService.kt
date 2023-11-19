@@ -19,10 +19,10 @@ class IntegrationService(
     @Value("\${discord.oauth.url}")
     var oauthUrl: String? = null
 
-    fun sendMailMessage(dto: MailMessageDTO) {
-        val content = String.format(dto.content, dto.data)
-        mailService.sendPlainTextMail(dto.subject, dto.recipient, content)
-    }
+//    fun sendMailMessage(dto: MailMessageDTO) {
+//        val content = String.format(dto.content, dto.data)
+//        mailService.sendPlainTextMail(dto.subject, dto.recipient, content)
+//    }
 
     fun getDiscordOAuthUrl(): String {
         return oauthUrl ?: throw InvalidStateException()

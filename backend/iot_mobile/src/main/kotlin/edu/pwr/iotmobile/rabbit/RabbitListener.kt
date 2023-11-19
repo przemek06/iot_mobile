@@ -2,6 +2,7 @@ package edu.pwr.iotmobile.rabbit
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.rabbitmq.client.AMQP
 import com.rabbitmq.client.DefaultConsumer
 import com.rabbitmq.client.Envelope
@@ -24,7 +25,9 @@ class RabbitListener(
 ) {
     val logger: Logger = LoggerFactory.getLogger("RabbitListener")
     val channel = rabbitChannel.createChannel() ?: throw ChannelException()
-    val objectMapper: ObjectMapper = ObjectMapper().registerModule(JavaTimeModule())
+    val objectMapper: ObjectMapper = ObjectMapper()
+        .registerModule(JavaTimeModule())
+        .registerModule(KotlinModule.Builder().build())
 
     /**
      * Register new consumer for existing topic
@@ -38,7 +41,7 @@ class RabbitListener(
                 properties: AMQP.BasicProperties,
                 body: ByteArray
             ) {
-                val messageDTO: MessageDTO = objectMapper.readValue(body, MessageDTO::class.java)
+                val messageDTO: MessageDTO = objectMapper.readValue(String(body), MessageDTO::class.java)
                 logger.info("$consumerTag: $messageDTO")
                 incomingMessageService.processEntityChange(messageDTO)
             }
