@@ -76,11 +76,14 @@ class DashboardViewModel(
 
             val topics = components.mapNotNull { it.topic?.uniqueName }
             messageReceivedListener?.closeWebSocket()
-            messageReceivedListener = MessageReceivedWebSocketListener(
-                client = client,
-                topicNames = topics,
-                onMessageReceived = { m -> onMessageReceived(m) }
-            )
+
+            if (topics.isNotEmpty()) {
+                messageReceivedListener = MessageReceivedWebSocketListener(
+                    client = client,
+                    topicNames = topics,
+                    onMessageReceived = { m -> onMessageReceived(m) }
+                )
+            }
 
             val lastMessages = getLastMessages()
 
@@ -101,8 +104,8 @@ class DashboardViewModel(
     private fun onComponentChangeMessage(data: ComponentListDto) {
         Log.d("Web", "onComponentChangeMessage called")
         Log.d("Web", data.toString())
-        _uiState.update {
-            it.copy(
+        _uiState.update { ui ->
+            ui.copy(
                 components = data.components.sortedBy { it.index }.mapNotNull { it.toComponentData() }
             )
         }
@@ -111,11 +114,33 @@ class DashboardViewModel(
     private fun onMessageReceived(data: MessageDto) {
         Log.d("Web", "onMessageReceived called")
         Log.d("Web", data.toString())
-//        _uiState.update {
-//            it.copy(
-//                components = data.components.sortedBy { it.index }.mapNotNull { it.toComponentData() }
-//            )
-//        }
+        val topicId = data.topic.id ?: return
+        val currentMessages = _uiState.value.currentMessages
+        val newMessages = if (topicId !in currentMessages.map { it.topicId }) {
+            currentMessages + listOf(
+                TopicMessagesDto(
+                    topicId = topicId,
+                    messages = listOf(data)
+                )
+            )
+        } else {
+            currentMessages
+                .map {
+                    if (it.topicId == topicId)
+                        it.copy(
+                            messages = it.messages + listOf(data)
+                        )
+                    else
+                        it
+                }
+        }
+        Log.d("Web", "newMessages")
+        Log.d("Web", newMessages.toString())
+        _uiState.update {
+            it.copy(
+                currentMessages = newMessages
+            )
+        }
     }
 
     /////////////////////
@@ -141,6 +166,8 @@ class DashboardViewModel(
 
     fun onComponentClick(item: ComponentData, value: Any?) {
         // TODO: implement - different behaviour based on type,
+        Log.d("Check", "value")
+        Log.d("Check", value.toString())
         val message = when (item.type) {
 
             ComponentDetailedType.Button -> { item.onSendValue }

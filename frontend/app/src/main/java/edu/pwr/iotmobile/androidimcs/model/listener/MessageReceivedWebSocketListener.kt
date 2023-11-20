@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.model.listener
 
+import android.util.Log
 import com.google.gson.Gson
 import edu.pwr.iotmobile.androidimcs.BuildConfig
 import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
@@ -8,6 +9,7 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
+
 
 class MessageReceivedWebSocketListener(
     client: OkHttpClient,
@@ -22,13 +24,17 @@ class MessageReceivedWebSocketListener(
         override fun onOpen(webSocket: WebSocket, response: Response) {
             // WebSocket connection is established
             // You can send the "dashboardId" here
-            webSocket.send(topicNames.joinToString(","))
+            Log.d("mess", "opened webSocket")
+            Log.d("mess", "sending: " + topicNames.distinct().joinToString(","))
+            webSocket.send(topicNames.distinct().joinToString(","))
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             // Handle incoming messages from the server
             // You will receive an infinite stream of messages here
             // Update your UI or perform any other necessary tasks
+            Log.d("WebSocket", "Message received")
+            Log.d("WebSocket", text)
             val obj = Gson().fromJson(text, MessageDto::class.java)
             onMessageReceived(obj)
             return
@@ -36,10 +42,15 @@ class MessageReceivedWebSocketListener(
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             // WebSocket connection is closed
+            Log.d("WebSocket", "onClosed called")
+            Log.d("WebSocket", reason)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             // Handle connection failure
+            Log.d("WebSocket", "onFailure called")
+            Log.d("WebSocket", response.toString())
+            Log.e("WebSocket", "Error", t)
         }
     })
 
