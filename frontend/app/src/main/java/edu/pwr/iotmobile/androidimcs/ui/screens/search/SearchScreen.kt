@@ -17,7 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ActionOption
+import edu.pwr.iotmobile.androidimcs.ui.components.RadioButtonWithText
 import edu.pwr.iotmobile.androidimcs.ui.components.SearchField
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
@@ -73,7 +76,19 @@ private fun SearchScreenContent(
                 }
                 uiInteraction.setDialogInvisible()
             }
-        )
+        ) {
+            if(navigation.mode == SearchMode.EDIT_ROLES) {
+
+                LazyColumn {
+                    items(UserProjectRole.values()) {
+                        RadioButtonWithText(
+                            text = it.name,
+                            isSelected = it == uiState.selectedRole
+                        ) { uiInteraction.selectRole(it) }
+                    }
+                }
+            }
+        }
     }
 
     Column(
@@ -115,6 +130,7 @@ private fun SearchScreenContent(
                     }
                 ) {
                     uiInteraction.setSelectedUser(it)
+                    uiState.data.buttonFunction(it)
                     uiInteraction.setDialogVisible()
                 }
                 Dimensions.space10.HeightSpacer()

@@ -13,6 +13,9 @@ interface ProjectDetailsNavigation {
     fun openDashboardScreen(dashboardId: Int, dashboardName: String)
     fun openAddTopic()
     fun openSearchInviteUsers()
+    fun openSearchEditRoles()
+    fun openSearchRevokeAccess()
+    fun openSearchAddAdmin()
     fun onReturn()
 
     companion object {
@@ -38,6 +41,24 @@ interface ProjectDetailsNavigation {
             override fun openSearchInviteUsers() {
                 projectId?.let {
                     navController.navigate(Screen.Search.path.appendArguments(SearchMode.INVITE_USERS, it))
+                }
+            }
+
+            override fun openSearchEditRoles() {
+                projectId?.let {
+                    navController.navigate(Screen.Search.path.appendArguments(SearchMode.EDIT_ROLES, it))
+                }
+            }
+
+            override fun openSearchRevokeAccess() {
+                projectId?.let {
+                    navController.navigate(Screen.Search.path.appendArguments(SearchMode.REVOKE_ACCESS, it))
+                }
+            }
+
+            override fun openSearchAddAdmin() {
+                projectId?.let {
+                    navController.navigate(Screen.Search.path.appendArguments(SearchMode.ADD_ADMIN, it))
                 }
             }
 
