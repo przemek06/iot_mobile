@@ -62,6 +62,7 @@ private fun AddComponentScreenContent(
             AddComponentPage.ChooseComponent -> ChooseComponentScreenContent(uiState, uiInteraction)
             AddComponentPage.ChooseTopic -> ChooseTopicScreenContent(uiState, uiInteraction, navigation)
             AddComponentPage.Settings -> SettingsScreenContent(uiState, uiInteraction)
+            AddComponentPage.Additional -> AdditionalScreenContent(uiState, uiInteraction)
         }
     }
 }

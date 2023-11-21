@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
-import edu.pwr.iotmobile.androidimcs.data.ComponentType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
@@ -23,15 +22,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.scope.ScopeID
-
-private val BottomNavDataList = listOf(
-    AddComponentViewModel.BottomNavData(),
-    AddComponentViewModel.BottomNavData(hasPrevButton = true),
-    AddComponentViewModel.BottomNavData(
-        nextButtonText = R.string.confirm,
-        hasPrevButton = true
-    )
-)
 
 class AddComponentViewModel(
     private val topicRepository: TopicRepository,
@@ -73,7 +63,11 @@ class AddComponentViewModel(
                     settings = generateSettings()
                 ) }
             AddComponentPage.Settings ->
-                onConfirmComponent(scopeID)
+                if (checkIfChosenComponentDiscord())
+                    openDiscord()
+                else
+                    onConfirmComponent(scopeID)
+            AddComponentPage.Additional -> onConfirmComponent(scopeID)
         }
     }
 
@@ -88,6 +82,11 @@ class AddComponentViewModel(
                 _uiState.update { it.copy(
                     currentPage = AddComponentPage.ChooseTopic,
                     bottomNavData = getBottomNavData(AddComponentPage.ChooseTopic)
+                ) }
+            AddComponentPage.Additional ->
+                _uiState.update { it.copy(
+                    currentPage = AddComponentPage.Settings,
+                    bottomNavData = getBottomNavData(AddComponentPage.Settings)
                 ) }
             else -> { /*Do nothing*/ }
         }
@@ -118,6 +117,13 @@ class AddComponentViewModel(
         }
     }
 
+    private fun checkIfChosenComponentDiscord() =
+        _uiState.value.chosenComponentType == ComponentDetailedType.Discord
+
+    private fun openDiscord() {
+        // TODO:
+    }
+
     private fun onConfirmComponent(scopeID: ScopeID) {
         viewModelScope.launch(Dispatchers.Default) {
             val data = getComponentDtoData() ?: return@launch
@@ -140,11 +146,10 @@ class AddComponentViewModel(
 
     private fun getComponentDtoData(): ComponentDto? {
         val locUiState = _uiState.value
-        // TODO: think of something better
         return ComponentDto(
-            componentType = ComponentType.INPUT.name, // TODO
-            type = locUiState.chosenComponentType?.name ?: return null,
-            size = 1, // TODO
+            componentType = locUiState.chosenComponentType?.belongsTo?.name ?: return null,
+            type = locUiState.chosenComponentType.name,
+            size = locUiState.chosenComponentType.size,
             topic = locUiState.chosenTopic?.toDto(),
             name = locUiState.settings[SettingType.Name]?.inputFieldData?.text,
             onSendValue = locUiState.settings[SettingType.OnClickSend]?.inputFieldData?.text ?: locUiState.settings[SettingType.OnToggleOnSend]?.inputFieldData?.text,
@@ -166,9 +171,21 @@ class AddComponentViewModel(
     }
 
     private fun getBottomNavData(page: AddComponentPage) = when (page) {
-        AddComponentPage.ChooseComponent -> BottomNavDataList[0]
-        AddComponentPage.ChooseTopic -> BottomNavDataList[1]
-        AddComponentPage.Settings -> BottomNavDataList[2]
+        AddComponentPage.ChooseComponent -> BottomNavData()
+        AddComponentPage.ChooseTopic -> BottomNavData(hasPrevButton = true)
+        AddComponentPage.Settings -> {
+            if (checkIfChosenComponentDiscord())
+                BottomNavData(hasPrevButton = true)
+            else
+                BottomNavData(
+                    nextButtonText = R.string.confirm,
+                    hasPrevButton = true
+                )
+        }
+        AddComponentPage.Additional -> BottomNavData(
+            nextButtonText = R.string.confirm,
+            hasPrevButton = true
+        )
     }
 
     private fun generateSettings(): Map<SettingType, SettingData> {

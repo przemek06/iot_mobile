@@ -16,5 +16,6 @@ data class AddComponentUiState(
 enum class AddComponentPage {
     ChooseComponent,
     ChooseTopic,
-    Settings
+    Settings,
+    Additional
 }
