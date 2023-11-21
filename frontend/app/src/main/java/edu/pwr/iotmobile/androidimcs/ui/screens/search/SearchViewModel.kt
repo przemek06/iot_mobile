@@ -10,6 +10,7 @@ import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
@@ -92,7 +93,14 @@ class SearchViewModel(
             SearchMode.EDIT_ROLES -> ScreenData(
                 topBarText = R.string.edit_roles,
                 buttonText = R.string.edit,
-                buttonFunction = { getRoles(navigation.projectId) },
+                buttonFunction = {
+                    getRoles(navigation.projectId)
+                    _uiState.value.selectedUser?.let { selectedUser ->
+                        selectRole(_uiState.value.userRoles.firstOrNull { dto ->
+                            dto.user.name == selectedUser.displayName
+                        }?.toUserProjectRole() ?: UserProjectRole.VIEWER)
+                    }?: Unit
+                },
                 dialogTitle = R.string.edit_role_dialog,
                 dialogButton2Function = {
                     editRole(

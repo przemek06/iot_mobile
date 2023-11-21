@@ -78,7 +78,6 @@ private fun SearchScreenContent(
             }
         ) {
             if(navigation.mode == SearchMode.EDIT_ROLES) {
-
                 LazyColumn {
                     items(UserProjectRole.values()) {
                         RadioButtonWithText(
