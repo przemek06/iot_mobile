@@ -13,6 +13,7 @@ import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import reactor.core.Disposable
+import jakarta.annotation.PreDestroy
 
 @Component
 @Slf4j
@@ -44,10 +45,24 @@ class IncomingMessageWebSocketHandler(
 
     //TODO: maybe better format./ maybe its enough
     private fun registerQueues(message: TextMessage): List<String> {
+        println("message.payload")
+        println(message.payload)
+
         val queueList: List<String> = message.payload.split(",")
+
+        println("queueList")
+        println(queueList)
+
+        println("queues before")
+        println(queues)
+
         val queueNames = queueList.stream().filter { !queues.contains(it) }.toList()
         rabbitListener.registerConsumer(queueNames)
         queues.addAll(queueList)
+
+        println("queues after")
+        println(queues)
+
         return queueList
     }
 
@@ -58,6 +73,13 @@ class IncomingMessageWebSocketHandler(
         }
         session.close()
         super.afterConnectionClosed(session, status)
+    }
+
+    @PreDestroy
+    public fun preDestroyed() {
+        queues.forEach {
+            rabbitListener.cancelConsumer(it)
+        }
     }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
