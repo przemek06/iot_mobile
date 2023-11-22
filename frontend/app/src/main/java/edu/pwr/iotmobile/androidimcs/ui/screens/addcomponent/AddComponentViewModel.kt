@@ -125,10 +125,22 @@ class AddComponentViewModel(
     }
 
     fun handleUri(uri: Uri?) {
-        // TODO: get params
-        val path: String? = uri?.path
-        val id = path?.substring(path.lastIndexOf('/') + 1)
-        // TODO: handle Discord
+        if (uri == null) return
+
+        val type = uri.getQueryParameter("type")
+        val id = uri.getQueryParameter("id")
+
+        when (type) {
+            "discord" -> { /*TODO: handle Discord*/ }
+
+            else -> { /*Do nothing*/ }
+        }
+
+        // TODO: update something in uiState e.g. discordChannelList
+        _uiState.update { it.copy(
+            currentPage = AddComponentPage.Additional,
+            bottomNavData = getBottomNavData(AddComponentPage.Additional),
+        ) }
     }
 
     private fun checkIfChosenComponentDiscord() =

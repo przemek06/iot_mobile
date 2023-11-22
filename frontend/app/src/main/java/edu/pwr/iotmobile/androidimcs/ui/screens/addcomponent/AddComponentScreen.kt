@@ -52,13 +52,16 @@ fun AddComponentScreen(navigation: AddComponentNavigation) {
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        when (true) {
-            (it == AddComponentViewModel.ADD_COMPONENT_SUCCESS_EVENT) ->
+        when (it) {
+            AddComponentViewModel.ADD_COMPONENT_SUCCESS_EVENT ->
                 navigation.onReturn()
-            (it == AddComponentViewModel.DISCORD_EVENT) ->
+
+            AddComponentViewModel.DISCORD_EVENT ->
                 // TODO: set discord link
                 webActivity.launch("your_discord_link")
-            else  -> { /*Nothing*/ }
+
+            else -> { /*Nothing*/
+            }
         }
     }
     viewModel.toast.CollectToast(context)
