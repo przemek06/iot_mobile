@@ -16,6 +16,7 @@ import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.dto.DiscordChannelDto
+import edu.pwr.iotmobile.androidimcs.data.dto.EActionDestinationType
 import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
@@ -220,7 +221,7 @@ class AddComponentViewModel(
     private fun List<DiscordChannel>.toActionDestinationDTO(): ActionDestinationDTO? {
         return ActionDestinationDTO(
             id = null,
-            type = "Discord", // TODO: something else?,
+            type = EActionDestinationType.DISCORD,
             token = this.firstOrNull { it.isChecked }?.id ?: return null
         )
     }
