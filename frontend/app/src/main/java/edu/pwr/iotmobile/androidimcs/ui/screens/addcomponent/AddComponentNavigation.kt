@@ -20,7 +20,7 @@ interface AddComponentNavigation {
             navBackStackEntry: NavBackStackEntry
         ) = object : AddComponentNavigation {
             override val projectId: Int?
-                get() = navBackStackEntry.getArguments().getOrNull(0)?.toInt()
+                get() = navBackStackEntry.getArguments().getOrNull(0)?.toIntOrNull()
             override val scopeID: ScopeID?
                 get() = navBackStackEntry.getArguments().getOrNull(1)
 
