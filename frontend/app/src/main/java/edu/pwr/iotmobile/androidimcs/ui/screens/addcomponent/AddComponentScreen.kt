@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,9 +43,23 @@ fun AddComponentScreen(navigation: AddComponentNavigation) {
         viewModel.init(it)
     }
 
+    val webActivity = rememberLauncherForActivityResult(
+        contract = GetWebActivityResultContract(),
+        onResult = { uri ->
+            viewModel.handleUri(uri)
+        }
+    )
+
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        navigation.onReturn()
+        when (true) {
+            (it == AddComponentViewModel.ADD_COMPONENT_SUCCESS_EVENT) ->
+                navigation.onReturn()
+            (it == AddComponentViewModel.DISCORD_EVENT) ->
+                // TODO: set discord link
+                webActivity.launch("your_discord_link")
+            else  -> { /*Nothing*/ }
+        }
     }
     viewModel.toast.CollectToast(context)
 

@@ -1,5 +1,11 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
@@ -117,11 +123,20 @@ class AddComponentViewModel(
         }
     }
 
+    fun handleUri(uri: Uri?) {
+        // TODO: get params
+        val path: String? = uri?.path
+        val id = path?.substring(path.lastIndexOf('/') + 1)
+        // TODO: handle Discord
+    }
+
     private fun checkIfChosenComponentDiscord() =
         _uiState.value.chosenComponentType == ComponentDetailedType.Discord
 
     private fun openDiscord() {
-        // TODO:
+        viewModelScope.launch {
+            event.event(DISCORD_EVENT)
+        }
     }
 
     private fun onConfirmComponent(scopeID: ScopeID) {
@@ -300,5 +315,22 @@ class AddComponentViewModel(
         const val ADD_COMPONENT_SUCCESS_EVENT = "addComponentSuccess"
         const val SUCCESS_TOAST_MESSAGE = "Successfully added new component"
         const val FAILURE_TOAST_MESSAGE = "Could not add new component"
+        const val DISCORD_EVENT = "DISCORD"
+    }
+}
+
+open class GetWebActivityResultContract : ActivityResultContract<String, Uri?>() {
+    @CallSuper
+    override fun createIntent(context: Context, input: String): Intent {
+        return Intent(Intent.ACTION_VIEW, Uri.parse(input))
+    }
+
+    final override fun getSynchronousResult(
+        context: Context,
+        input: String
+    ): SynchronousResult<Uri?>? = null
+
+    final override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+        return intent.takeIf { resultCode == Activity.RESULT_OK }?.data
     }
 }
