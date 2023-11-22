@@ -1,5 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
+import android.content.ActivityNotFoundException
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,9 +45,33 @@ fun AddComponentScreen(navigation: AddComponentNavigation) {
         viewModel.init(it)
     }
 
+    val webActivity = rememberLauncherForActivityResult(
+        contract = GetWebActivityResultContract(),
+        onResult = { uri ->
+            Log.d("Trigger", "uri received")
+            Log.d("Trigger", uri?.path ?: "")
+            viewModel.handleUri(uri)
+        }
+    )
+
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        navigation.onReturn()
+        when (it) {
+            AddComponentViewModel.ADD_COMPONENT_SUCCESS_EVENT ->
+                navigation.onReturn()
+
+            AddComponentViewModel.DISCORD_EVENT -> {
+                // TODO: set discord link
+                try {
+                    Log.d("Trigger", "Launching web activity")
+                    webActivity.launch("https://www.google.com")
+                } catch (e: ActivityNotFoundException) {
+                    Log.e("Trigger", "Could not start the web activity", e)
+                }
+            }
+
+            else -> { /*Nothing*/ }
+        }
     }
     viewModel.toast.CollectToast(context)
 
@@ -62,6 +89,7 @@ private fun AddComponentScreenContent(
             AddComponentPage.ChooseComponent -> ChooseComponentScreenContent(uiState, uiInteraction)
             AddComponentPage.ChooseTopic -> ChooseTopicScreenContent(uiState, uiInteraction, navigation)
             AddComponentPage.Settings -> SettingsScreenContent(uiState, uiInteraction)
+            AddComponentPage.Additional -> AdditionalScreenContent(uiState, uiInteraction)
         }
     }
 }
