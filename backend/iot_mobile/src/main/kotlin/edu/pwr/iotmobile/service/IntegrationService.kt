@@ -1,7 +1,7 @@
 package edu.pwr.iotmobile.service
 
 import edu.pwr.iotmobile.dto.DiscordChannelDTO
-import edu.pwr.iotmobile.dto.MailMessageDTO
+import edu.pwr.iotmobile.dto.UriDTO
 import edu.pwr.iotmobile.error.exception.InvalidStateException
 import edu.pwr.iotmobile.integration.DiscordBot
 import org.springframework.beans.factory.annotation.Value
@@ -24,8 +24,8 @@ class IntegrationService(
 //        mailService.sendPlainTextMail(dto.subject, dto.recipient, content)
 //    }
 
-    fun getDiscordOAuthUrl(): String {
-        return oauthUrl ?: throw InvalidStateException()
+    fun getDiscordOAuthUrl(): UriDTO {
+        return UriDTO(oauthUrl?: throw InvalidStateException())
     }
 
 //    fun discordCallback(guildId: String) : Stri {
