@@ -22,7 +22,7 @@ fun AdditionalScreenContent(
         if (uiState.discordChannels.isNotEmpty()) {
             item {
                 Text(
-                    text = stringResource(id = R.string.s51),
+                    text = stringResource(id = R.string.a_s51),
                     style = MaterialTheme.typography.titleSmall
                 )
             }
