@@ -312,6 +312,16 @@ class AddComponentViewModel(
                 )
             )
 
+            ComponentDetailedType.Discord -> mapOf(
+                SettingType.Description to SettingData(
+                    title = R.string.a_s52,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
+
             else -> emptyMap()
 
         }
@@ -351,7 +361,7 @@ class AddComponentViewModel(
 
     private fun generateTriggerComponents() = listOf(
         ComponentChoiceData(
-            titleId = R.string.s50,
+            titleId = R.string.a_s50,
             iconRes = R.drawable.ic_discord,
             type = ComponentDetailedType.Discord
         ),
@@ -371,7 +381,8 @@ class AddComponentViewModel(
 
     data class SettingData(
         @StringRes val title: Int,
-        val inputFieldData: InputFieldData
+        val inputFieldData: InputFieldData,
+        val isDescription: Boolean = false
     )
 
     data class DiscordChannel(
@@ -388,6 +399,7 @@ class AddComponentViewModel(
         OnToggleOffSend,
         MaxValue,
         MinValue,
+        Description
     }
 
     companion object {
