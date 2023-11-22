@@ -9,7 +9,6 @@ import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
-import edu.pwr.iotmobile.androidimcs.data.dto.EventSourceDTO
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
@@ -44,7 +43,7 @@ data class ComponentData(
     val minValue: String? = null,
 
     val actionDestinationDTO: ActionDestinationDTO? = null,
-    val eventSourceDTO: EventSourceDTO? = null
+    val pattern: String? = null
 ) {
     companion object {
         fun ComponentDto.toComponentData(): ComponentData? {
@@ -61,7 +60,7 @@ data class ComponentData(
                 maxValue = maxValue,
                 minValue = minValue,
                 actionDestinationDTO = actionDestinationDTO,
-                eventSourceDTO = eventSourceDTO
+                pattern = pattern
             )
         }
 
@@ -79,7 +78,7 @@ data class ComponentData(
                 maxValue = maxValue.toString(),
                 minValue = minValue.toString(),
                 actionDestinationDTO = actionDestinationDTO,
-                eventSourceDTO = eventSourceDTO,
+                pattern = pattern
             )
         }
     }

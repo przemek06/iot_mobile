@@ -2,6 +2,8 @@ package edu.pwr.iotmobile.integration
 
 import edu.pwr.iotmobile.service.MailService
 import edu.pwr.iotmobile.service.ProjectService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class EmailIntegrationAction(
     private val mailService: MailService,
@@ -11,14 +13,19 @@ class EmailIntegrationAction(
     private val subject: String
 ) : IntegrationAction {
 
+    val logger: Logger = LoggerFactory.getLogger("EmailIntegrationAction")
+
     override fun performAction(data: String) {
-        val users = projectService
-            .findAllUsersByProjectId(projectId)
+        try {
+            val users = projectService
+                .findAllUsersByProjectIdNoSecurity(projectId)
 
-        users.forEach {
-            val message = pattern.format(data, it.name)
-            mailService.sendHtmlMail(subject, it.email, message)
+            users.forEach {
+                val message = pattern.format(data, it.name)
+                mailService.sendHtmlMail(subject, it.email, message)
+            }
+        } catch (e: java.lang.Exception) {
+            logger.error("Error during email action execution ignored.", e)
         }
-
     }
 }

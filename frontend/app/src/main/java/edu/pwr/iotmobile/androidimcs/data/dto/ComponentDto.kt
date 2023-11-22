@@ -13,17 +13,15 @@ data class ComponentDto(
     val maxValue: String? = null,
     val minValue: String? = null,
     val actionDestinationDTO: ActionDestinationDTO? = null,
-    val eventSourceDTO: EventSourceDTO? = null
+    val pattern: String? = null
 )
 
 data class ActionDestinationDTO(
     val id: Int?,
-    val type: String,
+    val type: EActionDestinationType,
     val token: String,
 )
 
-data class EventSourceDTO(
-    val id: Int?,
-    val type: String,
-    val token: String,
-)
+enum class EActionDestinationType {
+    DISCORD, EMAIL, TELEGRAM, SLACK
+}

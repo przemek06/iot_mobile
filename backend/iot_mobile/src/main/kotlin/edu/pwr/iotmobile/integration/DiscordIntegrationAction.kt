@@ -1,5 +1,8 @@
 package edu.pwr.iotmobile.integration
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 class DiscordIntegrationAction(
     private val discordBot: DiscordBot,
     private val channelId: String,
@@ -7,8 +10,15 @@ class DiscordIntegrationAction(
 ) :
     IntegrationAction {
 
+    val logger: Logger = LoggerFactory.getLogger("IntegrationAction")
+
     override fun performAction(data: String) {
-        val message = pattern.format(data)
-        discordBot.sendMessageToChannel(channelId, message)
+        try {
+            val message = pattern.format(data)
+            discordBot.sendMessageToChannel(channelId, message)
+        } catch (e: Exception) {
+            logger.error("Error during Discord action execution ignored.", e)
+        }
+
     }
 }
