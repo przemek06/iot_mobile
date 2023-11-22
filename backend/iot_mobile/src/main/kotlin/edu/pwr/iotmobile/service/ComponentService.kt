@@ -6,6 +6,7 @@ import edu.pwr.iotmobile.entities.Component
 import edu.pwr.iotmobile.entities.InputComponent
 import edu.pwr.iotmobile.entities.OutputComponent
 import edu.pwr.iotmobile.entities.TriggerComponent
+import edu.pwr.iotmobile.enums.EComponentType
 import edu.pwr.iotmobile.error.exception.InvalidStateException
 import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.error.exception.NotAllowedException
@@ -62,6 +63,11 @@ class ComponentService(
         return ComponentListDTO(componentListDTO.dashboardId, savedDTO)
     }
 
+    fun findAllTriggerComponents() : List<TriggerComponent> {
+        return componentRepository.findAll()
+            .filterIsInstance<TriggerComponent>()
+    }
+
     fun findAllByDashboardId(dashboardId: Int): ComponentListDTO {
         val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
         val projectId = dashboardService.findById(dashboardId).projectId
@@ -95,5 +101,12 @@ class ComponentService(
                 it.toDTO()
             } else throw InvalidStateException()
         }
+    }
+
+    fun findAllByDashboardProjectId(projectId: Int) : List<Component> {
+        return componentRepository.findAllByDashboardProjectId(projectId)
+    }
+    fun findAllByDashboardProjectCreatedById(userId: Int) : List<Component> {
+        return componentRepository.findAllByDashboardProjectCreatedById(userId)
     }
 }

@@ -109,6 +109,12 @@ class ProjectService(
         return projectRepository.save(project).toDTO()
     }
 
+    fun findAllUsersByProjectIdNoSecurity(projectId: Int): List<UserInfoDTO> {
+        return projectRoleRepository
+            .findAllByProjectId(projectId)
+            .map { it.user.toUserInfoDTO() }
+    }
+
     fun findAllUsersByProjectId(projectId: Int): List<UserInfoDTO> {
         val projectUserList = projectRoleRepository.findAllByProjectId(projectId)
         val userIdList = projectUserList.map { it.user.id }
