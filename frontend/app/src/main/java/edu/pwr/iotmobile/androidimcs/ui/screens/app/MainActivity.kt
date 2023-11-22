@@ -2,8 +2,8 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.app
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -22,7 +22,7 @@ import edu.pwr.iotmobile.androidimcs.ui.navigation.appendArguments
 import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme
 import org.koin.androidx.compose.koinViewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     // TODO: delete if registerLauncher works
     private var intentState: MutableState<Intent?> = mutableStateOf(null)
 
@@ -61,8 +61,8 @@ private fun AppContent(intent: Intent? = null) {
 //    viewModel.handleIntent(intent)
 
     val context = LocalContext.current
-    // TODO: delete if registerLauncher works
     viewModel.event.CollectEvent(context) { id ->
+        // TODO: delete if registerLauncher works
         navController.navigate(Screen.AddComponent.path.appendArguments(id))
     }
     viewModel.toast.CollectToast(context)

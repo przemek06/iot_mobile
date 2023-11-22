@@ -79,6 +79,14 @@ fun ChooseComponentScreenContent(
             )
             Dimensions.space10.HeightSpacer()
         }
+
+        items(uiState.triggerComponents) {
+            ComponentItem(
+                isSelected = uiState.chosenComponentType == it.type,
+                data = it,
+                uiInteraction = uiInteraction
+            )
+        }
     }
 }
 

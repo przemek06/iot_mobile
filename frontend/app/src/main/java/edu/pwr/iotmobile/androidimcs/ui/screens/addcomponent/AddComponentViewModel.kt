@@ -48,6 +48,7 @@ class AddComponentViewModel(
                 _uiState.update {
                     it.copy(
                         inputComponents = generateInputComponents(),
+                        triggerComponents = generateTriggerComponents(),
                         topics = topics
                     )
                 }
@@ -283,6 +284,15 @@ class AddComponentViewModel(
             iconRes = R.drawable.ic_slider,
             type = ComponentDetailedType.Slider
         )
+    )
+
+    private fun generateTriggerComponents() = listOf(
+        ComponentChoiceData(
+            titleId = R.string.s50,
+            iconRes = R.drawable.ic_discord,
+            type = ComponentDetailedType.Discord
+        ),
+        // TODO: add email
     )
 
     data class BottomNavData(
