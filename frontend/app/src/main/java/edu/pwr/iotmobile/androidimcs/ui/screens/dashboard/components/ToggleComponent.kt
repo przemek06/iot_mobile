@@ -8,10 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
@@ -30,7 +26,6 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
 ) {
     val topicMessages = uiState.currentMessages.firstOrNull { it.topicId == item.topic?.id }
     val lastValue = topicMessages?.messages?.last()?.message
-    var currentValue by remember { mutableStateOf(item.onSendValue == lastValue) }
 
     Log.d("Web", "toggle")
     Log.d("Web", topicMessages?.messages?.last()?.message ?: "")
@@ -49,10 +44,9 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
         Box(modifier = Modifier.fillMaxSize()) {
             Switch(
                 modifier = Modifier.align(Alignment.Center),
-                checked = currentValue,
+                checked = item.onSendValue == lastValue,
                 onCheckedChange = {
-                    currentValue = it
-                    uiInteraction.onComponentClick(item, it)
+                    uiInteraction.onComponentClick(item, lastValue)
                 }
             )
         }

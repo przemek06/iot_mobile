@@ -174,11 +174,11 @@ class DashboardViewModel(
 
             ComponentDetailedType.Toggle -> {
                 /* if value == onSend send onAlternative -> else the other way */
-                val checked = value as Boolean
-                val newValue = if (checked) item.onSendAlternativeValue else item.onSendValue
+                val lastValue = value as String
+                val isChecked = lastValue == item.onSendValue
+                val newValue = if (isChecked) item.onSendAlternativeValue else item.onSendValue
                 val newItems = uiState.value.components.map {
                     if (it.id == item.id) {
-                        Log.d("click", "item found")
                         item.copy(topic = item.topic?.copy(currentValue = newValue))
                     }
                     else it
