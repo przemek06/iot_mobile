@@ -63,8 +63,9 @@ fun AddComponentScreen(navigation: AddComponentNavigation) {
             AddComponentViewModel.DISCORD_EVENT -> {
                 // TODO: set discord link
                 try {
-                    Log.d("Trigger", "Launching web activity")
-                    webActivity.launch("https://www.google.com")
+                    uiState.discordUrl?.let { url ->
+                        webActivity.launch(url)
+                    }
                 } catch (e: ActivityNotFoundException) {
                     Log.e("Trigger", "Could not start the web activity", e)
                 }

@@ -15,6 +15,7 @@ import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
+import edu.pwr.iotmobile.androidimcs.data.dto.DiscordChannelDto
 import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
@@ -22,6 +23,7 @@ import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.IntegrationRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +35,7 @@ import org.koin.core.scope.ScopeID
 class AddComponentViewModel(
     private val topicRepository: TopicRepository,
     private val componentRepository: ComponentRepository,
+    private val integrationRepository: IntegrationRepository,
     val event: Event,
     val toast: Toast
 ) : ViewModel() {
@@ -46,11 +49,13 @@ class AddComponentViewModel(
             _projectId = projectId
             viewModelScope.launch(Dispatchers.Default) {
                 val topics = getTopicsForProject(projectId)
+                val discordUrl = integrationRepository.getDiscordUrl()
                 _uiState.update {
                     it.copy(
                         inputComponents = generateInputComponents(),
                         triggerComponents = generateTriggerComponents(),
-                        topics = topics
+                        topics = topics,
+                        discordUrl = discordUrl
                     )
                 }
             }
@@ -139,26 +144,30 @@ class AddComponentViewModel(
     }
 
     fun handleUri(uri: Uri?) {
-        val type = uri?.getQueryParameter("type")
-        val id = uri?.getQueryParameter("id")
+        viewModelScope.launch {
+            val type = uri?.getQueryParameter("type")
+            val id = uri?.getQueryParameter("id")
 
-        when (type) {
-            "discord" -> {
-                // TODO: get channel and set in discordChannels = ...
-                _uiState.update { it.copy(
-                    currentPage = AddComponentPage.Additional,
-                    bottomNavData = getBottomNavData(AddComponentPage.Additional),
-                    discordChannels = generateDiscordChannels()
-                ) }
-            }
+            when (type) {
+                "discord" -> {
+                    _uiState.update {
+                        it.copy(
+                            currentPage = AddComponentPage.Additional,
+                            bottomNavData = getBottomNavData(AddComponentPage.Additional),
+                            discordChannels = id?.let { it1 -> generateDiscordChannels(it1) } ?: emptyList()
+                        )
+                    }
+                }
 
-            else -> {
-                // TODO: set error
-                _uiState.update { it.copy(
-                    currentPage = AddComponentPage.Additional,
-                    bottomNavData = getBottomNavData(AddComponentPage.Additional),
-                    discordChannels = generateDiscordChannels()
-                ) }
+                else -> {
+                    // TODO: set error
+                    _uiState.update {
+                        it.copy(
+                            currentPage = AddComponentPage.Additional,
+                            bottomNavData = getBottomNavData(AddComponentPage.Additional)
+                        )
+                    }
+                }
             }
         }
     }
@@ -309,25 +318,19 @@ class AddComponentViewModel(
         return defaultFields + specificFields
     }
 
-    private fun generateDiscordChannels(): List<DiscordChannel> {
-        // TODO: implement
-        return listOf(
-            DiscordChannel(
-                id = "1",
-                title = "Helo chanel",
-            ),
-            DiscordChannel(
-                id = "2",
-                title = "Helo chanel 2",
-            ),
-            DiscordChannel(
-                id = "3",
-                title = "Helo chanel 3",
-            )
-        )
+    private suspend fun generateDiscordChannels(guildId: String): List<DiscordChannel> {
+        val channels = integrationRepository.getDiscordChannels(guildId)
+        return channels.map {
+            it.toDiscordChannel()
+        }
     }
 
-            private fun generateInputComponents() = listOf(
+    private fun DiscordChannelDto.toDiscordChannel() = DiscordChannel(
+        id = id,
+        title = name
+    )
+
+    private fun generateInputComponents() = listOf(
         ComponentChoiceData(
             titleId = R.string.s41,
             iconRes = R.drawable.ic_button,

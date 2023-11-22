@@ -16,21 +16,25 @@ import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserLocalDataSo
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserSessionLocalDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ComponentRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.DashboardRemoteDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.IntegrationRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ProjectRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.TopicRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ComponentRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.DashboardRemoteDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.IntegrationRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ProjectRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.TopicRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.UserRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.IntegrationRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.ComponentRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.DashboardRepositoryImpl
+import edu.pwr.iotmobile.androidimcs.model.repository.impl.IntegrationRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.ProjectRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.TopicRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.UserRepositoryImpl
@@ -80,6 +84,7 @@ object AppKoin {
         singleOf(::DashboardRemoteDataSourceImpl) bind DashboardRemoteDataSource::class
         singleOf(::TopicRemoteDataSourceImpl) bind TopicRemoteDataSource::class
         singleOf(::ComponentRemoteDataSourceImpl) bind ComponentRemoteDataSource::class
+        singleOf(::IntegrationRemoteDataSourceImpl) bind IntegrationRemoteDataSource::class
 
         // Local
         singleOf(::UserSessionLocalDataSourceImpl) bind UserSessionLocalDataSource::class
@@ -93,6 +98,7 @@ object AppKoin {
         singleOf(::DashboardRepositoryImpl) bind DashboardRepository::class
         singleOf(::TopicRepositoryImpl) bind TopicRepository::class
         singleOf(::ComponentRepositoryImpl) bind ComponentRepository::class
+        singleOf(::IntegrationRepositoryImpl) bind IntegrationRepository::class
     }
 
     // Module for view models
