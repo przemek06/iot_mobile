@@ -11,7 +11,7 @@ class IntegrationRepositoryImpl(
         val result = remoteDataSource.getDiscordUrl()
         val body = result.body()
         return if (result.isSuccessful && body != null)
-            body
+            body.uri
         else null
     }
 
