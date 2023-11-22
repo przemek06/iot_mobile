@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import edu.pwr.iotmobile.androidimcs.ui.navigation.BottomNavigationBar
 import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
-import edu.pwr.iotmobile.androidimcs.ui.navigation.appendArguments
 import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -42,12 +41,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // TODO: delete if registerLauncher works
-    override fun onNewIntent(intent: Intent?) {
-        intentState.value = intent
-        super.onNewIntent(intent)
-    }
-
     // TODO: on cośtam dispose of rSOcket
 }
 
@@ -57,14 +50,7 @@ private fun AppContent(intent: Intent? = null) {
     val viewModel: MainViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    // TODO: delete if registerLauncher works
-//    viewModel.handleIntent(intent)
-
     val context = LocalContext.current
-    viewModel.event.CollectEvent(context) { id ->
-        // TODO: delete if registerLauncher works
-        navController.navigate(Screen.AddComponent.path.appendArguments(id))
-    }
     viewModel.toast.CollectToast(context)
 
     val startDestination =

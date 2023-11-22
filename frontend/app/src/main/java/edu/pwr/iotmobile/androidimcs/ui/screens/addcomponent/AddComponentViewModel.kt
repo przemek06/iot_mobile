@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
+import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
@@ -69,11 +70,12 @@ class AddComponentViewModel(
                     bottomNavData = getBottomNavData(AddComponentPage.Settings),
                     settings = generateSettings()
                 ) }
-            AddComponentPage.Settings ->
+            AddComponentPage.Settings -> {
                 if (checkIfChosenComponentDiscord())
                     openDiscord()
                 else
                     onConfirmComponent(scopeID)
+            }
             AddComponentPage.Additional -> onConfirmComponent(scopeID)
         }
     }
@@ -111,6 +113,18 @@ class AddComponentViewModel(
         }
     }
 
+    fun onChooseDiscordChannel(index: Int) {
+        val updatedList = uiState.value.discordChannels.mapIndexed { i, item ->
+            if (i == index)
+                item.copy(isChecked = !item.isChecked)
+            else
+                item.copy(isChecked = false)
+        }
+        _uiState.update {
+            it.copy(discordChannels = updatedList)
+        }
+    }
+
     fun onTextChange(
         type: SettingType,
         text: String
@@ -125,22 +139,28 @@ class AddComponentViewModel(
     }
 
     fun handleUri(uri: Uri?) {
-        if (uri == null) return
-
-        val type = uri.getQueryParameter("type")
-        val id = uri.getQueryParameter("id")
+        val type = uri?.getQueryParameter("type")
+        val id = uri?.getQueryParameter("id")
 
         when (type) {
-            "discord" -> { /*TODO: handle Discord*/ }
+            "discord" -> {
+                // TODO: get channel and set in discordChannels = ...
+                _uiState.update { it.copy(
+                    currentPage = AddComponentPage.Additional,
+                    bottomNavData = getBottomNavData(AddComponentPage.Additional),
+                    discordChannels = generateDiscordChannels()
+                ) }
+            }
 
-            else -> { /*Do nothing*/ }
+            else -> {
+                // TODO: set error
+                _uiState.update { it.copy(
+                    currentPage = AddComponentPage.Additional,
+                    bottomNavData = getBottomNavData(AddComponentPage.Additional),
+                    discordChannels = generateDiscordChannels()
+                ) }
+            }
         }
-
-        // TODO: update something in uiState e.g. discordChannelList
-        _uiState.update { it.copy(
-            currentPage = AddComponentPage.Additional,
-            bottomNavData = getBottomNavData(AddComponentPage.Additional),
-        ) }
     }
 
     private fun checkIfChosenComponentDiscord() =
@@ -183,7 +203,16 @@ class AddComponentViewModel(
             onSendValue = locUiState.settings[SettingType.OnClickSend]?.inputFieldData?.text ?: locUiState.settings[SettingType.OnToggleOnSend]?.inputFieldData?.text,
             onSendAlternativeValue = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
             maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,
-            minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text
+            minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text,
+            actionDestinationDTO = locUiState.discordChannels.toActionDestinationDTO()
+        )
+    }
+
+    private fun List<DiscordChannel>.toActionDestinationDTO(): ActionDestinationDTO? {
+        return ActionDestinationDTO(
+            id = null,
+            type = "Discord", // TODO: something else?,
+            token = this.firstOrNull { it.isChecked }?.id ?: return null
         )
     }
 
@@ -280,7 +309,25 @@ class AddComponentViewModel(
         return defaultFields + specificFields
     }
 
-    private fun generateInputComponents() = listOf(
+    private fun generateDiscordChannels(): List<DiscordChannel> {
+        // TODO: implement
+        return listOf(
+            DiscordChannel(
+                id = "1",
+                title = "Helo chanel",
+            ),
+            DiscordChannel(
+                id = "2",
+                title = "Helo chanel 2",
+            ),
+            DiscordChannel(
+                id = "3",
+                title = "Helo chanel 3",
+            )
+        )
+    }
+
+            private fun generateInputComponents() = listOf(
         ComponentChoiceData(
             titleId = R.string.s41,
             iconRes = R.drawable.ic_button,
@@ -321,6 +368,12 @@ class AddComponentViewModel(
     data class SettingData(
         @StringRes val title: Int,
         val inputFieldData: InputFieldData
+    )
+
+    data class DiscordChannel(
+        val id: String,
+        val title: String,
+        val isChecked: Boolean = false
     )
 
     enum class SettingType {

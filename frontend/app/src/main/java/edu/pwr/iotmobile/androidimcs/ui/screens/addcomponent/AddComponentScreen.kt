@@ -70,8 +70,7 @@ fun AddComponentScreen(navigation: AddComponentNavigation) {
                 }
             }
 
-            else -> { /*Nothing*/
-            }
+            else -> { /*Nothing*/ }
         }
     }
     viewModel.toast.CollectToast(context)

@@ -12,6 +12,7 @@ interface AddComponentUiInteraction {
         type: AddComponentViewModel.SettingType,
         text: String
     )
+    fun onChooseDiscordChannel(index: Int)
 
     companion object {
         fun default(
@@ -39,6 +40,10 @@ interface AddComponentUiInteraction {
                 viewModel.onTextChange(type, text)
             }
 
+            override fun onChooseDiscordChannel(index: Int) {
+                viewModel.onChooseDiscordChannel(index)
+            }
+
         }
 
         fun empty() = object : AddComponentUiInteraction {
@@ -47,7 +52,7 @@ interface AddComponentUiInteraction {
             override fun onChooseComponent(componentData: AddComponentViewModel.ComponentChoiceData) {}
             override fun onChooseTopic(topic: Topic) {}
             override fun onTextChange(type: AddComponentViewModel.SettingType, text: String) {}
-
+            override fun onChooseDiscordChannel(index: Int) {}
         }
     }
 }
