@@ -1,7 +1,11 @@
 package edu.pwr.iotmobile.controller
 
 import edu.pwr.iotmobile.dto.DiscordChannelDTO
+import edu.pwr.iotmobile.dto.KeyDTO
 import edu.pwr.iotmobile.dto.UriDTO
+import edu.pwr.iotmobile.entities.DiscordIntermediate
+import edu.pwr.iotmobile.error.exception.DiscordNotFoundException
+import edu.pwr.iotmobile.error.exception.InvalidStateException
 import edu.pwr.iotmobile.service.IntegrationService
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -28,14 +32,21 @@ class IntegrationController(val integrationService: IntegrationService) {
 //        return ResponseEntity.ok(integrationService.sendMailMessage(dto))
 //    }
 
+    @GetMapping("/user/discord/key")
+    fun getDiscordKey() : ResponseEntity<KeyDTO> {
+        return ResponseEntity.ok(integrationService.getDiscordKey())
+    }
+
     @GetMapping("/user/discord/oauth")
-    fun getDiscordOAuthUrl(): ResponseEntity<UriDTO> {
-        return ResponseEntity.ok(integrationService.getDiscordOAuthUrl())
+    fun getDiscordOAuthUrl(@PathVariable key: String): ResponseEntity<UriDTO> {
+        return ResponseEntity.ok(integrationService.getDiscordOAuthUrl(key))
     }
 
     @GetMapping("/anon/discord")
-    fun discordCallback(@RequestParam("guild_id") guildId: String) : String {
-        println("$redirectUri?type=discord&id=$guildId")
+    fun discordCallback(@RequestParam("guild_id") guildId: String, @RequestParam("state") state: String) : String {
+        integrationService.discordCallback(guildId, state)
+        val link = "$redirectUri"
+        println(link)
         return "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
@@ -44,9 +55,14 @@ class IntegrationController(val integrationService: IntegrationService) {
                 "    <title>Return to Application</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
-                "    <p>Click to return to the application: <a href=\"$redirectUri\">Return Link</a></p>\n" +
+                "    <p>Click to return to the application: <a href=\"$link\">Return Link</a></p>\n" +
                 "</body>\n" +
                 "</html>"
+    }
+
+    @GetMapping("/user/discord/guild/{key}")
+    fun getGuildId(@PathVariable key: String) : ResponseEntity<KeyDTO> {
+        return ResponseEntity.ok(integrationService.getGuildId(key))
     }
 
     @GetMapping("/user/discord/channels/{guildId}")
