@@ -12,7 +12,8 @@ data class AddComponentUiState(
     val settings: Map<AddComponentViewModel.SettingType, AddComponentViewModel.SettingData> = emptyMap(),
     val chosenComponentType: ComponentDetailedType? = null,
     val chosenTopic: Topic? = null,
-    val discordChannels: List<AddComponentViewModel.DiscordChannel> = emptyList()
+    val discordChannels: List<AddComponentViewModel.DiscordChannel> = emptyList(),
+    val discordUrl: String? = null
 )
 
 enum class AddComponentPage {

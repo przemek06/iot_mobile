@@ -19,9 +19,11 @@ import edu.pwr.iotmobile.androidimcs.extensions.conditional
 
 @Composable
 fun InputField(
+    modifier: Modifier = Modifier,
     text: String,
     label: String,
     width: Dp? = null,
+    isSingleLine: Boolean = true,
     isError: Boolean = false,
     errorText: String = "Error",
     trailingIcon: @Composable () -> Unit = {},
@@ -36,11 +38,11 @@ fun InputField(
         }
     ) {
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             value = text,
             onValueChange = { onValueChange(it) },
             label = { Text(label) },
-            singleLine = true,
+            singleLine = isSingleLine,
             trailingIcon = trailingIcon,
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,

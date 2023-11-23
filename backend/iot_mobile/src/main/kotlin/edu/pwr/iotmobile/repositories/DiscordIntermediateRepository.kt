@@ -1,5 +1,9 @@
 package edu.pwr.iotmobile.repositories
 
-//@Repository
-//interface DiscordIntermediateRepository : JpaRepository<DiscordIntermediate, String> {
-//}
+import edu.pwr.iotmobile.entities.DiscordIntermediate
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
+
+@Repository
+interface DiscordIntermediateRepository : JpaRepository<DiscordIntermediate, String> {
+}
