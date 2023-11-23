@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
@@ -146,7 +147,7 @@ class AddComponentViewModel(
 
     fun handleUri(uri: Uri?) {
         viewModelScope.launch {
-            val type = uri?.getQueryParameter("type")
+            val type = uri?.getQueryParameter("trigger")
             val id = uri?.getQueryParameter("id")
 
             when (type) {
@@ -413,7 +414,9 @@ class AddComponentViewModel(
 open class GetWebActivityResultContract : ActivityResultContract<String, Uri?>() {
     @CallSuper
     override fun createIntent(context: Context, input: String): Intent {
-        return Intent(Intent.ACTION_VIEW, Uri.parse(input))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(input))
+//        intent.setDataAndType(, "text/plain")
+        return intent
     }
 
     final override fun getSynchronousResult(
@@ -422,6 +425,9 @@ open class GetWebActivityResultContract : ActivityResultContract<String, Uri?>()
     ): SynchronousResult<Uri?>? = null
 
     final override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+        Log.d("Trigger", "parseResult called")
+        Log.d("Trigger", intent.toString())
+
         return intent.takeIf { resultCode == Activity.RESULT_OK }?.data
     }
 }

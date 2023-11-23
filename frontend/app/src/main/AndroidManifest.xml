@@ -37,7 +37,8 @@
 
                 <data
                     android:host="imcs"
-                    android:scheme="app" />
+                    android:scheme="app"
+                    android:pathPattern=".*"/>
             </intent-filter>
         </activity>
     </application>
