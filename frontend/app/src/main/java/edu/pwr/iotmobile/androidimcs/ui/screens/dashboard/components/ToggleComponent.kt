@@ -46,7 +46,7 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
                 modifier = Modifier.align(Alignment.Center),
                 checked = item.onSendValue == lastValue,
                 onCheckedChange = {
-                    uiInteraction.onComponentClick(item, lastValue)
+                    uiInteraction.onComponentClick(item, lastValue ?: item.onSendValue)
                 }
             )
         }
