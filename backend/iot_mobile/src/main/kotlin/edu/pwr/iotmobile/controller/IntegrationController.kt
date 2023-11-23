@@ -44,7 +44,7 @@ class IntegrationController(val integrationService: IntegrationService) {
                 "    <title>Return to Application</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
-                "    <p>Click to return to the application: <a href=\"$redirectUri?type=discord&id=$guildId\">Return Link</a></p>\n" +
+                "    <p>Click to return to the application: <a href=\"$redirectUri\">Return Link</a></p>\n" +
                 "</body>\n" +
                 "</html>"
     }
