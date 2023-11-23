@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.controller
 
 import edu.pwr.iotmobile.dto.DiscordChannelDTO
+import edu.pwr.iotmobile.dto.UriDTO
 import edu.pwr.iotmobile.service.IntegrationService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -25,16 +26,13 @@ class IntegrationController(val integrationService: IntegrationService) {
 //    }
 
     @GetMapping("/user/discord/oauth")
-    fun getDiscordOAuthUrl(): ResponseEntity<String> {
+    fun getDiscordOAuthUrl(): ResponseEntity<UriDTO> {
         return ResponseEntity.ok(integrationService.getDiscordOAuthUrl())
     }
 
-    @GetMapping("/user/discord")
-    fun discordCallback(@RequestParam("guild_id") guildId: String): ResponseEntity<Unit> {
-        val uri = redirectUri?.let { URI(it) }
-        val httpHeaders = HttpHeaders()
-        httpHeaders.location = uri
-        return ResponseEntity<Unit>(httpHeaders, HttpStatus.PERMANENT_REDIRECT)
+    @GetMapping("/anon/discord")
+    fun discordCallback(@RequestParam("guild_id") guildId: String): String {
+        return "redirect:$redirectUri?type=discord&id=$guildId"
     }
 
     @GetMapping("/user/discord/channels/{guildId}")
