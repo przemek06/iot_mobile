@@ -10,13 +10,19 @@ import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
+import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
+import edu.pwr.iotmobile.androidimcs.data.dto.TopicMessagesDto
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.listener.ComponentChangeWebSocketListener
+import edu.pwr.iotmobile.androidimcs.model.listener.MessageReceivedWebSocketListener
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.MessageRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toDto
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toMessageDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +35,8 @@ private const val TAG = "DashboardViewModel"
 class DashboardViewModel(
     private val componentRepository: ComponentRepository,
     private val dashboardRepository: DashboardRepository,
+    private val messageRepository: MessageRepository,
+    private val projectRepository: ProjectRepository,
     private val client: OkHttpClient,
     val toast: Toast,
     val event: Event
@@ -37,17 +45,21 @@ class DashboardViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var _dashboardId: Int? = null
+    private var _projectId: Int? = null
     private var userProjectRole: UserProjectRole? = UserProjectRole.EDITOR
     private var componentListDto: ComponentListDto? = null
+    private var _lastMessages: List<TopicMessagesDto> = emptyList()
 
     private var componentsListener: ComponentChangeWebSocketListener? = null
+    private var messageReceivedListener: MessageReceivedWebSocketListener? = null
 
     override fun onCleared() {
         componentsListener?.closeWebSocket()
     }
 
-    fun init(dashboardId: Int) {
+    fun init(dashboardId: Int, projectId: Int?) {
         if (dashboardId == _dashboardId) return
+        _projectId = projectId
 
         componentsListener?.closeWebSocket()
         componentsListener = ComponentChangeWebSocketListener(
@@ -63,11 +75,30 @@ class DashboardViewModel(
                 components = components
             )
 
+            val topics = components.mapNotNull { it.topic?.uniqueName }
+            messageReceivedListener?.closeWebSocket()
+
+            if (topics.isNotEmpty()) {
+                messageReceivedListener = MessageReceivedWebSocketListener(
+                    client = client,
+                    topicNames = topics,
+                    onMessageReceived = { m -> onMessageReceived(m) }
+                )
+            }
+
+            val lastMessages = getLastMessages()
+            _lastMessages = lastMessages
+
             _uiState.update { ui ->
                 ui.copy(
-                    components = components.mapNotNull { it.toComponentData() },
+                    components = components.mapNotNull { item ->
+                        item.topic?.id?.let {
+                            val lastMessage = getLastMessage(it)
+                            item.toComponentData(lastMessage)
+                        } ?: item.toComponentData(null)
+                    },
                     menuOptionsList = generateMenuOptions(userProjectRole),
-                    userProjectRole = userProjectRole
+                    userProjectRole = userProjectRole,
                 )
             }
         }
@@ -79,10 +110,53 @@ class DashboardViewModel(
     private fun onComponentChangeMessage(data: ComponentListDto) {
         Log.d("Web", "onComponentChangeMessage called")
         Log.d("Web", data.toString())
-        _uiState.update {
-            it.copy(
-                components = data.components.mapNotNull { it.toComponentData() }
+        _uiState.update { ui ->
+            ui.copy(
+                components = data.components
+                    .sortedBy { it.index }
+                    .mapNotNull { item ->
+                        item.topic?.id?.let {
+                            val lastMessage = getLastMessage(it)
+                            item.toComponentData(lastMessage)
+                        } ?: item.toComponentData(null)
+                    }
             )
+        }
+    }
+
+    private fun onMessageReceived(data: MessageDto) {
+        Log.d("Web", "onMessageReceived called")
+        Log.d("Web", data.toString())
+        val topicId = data.topic.id ?: return
+        val currentMessages = _lastMessages
+        val newMessages = if (topicId !in currentMessages.map { it.topicId }) {
+            currentMessages + listOf(
+                TopicMessagesDto(
+                    topicId = topicId,
+                    messages = listOf(data)
+                )
+            )
+        } else {
+            currentMessages
+                .map {
+                    if (it.topicId == topicId)
+                        it.copy(
+                            messages = it.messages + listOf(data)
+                        )
+                    else
+                        it
+                }
+        }
+        _lastMessages = newMessages
+        Log.d("Web", "newMessages")
+        Log.d("Web", newMessages.toString())
+        _uiState.update { ui ->
+            ui.copy(components = ui.components.map { item ->
+                item.topic?.id?.let {
+                    val lastMessage = getLastMessage(it)
+                    item.copy(currentValue = lastMessage)
+                } ?: item.copy(currentValue = null)
+            })
         }
     }
 
@@ -109,27 +183,73 @@ class DashboardViewModel(
 
     fun onComponentClick(item: ComponentData, value: Any?) {
         // TODO: implement - different behaviour based on type,
-        when (item.type) {
+        Log.d("Check", "value")
+        Log.d("Check", value.toString())
+        val message = when (item.type) {
 
-            ComponentDetailedType.Button -> { /* send component value */ }
+            ComponentDetailedType.Button -> { item.onSendValue }
 
             ComponentDetailedType.Toggle -> {
-                /* if value == onSend send onAlternative -> else the other way */
-                val checked = value as Boolean
-                val newValue = if (checked) item.onSendAlternativeValue else item.onSendValue
+                val lastValue = value as String
+                val isChecked = lastValue == item.onSendValue
+                val newValue = if (isChecked) item.onSendAlternativeValue else item.onSendValue
                 val newItems = uiState.value.components.map {
                     if (it.id == item.id) {
-                        Log.d("click", "item found")
-                        item.copy(topic = item.topic?.copy(currentValue = newValue))
+                        item.copy(currentValue = newValue)
                     }
                     else it
                 }
                 _uiState.update {
                     it.copy(components = newItems)
                 }
+                newValue
             }
 
-            else -> {}
+            else -> value
+
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val connectionKey = getConnectionKey()
+            val messageDto = item.toMessageDto(
+                value = message.toString(),
+                connectionKey = connectionKey,
+            )
+            if (messageDto == null) {
+                toast.toast("Could not send message.")
+                return@launch
+            }
+
+            Log.d("mess", "messageDto")
+            Log.d("mess", messageDto.toString())
+
+            kotlin.runCatching {
+                messageRepository.sendMessage(messageDto)
+            }.onSuccess {
+                if (!it.isSuccess) {
+                    toast.toast("Could not send message.")
+                }
+            }.onFailure {
+                toast.toast("Error while sending message.")
+            }
+        }
+    }
+
+    fun onLocalComponentValueChange(item: ComponentData, value: String?) {
+        when (item.type) {
+
+            ComponentDetailedType.Slider -> {
+                val newItems = uiState.value.components.map {
+                    if (it.id == item.id) {
+                        item.copy(currentValue = value)
+                    } else it
+                }
+                _uiState.update {
+                    it.copy(components = newItems)
+                }
+            }
+
+            else -> { /*Do nothing*/ }
 
         }
     }
@@ -139,6 +259,7 @@ class DashboardViewModel(
         windowWidth: Float
     ) {
         viewModelScope.launch {
+            val locComponentListDto = componentListDto
             val currentUiState = uiState.value
             val draggedComponentId = currentUiState.draggedComponentId ?: return@launch
 
@@ -155,19 +276,19 @@ class DashboardViewModel(
             val newOrderedList = currentUiState.components.toMutableList()
             newOrderedList.removeAt(itemIndex)
             newOrderedList.add(closestIndex, item)
-            newOrderedList.mapIndexed { index, data ->
+            val newList = newOrderedList.mapIndexed { index, data ->
                 data.copy(index = index)
             }
 
             _uiState.update {
                 it.copy(
                     draggedComponentId = null,
-                    components = newOrderedList
+                    components = newList
                 )
             }
 
-            val dto = componentListDto?.copy(
-                components = newOrderedList.map { it.toDto() }.toList()
+            val dto = locComponentListDto?.copy(
+                components = newList.map { it.toDto() }.toList()
             )
             dto?.let {
                 componentRepository.updateComponentList(dto)
@@ -216,6 +337,24 @@ class DashboardViewModel(
             }
         }
         return closestIndex
+    }
+
+    private suspend fun getLastMessages(): List<TopicMessagesDto> {
+        val id = _dashboardId ?: return emptyList()
+        return messageRepository.getLastMessagesForDashboard(id)
+    }
+
+    private fun getLastMessage(topicId: Int) = _lastMessages
+        .firstOrNull { it.topicId == topicId }
+        ?.messages?.last()
+        ?.message
+
+    private suspend fun getConnectionKey(): String? {
+        _projectId?.let {
+            val project = projectRepository.getProjectById(it)
+            return project?.connectionKey
+        }
+        return null
     }
 
     private fun deleteDashboard() {

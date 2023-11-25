@@ -19,7 +19,7 @@ fun DashboardScreen(navigation: DashboardNavigation) {
 
     LaunchedEffect(Unit) {
         navigation.dashboardId?.let {
-            viewModel.init(it)
+            viewModel.init(it, navigation.projectId)
         }
     }
 

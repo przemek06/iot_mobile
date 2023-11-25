@@ -181,10 +181,6 @@ class ProjectDetailsViewModel(
         kotlin.runCatching {
             dashboardRepository.getDashboardsByProjectId(localProjectId)
         }.onSuccess { dashboards ->
-            Log.d("null", "dashboards")
-            dashboards.forEach {
-                Log.d("null", it.toString())
-            }
             return dashboards.mapNotNull { it.toDashboard() }
         }.onFailure {
             Log.d(TAG, "Get dashboards error")

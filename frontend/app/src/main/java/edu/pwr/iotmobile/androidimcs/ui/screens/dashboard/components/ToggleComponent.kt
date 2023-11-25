@@ -12,12 +12,10 @@ import androidx.compose.ui.Modifier
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
-import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiState
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun LazyStaggeredGridItemScope.ToggleComponent(
-    uiState: DashboardUiState,
     item: ComponentData,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
@@ -37,12 +35,11 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
         Box(modifier = Modifier.fillMaxSize()) {
             Switch(
                 modifier = Modifier.align(Alignment.Center),
-                checked = item.onSendValue == item.topic?.currentValue,
+                checked = item.onSendValue == item.currentValue,
                 onCheckedChange = {
-                    uiInteraction.onComponentClick(item, it)
+                    uiInteraction.onComponentClick(item, item.currentValue ?: item.onSendAlternativeValue)
                 }
             )
         }
-
     }
 }
