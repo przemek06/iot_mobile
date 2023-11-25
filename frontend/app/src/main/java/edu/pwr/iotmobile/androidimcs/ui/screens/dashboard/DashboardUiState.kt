@@ -10,7 +10,6 @@ import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
-import edu.pwr.iotmobile.androidimcs.data.dto.TopicMessagesDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
@@ -23,7 +22,6 @@ data class DashboardUiState(
     val topics: List<Topic> = emptyList(),
     val menuOptionsList: List<MenuOption> = emptyList(),
     val userProjectRole: UserProjectRole? = null,
-    val currentMessages: List<TopicMessagesDto> = emptyList(),
 )
 
 data class ComponentData(
@@ -32,6 +30,8 @@ data class ComponentData(
     val height: Dp = 140.dp,
     val index: Int,
     val size: Int,
+
+    val currentValue: Any?,
 
     val absolutePosition: Offset = Offset.Zero,
     val isFullLine: Boolean = false,
@@ -50,12 +50,13 @@ data class ComponentData(
     val pattern: String? = null
 ) {
     companion object {
-        fun ComponentDto.toComponentData(): ComponentData? {
+        fun ComponentDto.toComponentData(currentValue: String?): ComponentData? {
             return ComponentData(
                 id = id ?: return null,
                 name = name ?: "",
                 index = index,
                 size = size,
+                currentValue = currentValue,
                 componentType = componentType.asEnum<ComponentType>() ?: return null,
                 type = type.asEnum<ComponentDetailedType>() ?: return null,
                 topic = topic?.toTopic(),

@@ -45,14 +45,21 @@ class LoginViewModel(
     fun onLoginClick() {
         viewModelScope.launch {
             val uiState = _uiState.value
-            val result = userRepository.login(
-                email = uiState.inputFields[InputFieldType.Email]?.text ?: return@launch,
-                password = uiState.inputFields[InputFieldType.Password]?.text ?: return@launch,
-            )
-            when (result) {
-                LoginUserResult.Success -> event.event(LOGIN_SUCCESS_EVENT)
-                LoginUserResult.AccountInactive -> event.event(LOGIN_ACCOUNT_INACTIVE_EVENT)
-                LoginUserResult.Failure -> toast.toast("Error - could not log in.")
+
+            kotlin.runCatching {
+                userRepository.login(
+                    email = uiState.inputFields[InputFieldType.Email]?.text ?: return@launch,
+                    password = uiState.inputFields[InputFieldType.Password]?.text ?: return@launch,
+                )
+            }.onSuccess { result ->
+                when (result) {
+                    // TODO: account doesn't exist error
+                    LoginUserResult.Success -> event.event(LOGIN_SUCCESS_EVENT)
+                    LoginUserResult.AccountInactive -> event.event(LOGIN_ACCOUNT_INACTIVE_EVENT)
+                    LoginUserResult.Failure -> toast.toast("Email or password incorrect.")
+                }
+            }.onFailure {
+                toast.toast("Error - could not log in.")
             }
         }
     }

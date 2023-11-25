@@ -1,6 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
@@ -13,23 +12,15 @@ import androidx.compose.ui.Modifier
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
-import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiState
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun LazyStaggeredGridItemScope.ToggleComponent(
-    uiState: DashboardUiState,
     item: ComponentData,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
 ) {
-    val topicMessages = uiState.currentMessages.firstOrNull { it.topicId == item.topic?.id }
-    val lastValue = topicMessages?.messages?.last()?.message
-
-    Log.d("Web", "toggle")
-    Log.d("Web", topicMessages?.messages?.last()?.message ?: "")
-
     ComponentWrapper(
         item = item,
         uiInteraction = uiInteraction,
@@ -44,12 +35,11 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
         Box(modifier = Modifier.fillMaxSize()) {
             Switch(
                 modifier = Modifier.align(Alignment.Center),
-                checked = item.onSendValue == lastValue,
+                checked = item.onSendValue == item.currentValue,
                 onCheckedChange = {
-                    uiInteraction.onComponentClick(item, lastValue ?: item.onSendValue)
+                    uiInteraction.onComponentClick(item, item.currentValue ?: item.onSendAlternativeValue)
                 }
             )
         }
-
     }
 }

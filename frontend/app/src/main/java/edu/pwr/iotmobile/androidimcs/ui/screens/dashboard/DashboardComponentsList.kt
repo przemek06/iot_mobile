@@ -145,7 +145,6 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
     when (item.type) {
 
         ComponentDetailedType.Toggle -> ToggleComponent(
-            uiState = uiState,
             item = item,
             uiInteraction = uiInteraction,
             onPlaceItem = onPlaceItem,

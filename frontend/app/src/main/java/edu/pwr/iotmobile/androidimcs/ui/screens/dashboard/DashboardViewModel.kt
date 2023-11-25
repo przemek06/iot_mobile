@@ -48,6 +48,7 @@ class DashboardViewModel(
     private var _projectId: Int? = null
     private var userProjectRole: UserProjectRole? = UserProjectRole.EDITOR
     private var componentListDto: ComponentListDto? = null
+    private var _lastMessages: List<TopicMessagesDto> = emptyList()
 
     private var componentsListener: ComponentChangeWebSocketListener? = null
     private var messageReceivedListener: MessageReceivedWebSocketListener? = null
@@ -86,13 +87,18 @@ class DashboardViewModel(
             }
 
             val lastMessages = getLastMessages()
+            _lastMessages = lastMessages
 
             _uiState.update { ui ->
                 ui.copy(
-                    components = components.mapNotNull { it.toComponentData() },
+                    components = components.mapNotNull { item ->
+                        item.topic?.id?.let {
+                            val lastMessage = getLastMessage(it)
+                            item.toComponentData(lastMessage)
+                        } ?: item.toComponentData(null)
+                    },
                     menuOptionsList = generateMenuOptions(userProjectRole),
                     userProjectRole = userProjectRole,
-                    currentMessages = lastMessages
                 )
             }
         }
@@ -106,7 +112,14 @@ class DashboardViewModel(
         Log.d("Web", data.toString())
         _uiState.update { ui ->
             ui.copy(
-                components = data.components.sortedBy { it.index }.mapNotNull { it.toComponentData() }
+                components = data.components
+                    .sortedBy { it.index }
+                    .mapNotNull { item ->
+                        item.topic?.id?.let {
+                            val lastMessage = getLastMessage(it)
+                            item.toComponentData(lastMessage)
+                        } ?: item.toComponentData(null)
+                    }
             )
         }
     }
@@ -115,7 +128,7 @@ class DashboardViewModel(
         Log.d("Web", "onMessageReceived called")
         Log.d("Web", data.toString())
         val topicId = data.topic.id ?: return
-        val currentMessages = _uiState.value.currentMessages
+        val currentMessages = _lastMessages
         val newMessages = if (topicId !in currentMessages.map { it.topicId }) {
             currentMessages + listOf(
                 TopicMessagesDto(
@@ -134,12 +147,16 @@ class DashboardViewModel(
                         it
                 }
         }
+        _lastMessages = newMessages
         Log.d("Web", "newMessages")
         Log.d("Web", newMessages.toString())
-        _uiState.update {
-            it.copy(
-                currentMessages = newMessages
-            )
+        _uiState.update { ui ->
+            ui.copy(components = ui.components.map { item ->
+                item.topic?.id?.let {
+                    val lastMessage = getLastMessage(it)
+                    item.copy(currentValue = lastMessage)
+                } ?: item.copy(currentValue = null)
+            })
         }
     }
 
@@ -173,13 +190,12 @@ class DashboardViewModel(
             ComponentDetailedType.Button -> { item.onSendValue }
 
             ComponentDetailedType.Toggle -> {
-                /* if value == onSend send onAlternative -> else the other way */
                 val lastValue = value as String
                 val isChecked = lastValue == item.onSendValue
                 val newValue = if (isChecked) item.onSendAlternativeValue else item.onSendValue
                 val newItems = uiState.value.components.map {
                     if (it.id == item.id) {
-                        item.copy(topic = item.topic?.copy(currentValue = newValue))
+                        item.copy(currentValue = newValue)
                     }
                     else it
                 }
@@ -308,6 +324,11 @@ class DashboardViewModel(
         val id = _dashboardId ?: return emptyList()
         return messageRepository.getLastMessagesForDashboard(id)
     }
+
+    private fun getLastMessage(topicId: Int) = _lastMessages
+        .firstOrNull { it.topicId == topicId }
+        ?.messages?.last()
+        ?.message
 
     private suspend fun getConnectionKey(): String? {
         _projectId?.let {
