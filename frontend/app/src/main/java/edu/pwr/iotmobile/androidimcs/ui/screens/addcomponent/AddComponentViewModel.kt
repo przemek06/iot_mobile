@@ -45,19 +45,18 @@ class AddComponentViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var _projectId: Int? = null
+    private var _discordKey: String? = null
 
     fun init(projectId: Int) {
         if (_projectId == null || projectId != _projectId) {
             _projectId = projectId
             viewModelScope.launch(Dispatchers.Default) {
                 val topics = getTopicsForProject(projectId)
-                val discordUrl = integrationRepository.getDiscordUrl()
                 _uiState.update {
                     it.copy(
                         inputComponents = generateInputComponents(),
                         triggerComponents = generateTriggerComponents(),
                         topics = topics,
-                        discordUrl = discordUrl
                     )
                 }
             }
@@ -145,18 +144,15 @@ class AddComponentViewModel(
         }
     }
 
-    fun handleUri(uri: Uri?) {
+    fun handleUri() {
         viewModelScope.launch {
-            val type = uri?.getQueryParameter("trigger")
-            val id = uri?.getQueryParameter("id")
-
-            when (type) {
-                "discord" -> {
+            when (uiState.value.chosenComponentType) {
+                ComponentDetailedType.Discord -> {
                     _uiState.update {
                         it.copy(
                             currentPage = AddComponentPage.Additional,
                             bottomNavData = getBottomNavData(AddComponentPage.Additional),
-                            discordChannels = id?.let { it1 -> generateDiscordChannels(it1) } ?: emptyList()
+                            discordChannels = generateDiscordChannels()
                         )
                     }
                 }
@@ -179,7 +175,26 @@ class AddComponentViewModel(
 
     private fun openDiscord() {
         viewModelScope.launch {
-            event.event(DISCORD_EVENT)
+            try {
+                val discordKey = integrationRepository.getDiscordKey() ?: kotlin.run {
+                    toast.toast("Failed to get discord key")
+                    return@launch
+                }
+                _discordKey = discordKey
+
+                val discordUrl = integrationRepository.getDiscordUrl(discordKey) ?: kotlin.run {
+                    toast.toast("Failed to load discord url")
+                    return@launch
+                }
+
+                _uiState.update {
+                    it.copy(discordUrl = discordUrl)
+                }
+                event.event(DISCORD_EVENT)
+            } catch (e: Exception) {
+                Log.e("Trigger", "Cannot open discord web", e)
+                toast.toast("Failed to load discord url")
+            }
         }
     }
 
@@ -215,7 +230,8 @@ class AddComponentViewModel(
             onSendAlternative = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
             maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,
             minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text,
-            actionDestinationDTO = locUiState.discordChannels.toActionDestinationDTO()
+            actionDestinationDTO = locUiState.discordChannels.toActionDestinationDTO(),
+            pattern = locUiState.settings[SettingType.Description]?.inputFieldData?.text
         )
     }
 
@@ -330,10 +346,20 @@ class AddComponentViewModel(
         return defaultFields + specificFields
     }
 
-    private suspend fun generateDiscordChannels(guildId: String): List<DiscordChannel> {
-        val channels = integrationRepository.getDiscordChannels(guildId)
-        return channels.map {
-            it.toDiscordChannel()
+    private suspend fun generateDiscordChannels(): List<DiscordChannel> {
+        try {
+            val discordKey = _discordKey ?: return emptyList()
+            val guildId = integrationRepository.getGuildId(discordKey) ?: kotlin.run {
+                toast.toast("Failed to get discord key")
+                return emptyList()
+            }
+            val channels = integrationRepository.getDiscordChannels(guildId)
+            return channels.map {
+                it.toDiscordChannel()
+            }
+        } catch (e: Exception) {
+            toast.toast("Failed to load discord channels")
+            return emptyList()
         }
     }
 
@@ -414,9 +440,7 @@ class AddComponentViewModel(
 open class GetWebActivityResultContract : ActivityResultContract<String, Uri?>() {
     @CallSuper
     override fun createIntent(context: Context, input: String): Intent {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(input))
-//        intent.setDataAndType(, "text/plain")
-        return intent
+        return Intent(Intent.ACTION_VIEW, Uri.parse(input))
     }
 
     final override fun getSynchronousResult(
@@ -425,9 +449,6 @@ open class GetWebActivityResultContract : ActivityResultContract<String, Uri?>()
     ): SynchronousResult<Uri?>? = null
 
     final override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
-        Log.d("Trigger", "parseResult called")
-        Log.d("Trigger", intent.toString())
-
         return intent.takeIf { resultCode == Activity.RESULT_OK }?.data
     }
 }

@@ -48,6 +48,7 @@ import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ButtonComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.DiscordComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.GraphComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SliderComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ToggleComponent
@@ -167,6 +168,13 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
         
         ComponentDetailedType.Graph -> GraphComponent(
             uiState = uiState,
+            item = item,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+
+        ComponentDetailedType.Discord -> DiscordComponent(
             item = item,
             uiInteraction = uiInteraction,
             onPlaceItem = onPlaceItem,
