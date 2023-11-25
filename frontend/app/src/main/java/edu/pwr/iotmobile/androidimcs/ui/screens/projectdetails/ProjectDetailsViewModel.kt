@@ -17,6 +17,7 @@ import edu.pwr.iotmobile.androidimcs.model.listener.ProjectDeletedWebSocketListe
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.Dashboard.Companion.toDashboard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +32,7 @@ class ProjectDetailsViewModel(
     private val dashboardRepository: DashboardRepository,
     private val topicRepository: TopicRepository,
     private val projectRepository: ProjectRepository,
+    private val userRepository: UserRepository,
     val toast: Toast,
     val event: Event,
     private val client: OkHttpClient
@@ -179,10 +181,6 @@ class ProjectDetailsViewModel(
         kotlin.runCatching {
             dashboardRepository.getDashboardsByProjectId(localProjectId)
         }.onSuccess { dashboards ->
-            Log.d("null", "dashboards")
-            dashboards.forEach {
-                Log.d("null", it.toString())
-            }
             return dashboards.mapNotNull { it.toDashboard() }
         }.onFailure {
             Log.d(TAG, "Get dashboards error")
@@ -260,29 +258,34 @@ class ProjectDetailsViewModel(
             ),
             MenuOption(
                 titleId = R.string.edit_roles,
-                onClick = { /*TODO*/}
+                onClick = { navigation.openSearchEditRoles() }
             ),
             MenuOption(
                 titleId = R.string.revoke_access,
-                onClick = { /*TODO*/}
+                onClick = { navigation.openSearchRevokeAccess() }
             ),
             MenuOption(
                 titleId = R.string.add_admin,
-                onClick = { /*TODO*/}
+                onClick = { navigation.openSearchAddAdmin() }
+            ),
+            MenuOption(
+                titleId = R.string.leave_group,
+                isBold = true,
+                onClick = { leaveGroup() }
             )
         )
         UserProjectRole.EDITOR -> listOf(
             MenuOption(
                 titleId = R.string.leave_group,
                 isBold = true,
-                onClick = { /*TODO*/}
+                onClick = { leaveGroup() }
             )
         )
         UserProjectRole.VIEWER -> listOf(
             MenuOption(
                 titleId = R.string.leave_group,
                 isBold = true,
-                onClick = { /*TODO*/}
+                onClick = { leaveGroup() }
             )
         )
     }
@@ -320,6 +323,24 @@ class ProjectDetailsViewModel(
     fun onTextChangeDashboard(text: String) {
         _uiState.update {
             it.copy(inputFieldDashboard = it.inputFieldDashboard.copy(text = text))
+        }
+    }
+
+    fun leaveGroup() {
+        viewModelScope.launch {
+            projectId?.let { projectId ->
+                userRepository.getActiveUserInfo().onSuccess { userInfo ->
+                    val result = projectRepository.revokeAccess(
+                        projectId = projectId,
+                        userId = userInfo.id
+                    )
+                    result.onSuccess {
+                        toast.toast("Left group")
+                        return@launch
+                    }
+                }
+            }
+            toast.toast("Failed")
         }
     }
 

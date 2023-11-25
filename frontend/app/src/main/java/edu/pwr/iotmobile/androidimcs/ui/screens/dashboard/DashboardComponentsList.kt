@@ -48,6 +48,7 @@ import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ButtonComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.GraphComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SliderComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ToggleComponent
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
@@ -61,7 +62,6 @@ fun ComponentsList(
     uiState: DashboardUiState,
     uiInteraction: DashboardUiInteraction
 ) {
-    val list = uiState.components
     val gridState = rememberLazyStaggeredGridState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -118,8 +118,8 @@ fun ComponentsList(
                 span = itemSpan
             ) {
                 ComponentChoice(
-                    item = item,
                     uiState = uiState,
+                    item = item,
                     uiInteraction = uiInteraction,
                     onPlaceItem = {
                         uiInteraction.onPlaceDraggedComponent(
@@ -136,8 +136,8 @@ fun ComponentsList(
 
 @Composable
 fun LazyStaggeredGridItemScope.ComponentChoice(
-    item: ComponentData,
     uiState: DashboardUiState,
+    item: ComponentData,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
@@ -145,7 +145,6 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
     when (item.type) {
 
         ComponentDetailedType.Toggle -> ToggleComponent(
-            uiState = uiState,
             item = item,
             uiInteraction = uiInteraction,
             onPlaceItem = onPlaceItem,
@@ -160,6 +159,13 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
         )
 
         ComponentDetailedType.Slider -> SliderComponent(
+            item = item,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+        
+        ComponentDetailedType.Graph -> GraphComponent(
             uiState = uiState,
             item = item,
             uiInteraction = uiInteraction,

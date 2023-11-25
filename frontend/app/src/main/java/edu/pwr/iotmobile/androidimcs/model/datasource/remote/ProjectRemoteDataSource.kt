@@ -65,5 +65,27 @@ interface ProjectRemoteDataSource {
     @POST("/user/project/invitation")
     suspend fun createInvitation(
         @Body invitationDtoSend: InvitationDtoSend
-    ) : Response<InvitationDto>
+    ): Response<InvitationDto>
+
+    @PUT("/user/project/users/roles")
+    suspend fun editProjectRole(
+        @Body projectRoleDto: ProjectRoleDto
+    ): Response<ProjectRoleDto>
+
+    @DELETE("/user/project/users/{projectId}/{userId}")
+    suspend fun revokeAccess(
+        @Path("projectId") projectId: Int,
+        @Path("userId") userId: Int
+    ): Response<Unit>
+
+    @PUT("/user/project/users/admin/{projectId}/{userId}")
+    suspend fun addProjectAdmin(
+        @Path("projectId") projectId: Int,
+        @Path("userId") userId: Int
+    ): Response<ProjectRoleDto>
+
+    @GET("/user/project/users/roles/{projectId}")
+    suspend fun findAllProjectRolesByProjectId(
+        @Path("projectId") projectId: Int
+    ): Response<List<ProjectRoleDto>>
 }
