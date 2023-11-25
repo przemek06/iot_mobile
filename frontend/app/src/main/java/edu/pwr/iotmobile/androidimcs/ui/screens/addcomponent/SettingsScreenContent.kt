@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.ui.components.DescriptionInputField
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -26,11 +27,20 @@ fun SettingsScreenContent(
             color = MaterialTheme.colorScheme.onBackground
         )
         Dimensions.space4.HeightSpacer()
-        InputField(
-            text = it.value.inputFieldData.text,
-            label = stringResource(id = it.value.inputFieldData.label),
-            onValueChange = { text -> uiInteraction.onTextChange(it.key, text) }
-        )
+
+        if (it.value.isDescription) {
+            DescriptionInputField(
+                text = it.value.inputFieldData.text,
+                label = stringResource(id = it.value.inputFieldData.label),
+                onValueChange = { text -> uiInteraction.onTextChange(it.key, text) }
+            )
+        } else {
+            InputField(
+                text = it.value.inputFieldData.text,
+                label = stringResource(id = it.value.inputFieldData.label),
+                onValueChange = { text -> uiInteraction.onTextChange(it.key, text) }
+            )
+        }
         Dimensions.space26.HeightSpacer()
     }
 }

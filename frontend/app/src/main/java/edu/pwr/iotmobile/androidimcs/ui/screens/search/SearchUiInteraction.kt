@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.search
 
 import edu.pwr.iotmobile.androidimcs.data.User
+import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 
 interface SearchUiInteraction {
 
@@ -8,7 +9,7 @@ interface SearchUiInteraction {
     fun setSelectedUser(user: User)
     fun setDialogVisible()
     fun setDialogInvisible()
-    fun addAdmin(user: User)
+    fun selectRole(role: UserProjectRole)
     fun toggleBlockUser(user: User)
 
     companion object {
@@ -29,10 +30,9 @@ interface SearchUiInteraction {
                 viewModel.setDialogInvisible()
             }
 
-            override fun addAdmin(user: User) {
-                viewModel.addAdmin(user)
+            override fun selectRole(role: UserProjectRole) {
+                viewModel.selectRole(role)
             }
-
             override fun toggleBlockUser(user: User) {
                 viewModel.toggleBlockUser(user)
             }

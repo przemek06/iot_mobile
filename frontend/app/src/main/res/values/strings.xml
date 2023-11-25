@@ -38,6 +38,7 @@
     <string name="manage_group">Manage group</string>
     <string name="expand">Expand</string>
     <string name="hide">Hide</string>
+    <string name="remove">Remove</string>
     <string name="nothing"> </string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -102,10 +103,13 @@
     <string name="admin_5">Add admin</string>
 
     <string name="invite">Invite</string>
+    <string name="edit">Edit</string>
     <string name="sure_invite">Are you sure you want to invite %s</string>
     <string name="search_admin_1">Are you sure you want to add user %s as Admin?</string>
     <string name="search_block_1">Are you sure you want ban user %s</string>
     <string name="search_block_2">Are you sure you want unban user %s</string>
+    <string name="u_sure_revoke_access">Are you sure, you want to remove user %s</string>
+    <string name="edit_role_dialog">Edit role for %s</string>
 
     <string name="invitations_1">Your pending invitations</string>
     <string name="invitations_2">You have no pending invitations</string>
@@ -174,6 +178,7 @@
     <string name="s47">Link:</string>
     <string name="s48">Use this connection key on your IoT device in order to authorize the connection.</string>
     <string name="s49">Are you sure you want to delete this topic (%s)?</string>
-    <string name="s50">Discord</string>
-    <string name="s51">Choose discord channels to send the message to</string>
+    <string name="a_s50">Discord</string>
+    <string name="a_s51">Choose discord channels to send the message to</string>
+    <string name="a_s52">Description</string>
 </resources>
