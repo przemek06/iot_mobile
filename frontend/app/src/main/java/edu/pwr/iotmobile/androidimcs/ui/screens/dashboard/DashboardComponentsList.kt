@@ -118,6 +118,7 @@ fun ComponentsList(
                 span = itemSpan
             ) {
                 ComponentChoice(
+                    uiState = uiState,
                     item = item,
                     uiInteraction = uiInteraction,
                     onPlaceItem = {
@@ -135,6 +136,7 @@ fun ComponentsList(
 
 @Composable
 fun LazyStaggeredGridItemScope.ComponentChoice(
+    uiState: DashboardUiState,
     item: ComponentData,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
