@@ -235,6 +235,25 @@ class DashboardViewModel(
         }
     }
 
+    fun onLocalComponentValueChange(item: ComponentData, value: String?) {
+        when (item.type) {
+
+            ComponentDetailedType.Slider -> {
+                val newItems = uiState.value.components.map {
+                    if (it.id == item.id) {
+                        item.copy(currentValue = value)
+                    } else it
+                }
+                _uiState.update {
+                    it.copy(components = newItems)
+                }
+            }
+
+            else -> { /*Do nothing*/ }
+
+        }
+    }
+
     fun onPlaceDraggedComponent(
         visibleItems: List<LazyStaggeredGridItemInfo>,
         windowWidth: Float

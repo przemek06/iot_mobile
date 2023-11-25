@@ -61,7 +61,6 @@ fun ComponentsList(
     uiState: DashboardUiState,
     uiInteraction: DashboardUiInteraction
 ) {
-    val list = uiState.components
     val gridState = rememberLazyStaggeredGridState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -119,7 +118,6 @@ fun ComponentsList(
             ) {
                 ComponentChoice(
                     item = item,
-                    uiState = uiState,
                     uiInteraction = uiInteraction,
                     onPlaceItem = {
                         uiInteraction.onPlaceDraggedComponent(
@@ -137,7 +135,6 @@ fun ComponentsList(
 @Composable
 fun LazyStaggeredGridItemScope.ComponentChoice(
     item: ComponentData,
-    uiState: DashboardUiState,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
@@ -159,7 +156,6 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
         )
 
         ComponentDetailedType.Slider -> SliderComponent(
-            uiState = uiState,
             item = item,
             uiInteraction = uiInteraction,
             onPlaceItem = onPlaceItem,

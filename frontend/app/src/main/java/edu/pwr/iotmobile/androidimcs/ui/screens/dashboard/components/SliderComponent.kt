@@ -7,21 +7,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
-import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiState
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun LazyStaggeredGridItemScope.SliderComponent(
-    uiState: DashboardUiState,
     item: ComponentData,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
@@ -33,9 +27,6 @@ fun LazyStaggeredGridItemScope.SliderComponent(
     val middlePoint = if (minValue != null && maxValue != null)
         maxValue + minValue / 2
     else 0f
-
-    val lastValue = item.topic?.currentValue?.toFloat() ?: middlePoint
-    var currentValue by remember { mutableFloatStateOf(lastValue) }
 
     ComponentWrapper(
         item = item,
@@ -52,10 +43,10 @@ fun LazyStaggeredGridItemScope.SliderComponent(
             if (minValue != null && maxValue != null) {
                 Slider(
                     modifier = Modifier.align(Alignment.Center),
-                    value = currentValue,
+                    value = item.currentValue?.toFloat() ?: middlePoint,
                     valueRange = minValue..maxValue,
-                    onValueChange = { currentValue = it },
-                    onValueChangeFinished = { uiInteraction.onComponentClick(item, currentValue) }
+                    onValueChange = { uiInteraction.onLocalComponentValueChange(item, item.currentValue) },
+                    onValueChangeFinished = { uiInteraction.onComponentClick(item, item.currentValue) }
                 )
             }
         }

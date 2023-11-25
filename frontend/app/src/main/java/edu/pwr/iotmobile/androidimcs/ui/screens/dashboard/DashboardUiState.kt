@@ -31,7 +31,7 @@ data class ComponentData(
     val index: Int,
     val size: Int,
 
-    val currentValue: Any?,
+    val currentValue: String?,
 
     val absolutePosition: Offset = Offset.Zero,
     val isFullLine: Boolean = false,
