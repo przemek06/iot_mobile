@@ -60,6 +60,8 @@ class DashboardViewModel(
 
     fun init(dashboardId: Int, projectId: Int?) {
         if (dashboardId == _dashboardId) return
+        _uiState.update { it.copy(isLoading = true) }
+
         _projectId = projectId
         _dashboardId = dashboardId
 
@@ -71,7 +73,18 @@ class DashboardViewModel(
         )
 
         viewModelScope.launch {
-            val components = componentRepository.getComponentList(dashboardId).sortedBy { it.index }
+            val components = try {
+                componentRepository.getComponentList(dashboardId).sortedBy { it.index }
+            } catch (e: Exception) {
+                Log.e("Dashboard", "Error getting component", e)
+                _uiState.update {
+                    it.copy(
+                        isError = true,
+                        isLoading = false
+                    )
+                }
+                return@launch
+            }
             componentListDto = ComponentListDto(
                 dashboardId = dashboardId,
                 components = components
@@ -101,6 +114,8 @@ class DashboardViewModel(
                     },
                     menuOptionsList = generateMenuOptions(userProjectRole),
                     userProjectRole = userProjectRole,
+                    isError = false,
+                    isLoading = false
                 )
             }
         }
@@ -257,6 +272,12 @@ class DashboardViewModel(
         }
     }
 
+    fun toggleDeleteDashboardDialog() {
+        _uiState.update {
+            it.copy(isDeleteDashboardDialogVisible = !it.isDeleteDashboardDialogVisible)
+        }
+    }
+
     fun onPlaceDraggedComponent(
         visibleItems: List<LazyStaggeredGridItemInfo>,
         windowWidth: Float
@@ -294,7 +315,9 @@ class DashboardViewModel(
                 components = newList.map { it.toDto() }.toList()
             )
             dto?.let {
-                componentRepository.updateComponentList(dto)
+                kotlin.runCatching {
+                    componentRepository.updateComponentList(dto)
+                }
             }
         }
     }
@@ -359,13 +382,19 @@ class DashboardViewModel(
 
     private suspend fun getConnectionKey(): String? {
         _projectId?.let {
-            val project = projectRepository.getProjectById(it)
-            return project?.connectionKey
+            try {
+                val project = projectRepository.getProjectById(it)
+                return project?.connectionKey
+            } catch (e: Exception) {
+                Log.e("Dashboard", "Error getting conneciton key", e)
+                return null
+            }
         }
         return null
     }
 
-    private fun deleteDashboard() {
+    fun deleteDashboard() {
+        _uiState.update { it.copy(isDialogLoading = true) }
         viewModelScope.launch(Dispatchers.Default) {
             val dashboardId = _dashboardId ?: return@launch
             kotlin.runCatching {
@@ -376,6 +405,7 @@ class DashboardViewModel(
             }.onFailure {
                 Log.d(TAG, "Delete dashboard error")
             }
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
 
@@ -387,7 +417,7 @@ class DashboardViewModel(
             ),
             MenuOption(
                 titleId = R.string.s21,
-                onClick = { deleteDashboard() }
+                onClick = { toggleDeleteDashboardDialog() }
             )
         )
         else -> emptyList()

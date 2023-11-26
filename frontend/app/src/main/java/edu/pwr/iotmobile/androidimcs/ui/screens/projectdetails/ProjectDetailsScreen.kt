@@ -68,7 +68,7 @@ fun ProjectDetailsScreen(
 
     AnimatedVisibility(
         visible = !uiState.isError && !uiState.isLoading,
-        enter = fadeIn(initialAlpha = 0.3f),
+        enter = fadeIn(),
         exit = fadeOut()
     ) {
         ProjectDetailsScreenContent(
