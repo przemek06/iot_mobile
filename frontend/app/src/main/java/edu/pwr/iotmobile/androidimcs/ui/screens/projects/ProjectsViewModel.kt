@@ -40,7 +40,6 @@ class ProjectsViewModel(
 
     fun addProject(name: String) {
         if (name.isBlank()) {
-            Log.d("mess", "name blank")
             _uiState.update {
                 it.copy(inputFiled = it.inputFiled.copy(
                     isError = true,

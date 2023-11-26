@@ -42,11 +42,11 @@ fun SimpleDialog(
             ButtonCommon(
                 text = closeButtonText,
                 onClick = onCloseDialog,
-                isDisabled = isLoading,
                 type = ButtonCommonType.Alternative
             )
             ButtonCommon(
                 text = confirmButtonText,
+                isDisabled = isLoading,
                 onClick = onConfirm
             )
         }

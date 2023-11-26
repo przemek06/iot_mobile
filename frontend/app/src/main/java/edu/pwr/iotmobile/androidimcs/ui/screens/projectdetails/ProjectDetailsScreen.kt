@@ -37,7 +37,10 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
 import edu.pwr.iotmobile.androidimcs.ui.components.InfoDialog
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
+import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -60,11 +63,20 @@ fun ProjectDetailsScreen(
     }
     viewModel.toast.CollectToast(context)
 
-    ProjectDetailsScreenContent(
-        uiState = uiState,
-        uiInteraction = ProjectDetailsUiInteraction.default(viewModel),
-        navigation = navigation
-    )
+    ErrorBox(isVisible = uiState.isError)
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isError && !uiState.isLoading,
+        enter = fadeIn(initialAlpha = 0.3f),
+        exit = fadeOut()
+    ) {
+        ProjectDetailsScreenContent(
+            uiState = uiState,
+            uiInteraction = ProjectDetailsUiInteraction.default(viewModel),
+            navigation = navigation
+        )
+    }
 }
 
 @Composable
@@ -79,6 +91,10 @@ private fun ProjectDetailsScreenContent(
         connectionString = uiState.projectData.connectionKey ?: "",
         uiInteraction =  uiInteraction,
         onCloseDialog = { isAccessDialogVisible = false }
+    )
+    DeleteProjectDialog(
+        uiState = uiState,
+        uiInteraction = uiInteraction
     )
 
     Column {
@@ -125,7 +141,6 @@ private fun ProjectDetailsScreenContent(
                     )
                 }
             }
-            Dimensions.space22.HeightSpacer()
 
             TabContent(uiState, uiInteraction, navigation)
         }
@@ -146,7 +161,7 @@ private fun TabContent(
             TopicsScreenContent(uiState, uiInteraction, navigation)
         }
         AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 2) {
-            GroupScreenContent(uiState, uiInteraction)
+            GroupScreenContent(uiState)
         }
     }
 }
@@ -162,6 +177,35 @@ private fun AnimatedVisibilityTabContainer(
         exit = fadeOut() + slideOutHorizontally()
     ) {
         content()
+    }
+}
+
+@Composable
+private fun DeleteProjectDialog(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction,
+) {
+    if (uiState.isDeleteProjectDialogVisible) {
+        SimpleDialog(
+            title = stringResource(id = R.string.s61, uiState.projectData.name),
+            confirmButtonText = stringResource(id = R.string.yes),
+            closeButtonText = stringResource(id = R.string.no),
+            onCloseDialog = { uiInteraction.toggleDeleteProjectDialog() },
+            isLoading = uiState.isDialogLoading,
+            onConfirm = { uiInteraction.deleteProject() }
+        ) {
+            Text(
+                text = stringResource(id = R.string.delete_account_desc),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Dimensions.space10
+            Text(
+                text = stringResource(id = R.string.delete_account_desc2) + ".",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
     }
 }
 

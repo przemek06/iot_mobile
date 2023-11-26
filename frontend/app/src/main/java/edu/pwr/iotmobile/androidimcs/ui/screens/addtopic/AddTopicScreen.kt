@@ -44,7 +44,7 @@ fun AddTopicScreen(navigation: AddTopicNavigation) {
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        navigation.goBack()
+        navigation.openProjectDetails()
     }
     viewModel.toast.CollectToast(context)
 

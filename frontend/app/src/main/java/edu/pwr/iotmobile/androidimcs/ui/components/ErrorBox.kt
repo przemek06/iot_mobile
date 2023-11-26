@@ -1,5 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,31 +25,38 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 @Composable
 fun ErrorBox(
     modifier: Modifier = Modifier,
+    isVisible: Boolean,
     isFullScreen: Boolean = true
 ) {
-    Box(modifier = modifier.conditional(isFullScreen) { fillMaxSize() }) {
-        Column(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                modifier = Modifier.size(240.dp),
-                painter = painterResource(id = R.drawable.ic_thinking),
-                contentDescription = "Error image",
-                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
-            )
-            Dimensions.space22.HeightSpacer()
-            Text(
-                text = stringResource(id = R.string.s57),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Dimensions.space22.HeightSpacer()
-            Text(
-                text = stringResource(id = R.string.s58),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Box(modifier = modifier.conditional(isFullScreen) { fillMaxSize() }) {
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    modifier = Modifier.size(240.dp),
+                    painter = painterResource(id = R.drawable.ic_thinking),
+                    contentDescription = "Error image",
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
+                )
+                Dimensions.space22.HeightSpacer()
+                Text(
+                    text = stringResource(id = R.string.s57),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Dimensions.space22.HeightSpacer()
+                Text(
+                    text = stringResource(id = R.string.s58),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
         }
     }
 }

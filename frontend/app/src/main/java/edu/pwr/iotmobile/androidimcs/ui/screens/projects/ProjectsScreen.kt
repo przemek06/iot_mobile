@@ -40,15 +40,12 @@ fun ProjectsScreen(
     val context = LocalContext.current
     viewModel.toast.CollectToast(context)
 
-    if (uiState.isError) {
-        ErrorBox()
-    } else if (uiState.isLoading) {
-        LoadingBox()
-    }
+    ErrorBox(isVisible = uiState.isError)
+    LoadingBox(isVisible = uiState.isLoading)
 
     AnimatedVisibility(
         visible = !uiState.isError && !uiState.isLoading,
-        enter = fadeIn(initialAlpha = 0.3f),
+        enter = fadeIn(),
         exit = fadeOut()
     ) {
         ProjectsScreenContent(

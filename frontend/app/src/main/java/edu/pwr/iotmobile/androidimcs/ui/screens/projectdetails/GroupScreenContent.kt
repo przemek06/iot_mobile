@@ -32,8 +32,7 @@ private const val MAX_USERS_IN_LIST = 2
 
 @Composable
 fun GroupScreenContent(
-    uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiState: ProjectDetailsUiState
 ) {
     var isUserListExpanded by remember { mutableStateOf(false) }
 
@@ -44,6 +43,10 @@ fun GroupScreenContent(
     val bottomText = if (isUserListExpanded) R.string.hide else R.string.expand
 
     LazyColumn {
+        item {
+            Dimensions.space22.HeightSpacer()
+        }
+
         item {
             Role(uiState = uiState)
             Dimensions.space40.HeightSpacer()

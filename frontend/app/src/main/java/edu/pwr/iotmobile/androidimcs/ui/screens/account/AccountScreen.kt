@@ -44,11 +44,8 @@ fun AccountScreen(navigation: AccountNavigation) {
         viewModel.init(navigation)
     }
 
-    if (uiState.isError) {
-        ErrorBox()
-    } else if (uiState.isLoading) {
-        LoadingBox()
-    }
+    ErrorBox(isVisible = uiState.isError)
+    LoadingBox(isVisible = uiState.isLoading)
 
     AnimatedVisibility(
         visible = !uiState.isError && !uiState.isLoading,
