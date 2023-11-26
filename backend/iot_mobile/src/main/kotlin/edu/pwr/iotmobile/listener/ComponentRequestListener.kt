@@ -34,7 +34,8 @@ class ComponentRequestListener {
     )
     fun propagateChangesOnComponentAction(pjp: ProceedingJoinPoint, componentListDTO: ComponentListDTO) : ResponseEntity<*> {
         val dashboardId = componentListDTO.dashboardId
-        val oldComponentListDto = componentService.findAllByDashboardIdNoSecurity(dashboardId)
+        val entities = componentService.findAllEntitiesByDashboardIdNoSecurity(dashboardId)
+        val oldComponentListDto = ComponentListDTO(dashboardId, componentService.entitiesToDTOs(entities))
 
         val result = pjp.proceed()
 
@@ -52,7 +53,8 @@ class ComponentRequestListener {
             resultComponentListDTO.components.filter { it.id !in oldComponentListDto.components.map { it2 -> it2.id } }
                 .filter { it.componentType == EComponentType.TRIGGER }
 
-        toAdd.forEach { integrationManager.addIntegrationAction(it.toEntity(dashboardId) as TriggerComponent) }
+        val connectionKey = entities.map { it.dashboard.project.connectionKey }.distinct().firstOrNull()
+        connectionKey?.let { toAdd.forEach { c -> integrationManager.addIntegrationAction(c.toEntity(dashboardId) as TriggerComponent, it) } }
         toDelete.forEach { it.id?.let { it1 -> integrationManager.removeIntegrationAction(it1) } }
 
         componentChangeService.processEntityChange(resultComponentListDTO)

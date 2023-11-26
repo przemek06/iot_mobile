@@ -8,7 +8,6 @@ import edu.pwr.iotmobile.error.exception.*
 import edu.pwr.iotmobile.rabbit.queue.QueueService
 import edu.pwr.iotmobile.repositories.MessageRepository
 import lombok.extern.slf4j.Slf4j
-import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -40,7 +39,7 @@ class MessageService (
         val messageStr = objectMapper.writeValueAsString(message)
 
         try {
-            queueService.sendMessage(message.topic.uniqueName, messageStr)
+            queueService.sendMessage(message.topic.uniqueName, messageStr, message.connectionKey)
             return saved.toDTO()
         } catch (_: Exception) {
             throw QueueException()
@@ -58,7 +57,7 @@ class MessageService (
         val messageStr = objectMapper.writeValueAsString(message)
 
         try {
-            queueService.sendMessage(message.topic.uniqueName, messageStr)
+            queueService.sendMessage(message.topic.uniqueName, messageStr, message.connectionKey)
             return saved.toDTO()
         } catch (_: Exception) {
             throw QueueException()

@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.service
 
+import edu.pwr.iotmobile.dto.TopicConnectionDTO
 import edu.pwr.iotmobile.dto.TopicDTO
 import edu.pwr.iotmobile.entities.Topic
 import edu.pwr.iotmobile.error.exception.*
@@ -71,5 +72,19 @@ class TopicService(
 
     fun isTopicUsed(topicId: Int) : Boolean {
         return topicRepository.countTopicUsage(topicId) > 0
+    }
+
+    fun findAllByUniqueNames(uniqueNames: List<String>) : List<Topic> {
+        return topicRepository.findAllByUniqueNameIn(uniqueNames)
+    }
+
+    fun findByUniqueName(uniqueName: String) : Topic {
+        return topicRepository.findByUniqueName(uniqueName) ?: throw TopicNotFoundException()
+    }
+
+    fun findForDevice(topicConnectionDTO: TopicConnectionDTO) : TopicDTO {
+        val topic = findByUniqueName(topicConnectionDTO.uniqueName)
+        if (topic.project.connectionKey != topicConnectionDTO.connectionKey) throw NotAllowedException()
+        return topic.toDTO()
     }
 }
