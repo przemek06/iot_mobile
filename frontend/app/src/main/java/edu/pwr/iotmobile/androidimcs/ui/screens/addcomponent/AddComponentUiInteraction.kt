@@ -14,6 +14,8 @@ interface AddComponentUiInteraction {
     )
     fun onChooseDiscordChannel(index: Int)
 
+    fun checkInputFields()
+
     companion object {
         fun default(
             viewModel: AddComponentViewModel
@@ -44,6 +46,10 @@ interface AddComponentUiInteraction {
                 viewModel.onChooseDiscordChannel(index)
             }
 
+            override fun checkInputFields() {
+                viewModel.checkInputFields()
+            }
+
         }
 
         fun empty() = object : AddComponentUiInteraction {
@@ -53,6 +59,7 @@ interface AddComponentUiInteraction {
             override fun onChooseTopic(topic: Topic) {}
             override fun onTextChange(type: AddComponentViewModel.SettingType, text: String) {}
             override fun onChooseDiscordChannel(index: Int) {}
+            override fun checkInputFields() {}
         }
     }
 }

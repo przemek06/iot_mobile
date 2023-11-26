@@ -200,4 +200,5 @@
     <string name="s63">Dashboard with this name already exists</string>
     <string name="s64">Are you sure you want to delete this dashboard (%s)?</string>
     <string name="s65">The dashboard will be deleted for all users.</string>
+    <string name="s66">This field cannot be empty</string>
 </resources>

@@ -67,7 +67,10 @@ fun ProjectDetailsScreen(
     }
     viewModel.toast.CollectToast(context)
 
-    ErrorBox(isVisible = uiState.isError)
+    ErrorBox(
+        isVisible = uiState.isError,
+        onReturn = navigation::onReturn
+    )
     LoadingBox(isVisible = uiState.isLoading)
 
     AnimatedVisibility(

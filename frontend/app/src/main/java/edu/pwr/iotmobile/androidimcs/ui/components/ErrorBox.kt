@@ -26,7 +26,8 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 fun ErrorBox(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
-    isFullScreen: Boolean = true
+    isFullScreen: Boolean = true,
+    onReturn: () -> Unit
 ) {
     AnimatedVisibility(
         visible = isVisible,
@@ -56,6 +57,10 @@ fun ErrorBox(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
+                Dimensions.space30.HeightSpacer()
+                ButtonCommon(text = stringResource(id = R.string.return_text)) {
+                    onReturn()
+                }
             }
         }
     }
