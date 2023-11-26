@@ -110,8 +110,12 @@ private fun NavigationWrapper(
                 onReturn = navigation::onReturn
             )
             Dimensions.space14.HeightSpacer()
-            Column(modifier = Modifier.padding(horizontal = Dimensions.space22)) {
+            Column(
+                modifier = Modifier
+                    .padding(start = Dimensions.space22, end = Dimensions.space22, bottom = BOTTOM_BAR_HEIGHT)
+            ) {
                 content()
+                Dimensions.space22.HeightSpacer()
             }
         }
         BottomNavigationBar(

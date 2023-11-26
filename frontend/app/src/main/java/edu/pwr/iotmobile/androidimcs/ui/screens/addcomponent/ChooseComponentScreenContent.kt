@@ -35,6 +35,7 @@ fun ChooseComponentScreenContent(
     uiInteraction: AddComponentUiInteraction
 ) {
     LazyVerticalGrid(
+        modifier = Modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.space30),
         verticalArrangement = Arrangement.spacedBy(Dimensions.space14)

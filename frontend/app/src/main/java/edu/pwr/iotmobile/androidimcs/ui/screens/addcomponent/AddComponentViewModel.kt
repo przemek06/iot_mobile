@@ -178,13 +178,13 @@ class AddComponentViewModel(
         viewModelScope.launch {
             try {
                 val discordKey = integrationRepository.getDiscordKey() ?: kotlin.run {
-                    toast.toast("Failed to get discord key")
+                    toast.toast("Operation failed.")
                     return@launch
                 }
                 _discordKey = discordKey
 
                 val discordUrl = integrationRepository.getDiscordUrl(discordKey) ?: kotlin.run {
-                    toast.toast("Failed to load discord url")
+                    toast.toast("Operation failed.")
                     return@launch
                 }
 
@@ -194,7 +194,7 @@ class AddComponentViewModel(
                 event.event(DISCORD_EVENT)
             } catch (e: Exception) {
                 Log.e("Trigger", "Cannot open discord web", e)
-                toast.toast("Failed to load discord url")
+                toast.toast("Operation failed.")
             }
         }
     }
@@ -375,7 +375,7 @@ class AddComponentViewModel(
         try {
             val discordKey = _discordKey ?: return emptyList()
             val guildId = integrationRepository.getGuildId(discordKey) ?: kotlin.run {
-                toast.toast("Failed to get discord key")
+                toast.toast("Operation failed.")
                 return emptyList()
             }
             val channels = integrationRepository.getDiscordChannels(guildId)
@@ -383,7 +383,7 @@ class AddComponentViewModel(
                 it.toDiscordChannel()
             }
         } catch (e: Exception) {
-            toast.toast("Failed to load discord channels")
+            toast.toast("Operation failed.")
             return emptyList()
         }
     }
