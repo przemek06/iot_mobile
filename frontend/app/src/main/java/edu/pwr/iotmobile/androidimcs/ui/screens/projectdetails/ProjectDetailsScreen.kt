@@ -57,6 +57,10 @@ fun ProjectDetailsScreen(
         viewModel.init(navigation)
     }
 
+    LaunchedEffect(navigation.isTopicSuccess) {
+        viewModel.updateTopics()
+    }
+
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
         navigation.onReturn()

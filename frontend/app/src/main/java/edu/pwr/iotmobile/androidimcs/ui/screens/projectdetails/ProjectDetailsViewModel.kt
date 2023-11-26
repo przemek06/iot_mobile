@@ -270,7 +270,7 @@ class ProjectDetailsViewModel(
         return emptyList()
     }
 
-    private fun updateTopics() {
+    fun updateTopics() {
         val localProjectId = _projectId ?: run {
             _uiState.update { it.copy(isError = true) }
             return

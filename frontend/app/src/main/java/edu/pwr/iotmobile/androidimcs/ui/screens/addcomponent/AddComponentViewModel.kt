@@ -173,6 +173,16 @@ class AddComponentViewModel(
         }
     }
 
+    fun updateTopics() {
+        viewModelScope.launch {
+            val projectId = _projectId ?: return@launch
+            val topics = getTopicsForProject(projectId)
+            _uiState.update {
+                it.copy(topics = topics)
+            }
+        }
+    }
+
     private fun checkIfChosenComponentDiscord() =
         _uiState.value.chosenComponentType == ComponentDetailedType.Discord
 
