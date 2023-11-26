@@ -21,12 +21,8 @@ fun LazyStaggeredGridItemScope.SliderComponent(
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
 ) {
-    // TODO: get current value from other place than topic
     val minValue = item.minValue?.toFloat()
     val maxValue = item.maxValue?.toFloat()
-    val middlePoint = if (minValue != null && maxValue != null)
-        maxValue + minValue / 2
-    else 0f
 
     ComponentWrapper(
         item = item,
@@ -43,10 +39,10 @@ fun LazyStaggeredGridItemScope.SliderComponent(
             if (minValue != null && maxValue != null) {
                 Slider(
                     modifier = Modifier.align(Alignment.Center),
-                    value = item.currentValue?.toFloat() ?: middlePoint,
+                    value = item.currentValue?.toFloat() ?: minValue,
                     valueRange = minValue..maxValue,
-                    onValueChange = { uiInteraction.onLocalComponentValueChange(item, item.currentValue) },
-                    onValueChangeFinished = { uiInteraction.onComponentClick(item, item.currentValue) }
+                    onValueChange = { f -> uiInteraction.onLocalComponentValueChange(item, f) },
+                    onValueChangeFinished = { uiInteraction.onComponentClick(item, item.currentValue ?: item.minValue) }
                 )
             }
         }

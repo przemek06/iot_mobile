@@ -48,6 +48,8 @@ import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ButtonComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.DiscordComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.EmailComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.GraphComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SliderComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ToggleComponent
@@ -110,7 +112,7 @@ fun ComponentsList(
         }
         for (item in uiState.components) {
             val itemSpan =
-                if (item.isFullLine) StaggeredGridItemSpan.FullLine
+                if (item.size == 2) StaggeredGridItemSpan.FullLine
                 else StaggeredGridItemSpan.SingleLane
 
             item(
@@ -118,7 +120,6 @@ fun ComponentsList(
                 span = itemSpan
             ) {
                 ComponentChoice(
-                    uiState = uiState,
                     item = item,
                     uiInteraction = uiInteraction,
                     onPlaceItem = {
@@ -136,7 +137,6 @@ fun ComponentsList(
 
 @Composable
 fun LazyStaggeredGridItemScope.ComponentChoice(
-    uiState: DashboardUiState,
     item: ComponentData,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
@@ -165,17 +165,26 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
             coroutineScope = coroutineScope
         )
         
-        ComponentDetailedType.Graph -> GraphComponent(
-            uiState = uiState,
+        ComponentDetailedType.LineGraph -> GraphComponent(
             item = item,
             uiInteraction = uiInteraction,
             onPlaceItem = onPlaceItem,
             coroutineScope = coroutineScope
         )
 
-        // TODO: other component types
+        ComponentDetailedType.Discord -> DiscordComponent(
+            item = item,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
 
-        else -> {}
+        ComponentDetailedType.Email -> EmailComponent(
+            item = item,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
 
     }
 }
@@ -261,7 +270,7 @@ fun LazyStaggeredGridItemScope.ComponentWrapper(
     ) {
         Card(
             modifier = Modifier
-                .height(140.dp)
+                .height(item.height)
                 .clip(CardDefaults.shape),
             border = BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.primary),
             colors = CardDefaults.cardColors(

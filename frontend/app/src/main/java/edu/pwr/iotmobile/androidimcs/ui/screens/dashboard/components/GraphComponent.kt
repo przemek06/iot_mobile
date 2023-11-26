@@ -26,16 +26,13 @@ import androidx.compose.ui.unit.sp
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
-import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiState
 import kotlinx.coroutines.CoroutineScope
 import java.time.LocalDateTime
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LazyStaggeredGridItemScope.GraphComponent(
-    uiState: DashboardUiState,
     item: ComponentData,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,

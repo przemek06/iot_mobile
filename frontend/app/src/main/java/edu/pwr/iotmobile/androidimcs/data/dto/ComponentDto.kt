@@ -17,7 +17,7 @@ data class ComponentDto(
 )
 
 data class ActionDestinationDTO(
-    val id: Int?,
+    val id: Int? = null,
     val type: EActionDestinationType,
     val token: String,
 )
