@@ -13,6 +13,7 @@ data class AccountUiState(
     val inputField: InputFieldData,
     val statList: List<StatData>,
     val options: List<MenuOption>,
+    val isLoading: Boolean,
     val isError: Boolean
 ) {
     companion object {
@@ -40,6 +41,7 @@ data class AccountUiState(
             statList = statList,
             options = options,
             user = user,
+            isLoading = true,
             isError = false
         )
     }

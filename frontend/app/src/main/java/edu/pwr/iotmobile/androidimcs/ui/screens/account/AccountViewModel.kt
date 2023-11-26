@@ -23,6 +23,11 @@ class AccountViewModel(
     val uiState = _uiState.asStateFlow()
 
     fun init(navigation: AccountNavigation) {
+        _uiState.update {
+            it.copy(
+                isLoading = true
+            )
+        }
 
         val changePasswordOption = MenuOption(
             titleId = R.string.change_password
@@ -39,14 +44,16 @@ class AccountViewModel(
                         it.copy(
                             user = user,
                             changePasswordOption = changePasswordOption,
-                            isError = false
+                            isError = false,
+                            isLoading = false
                         )
                     }
                 } else {
                     Log.d("Account", "Error while getting user data")
                     _uiState.update {
                         it.copy(
-                            isError = true
+                            isError = true,
+                            isLoading = false
                         )
                     }
                 }
@@ -54,7 +61,8 @@ class AccountViewModel(
                 Log.e("Account", "Error while getting user data", e)
                 _uiState.update {
                     it.copy(
-                        isError = true
+                        isError = true,
+                        isLoading = false
                     )
                 }
             }
@@ -68,6 +76,7 @@ class AccountViewModel(
             }
             return
         }
+        updateLoading(true)
 
         viewModelScope.launch {
             try {
@@ -88,20 +97,26 @@ class AccountViewModel(
                     _uiState.update {
                         it.copy(
                             user = user,
-                            inputField = it.inputField.copy(isError = false)
+                            inputField = it.inputField.copy(isError = false),
+                            isLoading = false
                         )
                     }
 
                     toast.toast("Successfully updated display name")
+                }.onFailure {
+                    updateLoading(false)
+                    toast.toast("Could not update display name.")
                 }
             } catch (e: Exception) {
                 Log.e("Account", "Error when updating user data.", e)
-                toast.toast("Could not update display name")
+                updateLoading(false)
+                toast.toast("Could not update display name.")
             }
         }
     }
 
     fun deleteAccount(navigation: AccountNavigation) {
+        updateLoading(true)
         viewModelScope.launch {
             try {
                 val result = userRepository.deleteActiveUser()
@@ -111,9 +126,11 @@ class AccountViewModel(
                     navigation.openLogin()
                     return@launch
                 }
+                updateLoading(false)
                 toast.toast("Failed to delete user account.")
             } catch (e: Exception) {
                 Log.e("Account", "Error while logging out.", e)
+                updateLoading(false)
                 toast.toast("Failed to delete user account.")
             }
         }
@@ -126,6 +143,7 @@ class AccountViewModel(
     }
 
     fun logout(navigation: AccountNavigation) {
+        updateLoading(true)
         viewModelScope.launch {
             try {
                 val result = userRepository.logout()
@@ -136,9 +154,17 @@ class AccountViewModel(
                 result.onFailure {
                     toast.toast("Could not log out")
                 }
+                updateLoading(false)
             } catch (e: Exception) {
                 Log.e("Account", "Error while logging out.", e)
+                updateLoading(false)
             }
+        }
+    }
+
+    private fun updateLoading(value: Boolean) {
+        _uiState.update {
+            it.copy(isLoading = value)
         }
     }
 }

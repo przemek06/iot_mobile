@@ -1,5 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.account
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +28,7 @@ import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
@@ -42,7 +46,15 @@ fun AccountScreen(navigation: AccountNavigation) {
 
     if (uiState.isError) {
         ErrorBox()
-    } else {
+    } else if (uiState.isLoading) {
+        LoadingBox()
+    }
+
+    AnimatedVisibility(
+        visible = !uiState.isError && !uiState.isLoading,
+        enter = fadeIn(initialAlpha = 0.3f),
+        exit = fadeOut()
+    ) {
         AccountScreenContent(
             uiState = uiState,
             uiInteraction = AccountUiInteraction.default(viewModel),
