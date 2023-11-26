@@ -1,9 +1,6 @@
 package edu.pwr.iotmobile.config
 
-import edu.pwr.iotmobile.websocket.ComponentChangeWebSocketHandler
-import edu.pwr.iotmobile.websocket.IncomingMessageWebSocketHandler
-import edu.pwr.iotmobile.websocket.InvitationAlertWebSocketHandler
-import edu.pwr.iotmobile.websocket.ProjectDeletedWebSocketHandler
+import edu.pwr.iotmobile.websocket.*
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.socket.config.annotation.EnableWebSocket
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer
@@ -16,7 +13,8 @@ class WebSocketConfig(
         val componentChangeWebSocketHandler: ComponentChangeWebSocketHandler,
         val invitationAlertWebSocketHandler: InvitationAlertWebSocketHandler,
         val projectDeletedWebSocketHandler: ProjectDeletedWebSocketHandler,
-        val incomingMessageWebSocketHandler: IncomingMessageWebSocketHandler
+        val incomingMessageWebSocketHandler: IncomingMessageWebSocketHandler,
+        val deviceIncomingMessageWebSocketHandler: DeviceIncomingMessageWebSocketHandler
 )
     : WebSocketConfigurer {
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
@@ -32,5 +30,8 @@ class WebSocketConfig(
         registry
                 .addHandler(incomingMessageWebSocketHandler, "/messages")
                 .setAllowedOrigins("*")
+        registry
+            .addHandler(deviceIncomingMessageWebSocketHandler, "/messages/device")
+            .setAllowedOrigins("*")
     }
 }

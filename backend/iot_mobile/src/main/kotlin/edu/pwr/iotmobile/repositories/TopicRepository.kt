@@ -18,4 +18,7 @@ interface TopicRepository : JpaRepository<Topic, Int> {
             "WHERE t.id = :id")
     fun countTopicUsage(@Param("id") id: Int) : Int
 
+    fun findAllByUniqueNameIn(uniqueNames: List<String>) : List<Topic>
+    fun findByUniqueName(uniqueName: String) : Topic?
+
 }

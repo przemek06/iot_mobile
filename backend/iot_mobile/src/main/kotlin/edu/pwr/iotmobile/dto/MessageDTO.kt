@@ -13,7 +13,7 @@ data class MessageDTO(
     val message: String,
     @field:NotNull
     val connectionKey: String,
-    val tsSent: String,
+    val tsSent: String = LocalDateTime.now().toString(),
     val id: Int?=null
 ){
 
