@@ -55,11 +55,13 @@ class DashboardViewModel(
 
     override fun onCleared() {
         componentsListener?.closeWebSocket()
+        messageReceivedListener?.closeWebSocket()
     }
 
     fun init(dashboardId: Int, projectId: Int?) {
         if (dashboardId == _dashboardId) return
         _projectId = projectId
+        _dashboardId = dashboardId
 
         componentsListener?.closeWebSocket()
         componentsListener = ComponentChangeWebSocketListener(
@@ -148,8 +150,7 @@ class DashboardViewModel(
                 }
         }
         _lastMessages = newMessages
-        Log.d("Web", "newMessages")
-        Log.d("Web", newMessages.toString())
+
         _uiState.update { ui ->
             ui.copy(components = ui.components.map { item ->
                 item.topic?.id?.let {
@@ -182,9 +183,6 @@ class DashboardViewModel(
     }
 
     fun onComponentClick(item: ComponentData, value: Any?) {
-        // TODO: implement - different behaviour based on type,
-        Log.d("Check", "value")
-        Log.d("Check", value.toString())
         val message = when (item.type) {
 
             ComponentDetailedType.Button -> { item.onSendValue }
@@ -210,6 +208,11 @@ class DashboardViewModel(
         }
 
         viewModelScope.launch(Dispatchers.Default) {
+            if (message == null) {
+                toast.toast("Error while sending message.")
+                return@launch
+            }
+
             val connectionKey = getConnectionKey()
             val messageDto = item.toMessageDto(
                 value = message.toString(),
@@ -220,8 +223,8 @@ class DashboardViewModel(
                 return@launch
             }
 
-            Log.d("mess", "messageDto")
-            Log.d("mess", messageDto.toString())
+            Log.d("Message", "messageDto")
+            Log.d("Message", messageDto.toString())
 
             kotlin.runCatching {
                 messageRepository.sendMessage(messageDto)
@@ -235,13 +238,13 @@ class DashboardViewModel(
         }
     }
 
-    fun onLocalComponentValueChange(item: ComponentData, value: String?) {
+    fun onLocalComponentValueChange(item: ComponentData, value: Any?) {
         when (item.type) {
 
             ComponentDetailedType.Slider -> {
                 val newItems = uiState.value.components.map {
                     if (it.id == item.id) {
-                        item.copy(currentValue = value)
+                        item.copy(currentValue = value?.toString())
                     } else it
                 }
                 _uiState.update {
@@ -324,7 +327,7 @@ class DashboardViewModel(
 
             // Calculate the current distance squared.
             val currComponent = components.getOrNull(currentItemIndex) ?: return null
-            val width = if (draggedComponent.isFullLine) windowWidth else windowWidth/2
+            val width = if (draggedComponent.size == 2) windowWidth else windowWidth/2
             val draggedCenterPos = draggedComponent.absolutePosition + Offset(width/2, draggedComponent.height.value/2)
             val currCenterPos = currComponent.absolutePosition + Offset(width/2, currComponent.height.value/2)
             val currDiff = (draggedCenterPos - currCenterPos).getDistanceSquared()
@@ -341,12 +344,17 @@ class DashboardViewModel(
 
     private suspend fun getLastMessages(): List<TopicMessagesDto> {
         val id = _dashboardId ?: return emptyList()
-        return messageRepository.getLastMessagesForDashboard(id)
+        return try {
+            messageRepository.getLastMessagesForDashboard(id)
+        } catch (e: Exception) {
+            Log.e("Messages", "Last messages not received", e)
+            emptyList()
+        }
     }
 
     private fun getLastMessage(topicId: Int) = _lastMessages
         .firstOrNull { it.topicId == topicId }
-        ?.messages?.last()
+        ?.messages?.lastOrNull()
         ?.message
 
     private suspend fun getConnectionKey(): String? {

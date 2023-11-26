@@ -37,7 +37,7 @@ class IntegrationController(val integrationService: IntegrationService) {
         return ResponseEntity.ok(integrationService.getDiscordKey())
     }
 
-    @GetMapping("/user/discord/oauth")
+    @GetMapping("/user/discord/oauth/{key}")
     fun getDiscordOAuthUrl(@PathVariable key: String): ResponseEntity<UriDTO> {
         return ResponseEntity.ok(integrationService.getDiscordOAuthUrl(key))
     }

@@ -9,7 +9,5 @@ enum class ComponentDetailedType(
     Slider(ComponentType.INPUT, 2),
     Discord(ComponentType.TRIGGER, 1),
     Email(ComponentType.TRIGGER, 1),
-    Graph(ComponentType.OUTPUT, 2),
-//        LineGraph,
-//        SpeedGraph
+    LineGraph(ComponentType.OUTPUT, 2),
 }

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
@@ -44,19 +45,19 @@ class AddComponentViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var _projectId: Int? = null
+    private var _discordKey: String? = null
 
     fun init(projectId: Int) {
         if (_projectId == null || projectId != _projectId) {
             _projectId = projectId
             viewModelScope.launch(Dispatchers.Default) {
                 val topics = getTopicsForProject(projectId)
-                val discordUrl = integrationRepository.getDiscordUrl()
                 _uiState.update {
                     it.copy(
                         inputComponents = generateInputComponents(),
+                        outputComponents = generateOutputComponents(),
                         triggerComponents = generateTriggerComponents(),
                         topics = topics,
-                        discordUrl = discordUrl
                     )
                 }
             }
@@ -144,18 +145,15 @@ class AddComponentViewModel(
         }
     }
 
-    fun handleUri(uri: Uri?) {
+    fun handleUri() {
         viewModelScope.launch {
-            val type = uri?.getQueryParameter("type")
-            val id = uri?.getQueryParameter("id")
-
-            when (type) {
-                "discord" -> {
+            when (uiState.value.chosenComponentType) {
+                ComponentDetailedType.Discord -> {
                     _uiState.update {
                         it.copy(
                             currentPage = AddComponentPage.Additional,
                             bottomNavData = getBottomNavData(AddComponentPage.Additional),
-                            discordChannels = id?.let { it1 -> generateDiscordChannels(it1) } ?: emptyList()
+                            discordChannels = generateDiscordChannels()
                         )
                     }
                 }
@@ -178,7 +176,26 @@ class AddComponentViewModel(
 
     private fun openDiscord() {
         viewModelScope.launch {
-            event.event(DISCORD_EVENT)
+            try {
+                val discordKey = integrationRepository.getDiscordKey() ?: kotlin.run {
+                    toast.toast("Operation failed.")
+                    return@launch
+                }
+                _discordKey = discordKey
+
+                val discordUrl = integrationRepository.getDiscordUrl(discordKey) ?: kotlin.run {
+                    toast.toast("Operation failed.")
+                    return@launch
+                }
+
+                _uiState.update {
+                    it.copy(discordUrl = discordUrl)
+                }
+                event.event(DISCORD_EVENT)
+            } catch (e: Exception) {
+                Log.e("Trigger", "Cannot open discord web", e)
+                toast.toast("Operation failed.")
+            }
         }
     }
 
@@ -214,7 +231,8 @@ class AddComponentViewModel(
             onSendAlternative = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
             maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,
             minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text,
-            actionDestinationDTO = locUiState.discordChannels.toActionDestinationDTO()
+            actionDestinationDTO = locUiState.discordChannels.toActionDestinationDTO() ?: getEmailActionDestinationDto(),
+            pattern = locUiState.settings[SettingType.Description]?.inputFieldData?.text
         )
     }
 
@@ -223,6 +241,13 @@ class AddComponentViewModel(
             id = null,
             type = EActionDestinationType.DISCORD,
             token = this.firstOrNull { it.isChecked }?.id ?: return null
+        )
+    }
+
+    private fun getEmailActionDestinationDto(): ActionDestinationDTO? {
+        return ActionDestinationDTO(
+            type = EActionDestinationType.EMAIL,
+            token = uiState.value.settings[SettingType.Title]?.inputFieldData?.text ?: return null
         )
     }
 
@@ -322,6 +347,23 @@ class AddComponentViewModel(
                 )
             )
 
+            ComponentDetailedType.Email -> mapOf(
+                SettingType.Title to SettingData(
+                    title = R.string.s54,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s54
+                    ),
+                    isDescription = true
+                ),
+                SettingType.Description to SettingData(
+                    title = R.string.a_s52,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
+
             else -> emptyMap()
 
         }
@@ -329,10 +371,20 @@ class AddComponentViewModel(
         return defaultFields + specificFields
     }
 
-    private suspend fun generateDiscordChannels(guildId: String): List<DiscordChannel> {
-        val channels = integrationRepository.getDiscordChannels(guildId)
-        return channels.map {
-            it.toDiscordChannel()
+    private suspend fun generateDiscordChannels(): List<DiscordChannel> {
+        try {
+            val discordKey = _discordKey ?: return emptyList()
+            val guildId = integrationRepository.getGuildId(discordKey) ?: kotlin.run {
+                toast.toast("Operation failed.")
+                return emptyList()
+            }
+            val channels = integrationRepository.getDiscordChannels(guildId)
+            return channels.map {
+                it.toDiscordChannel()
+            }
+        } catch (e: Exception) {
+            toast.toast("Operation failed.")
+            return emptyList()
         }
     }
 
@@ -359,13 +411,25 @@ class AddComponentViewModel(
         )
     )
 
+    private fun generateOutputComponents() = listOf(
+        ComponentChoiceData(
+            titleId = R.string.s55,
+            iconRes = R.drawable.ic_graph_time,
+            type = ComponentDetailedType.LineGraph
+        ),
+    )
+
     private fun generateTriggerComponents() = listOf(
         ComponentChoiceData(
             titleId = R.string.a_s50,
             iconRes = R.drawable.ic_discord,
             type = ComponentDetailedType.Discord
         ),
-        // TODO: add email
+        ComponentChoiceData(
+            titleId = R.string.s53,
+            iconRes = R.drawable.ic_mail,
+            type = ComponentDetailedType.Email
+        ),
     )
 
     data class BottomNavData(
@@ -399,7 +463,8 @@ class AddComponentViewModel(
         OnToggleOffSend,
         MaxValue,
         MinValue,
-        Description
+        Description,
+        Title
     }
 
     companion object {
