@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.integration
 
+import edu.pwr.iotmobile.dto.MessageDTO
 import edu.pwr.iotmobile.service.MailService
 import edu.pwr.iotmobile.service.ProjectService
 import org.slf4j.Logger
@@ -15,13 +16,13 @@ class EmailIntegrationAction(
 
     val logger: Logger = LoggerFactory.getLogger("EmailIntegrationAction")
 
-    override fun performAction(data: String) {
+    override fun performAction(data: MessageDTO) {
         try {
             val users = projectService
                 .findAllUsersByProjectIdNoSecurity(projectId)
 
             users.forEach {
-                val message = pattern.format(data, it.name)
+                val message = pattern.format(data.message, it.name)
                 mailService.sendHtmlMail(subject, it.email, message)
             }
         } catch (e: java.lang.Exception) {
