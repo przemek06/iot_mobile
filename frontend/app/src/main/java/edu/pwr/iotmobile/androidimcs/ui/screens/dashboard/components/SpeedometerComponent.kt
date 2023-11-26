@@ -1,8 +1,10 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components
 
+import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +24,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.rotate
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
@@ -53,17 +56,21 @@ fun LazyStaggeredGridItemScope.Speedometer(
 
         val gaugeDegrees = 180
         val startAngle = 180f
-        val yOffset = 1.65f
+        val ratio = 1.5f
+
         val max = item.maxValue?.toFloatOrNull() ?: 0f
         val min = item.minValue?.toFloatOrNull() ?: 0f
 
-        val primaryColor = MaterialTheme.colorScheme.tertiary
-        val needlePaint = remember { Paint().apply { color = primaryColor } }
+        val onBackground = MaterialTheme.colorScheme.onBackground
+        val needlePaint = remember { Paint().apply { color = onBackground } }
+        val font = MaterialTheme.typography.bodySmall.fontFamily
+        val context = LocalContext.current
         val textPaint = remember {
             android.graphics.Paint().apply {
-                color = primaryColor.toArgb()
+                color = onBackground.toArgb()
                 textSize = textFontSize
                 textAlign = android.graphics.Paint.Align.CENTER
+                //typeface = Typeface.createFromAsset(context.assets, "font/readexpro_regular.ttf")
             }
         }
 
@@ -80,16 +87,18 @@ fun LazyStaggeredGridItemScope.Speedometer(
             contentAlignment = Alignment.Center
         ) {
 
-            val canvasSize = min(constraints.maxWidth, constraints.maxHeight)
+            val canvasSize = min(constraints.maxWidth, (constraints.maxHeight * ratio).toInt())
             val size = Size(canvasSize.toFloat(), canvasSize.toFloat())
             val canvasSizeDp = with(density) { canvasSize.toDp() }
             val w = size.width
             val h = size.height
-            val center = Offset(w / 2, h * yOffset / 2)
+            val center = Offset(w / 2, h / 2)
             val textY = center.y + textFontSize + fontPadding
 
             Canvas(
-                modifier = Modifier.size(canvasSizeDp),
+                modifier = Modifier
+                    .size(canvasSizeDp)
+                    .offset(y = 25.dp),
                 onDraw = {
 
                     /** Gauge implementation */
@@ -98,8 +107,7 @@ fun LazyStaggeredGridItemScope.Speedometer(
                         startAngle = startAngle,
                         sweepAngle = gaugeDegrees.toFloat(),
                         useCenter = false,
-                        topLeft = Offset(x = -(size.width * (yOffset - 1f)) / 2, y = 0f),
-                        size = size.times(yOffset),
+                        size = Size(width = size.width, height = size.width),
                         style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                     )
 
@@ -125,7 +133,7 @@ fun LazyStaggeredGridItemScope.Speedometer(
                             Path().apply {
                                 moveTo(center.x, center.x)
                                 lineTo(center.x, center.y + needleBaseSize)
-                                lineTo( - center.x / 3, center.y)
+                                lineTo(w / 16 , center.y)
                                 lineTo(center.x, center.y - 5)
                                 close()
                             },
@@ -141,16 +149,24 @@ fun LazyStaggeredGridItemScope.Speedometer(
                             textY,
                             textPaint
                         )
-
                         canvas.nativeCanvas.drawText(
-                            min.round(1).toString(),
-                            -center.x / 2,
+                            item.name,
+                            center.x,
+                            textPaint.fontMetrics.ascent,
+                            textPaint
+                        )
+
+                        val minStr = min.round(1).toString()
+                        val maxStr = max.round(1).toString()
+                        canvas.nativeCanvas.drawText(
+                            minStr,
+                            textPaint.measureText(minStr) / 2,
                             textY,
                             textPaint
                         )
                         canvas.nativeCanvas.drawText(
-                            max.round(1).toString(),
-                            w * 1.25f,
+                            maxStr,
+                            w - textPaint.measureText(maxStr) / 2,
                             textY,
                             textPaint
                         )
