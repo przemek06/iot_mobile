@@ -1,7 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,19 +21,22 @@ fun ChooseTopicScreenContent(
     uiInteraction: AddComponentUiInteraction,
     navigation: AddComponentNavigation
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            text = stringResource(id = R.string.s28),
-            style = MaterialTheme.typography.titleSmall
-        )
-        Dimensions.space22.HeightSpacer()
-        ButtonCommon(
-            text = stringResource(id = R.string.add_new_topic),
-            type = ButtonCommonType.Secondary,
-            onClick = { navigation.openAddNewTopic() }
-        )
-        Dimensions.space22.HeightSpacer()
-        uiState.topics.forEach {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            Text(
+                text = stringResource(id = R.string.s28),
+                style = MaterialTheme.typography.titleSmall
+            )
+            Dimensions.space22.HeightSpacer()
+            ButtonCommon(
+                text = stringResource(id = R.string.add_new_topic),
+                type = ButtonCommonType.Secondary,
+                onClick = { navigation.openAddNewTopic() }
+            )
+            Dimensions.space22.HeightSpacer()
+        }
+
+        items(uiState.topics) {
             RadioButtonWithText(
                 text = it.title,
                 isSelected = uiState.chosenTopic?.id == it.id,

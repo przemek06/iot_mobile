@@ -40,6 +40,5 @@ fun LazyStaggeredGridItemScope.ButtonComponent(
                 onClick = { uiInteraction.onComponentClick(item, item.onSendValue) },
             )
         }
-
     }
 }

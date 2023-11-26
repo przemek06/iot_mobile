@@ -1,5 +1,12 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,9 +15,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
-import edu.pwr.iotmobile.androidimcs.data.ComponentType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
+import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
+import edu.pwr.iotmobile.androidimcs.data.dto.DiscordChannelDto
+import edu.pwr.iotmobile.androidimcs.data.dto.EActionDestinationType
 import edu.pwr.iotmobile.androidimcs.data.scopestates.ComponentsListState
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
@@ -18,6 +27,7 @@ import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.IntegrationRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,18 +36,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.scope.ScopeID
 
-private val BottomNavDataList = listOf(
-    AddComponentViewModel.BottomNavData(),
-    AddComponentViewModel.BottomNavData(hasPrevButton = true),
-    AddComponentViewModel.BottomNavData(
-        nextButtonText = R.string.confirm,
-        hasPrevButton = true
-    )
-)
-
 class AddComponentViewModel(
     private val topicRepository: TopicRepository,
     private val componentRepository: ComponentRepository,
+    private val integrationRepository: IntegrationRepository,
     val event: Event,
     val toast: Toast
 ) : ViewModel() {
@@ -45,6 +47,7 @@ class AddComponentViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var _projectId: Int? = null
+    private var _discordKey: String? = null
 
     fun init(projectId: Int) {
         if (_projectId == null || projectId != _projectId) {
@@ -54,7 +57,9 @@ class AddComponentViewModel(
                 _uiState.update {
                     it.copy(
                         inputComponents = generateInputComponents(),
-                        topics = topics
+                        outputComponents = generateOutputComponents(),
+                        triggerComponents = generateTriggerComponents(),
+                        topics = topics,
                     )
                 }
             }
@@ -74,8 +79,13 @@ class AddComponentViewModel(
                     bottomNavData = getBottomNavData(AddComponentPage.Settings),
                     settings = generateSettings()
                 ) }
-            AddComponentPage.Settings ->
-                onConfirmComponent(scopeID)
+            AddComponentPage.Settings -> {
+                if (checkIfChosenComponentDiscord())
+                    openDiscord()
+                else
+                    onConfirmComponent(scopeID)
+            }
+            AddComponentPage.Additional -> onConfirmComponent(scopeID)
         }
     }
 
@@ -90,6 +100,11 @@ class AddComponentViewModel(
                 _uiState.update { it.copy(
                     currentPage = AddComponentPage.ChooseTopic,
                     bottomNavData = getBottomNavData(AddComponentPage.ChooseTopic)
+                ) }
+            AddComponentPage.Additional ->
+                _uiState.update { it.copy(
+                    currentPage = AddComponentPage.Settings,
+                    bottomNavData = getBottomNavData(AddComponentPage.Settings)
                 ) }
             else -> { /*Do nothing*/ }
         }
@@ -107,6 +122,18 @@ class AddComponentViewModel(
         }
     }
 
+    fun onChooseDiscordChannel(index: Int) {
+        val updatedList = uiState.value.discordChannels.mapIndexed { i, item ->
+            if (i == index)
+                item.copy(isChecked = !item.isChecked)
+            else
+                item.copy(isChecked = false)
+        }
+        _uiState.update {
+            it.copy(discordChannels = updatedList)
+        }
+    }
+
     fun onTextChange(
         type: SettingType,
         text: String
@@ -117,6 +144,60 @@ class AddComponentViewModel(
             val newSettings = ui.settings.toMutableMap()
             newSettings.replace(type, inputField)
             ui.copy(settings = newSettings)
+        }
+    }
+
+    fun handleUri() {
+        viewModelScope.launch {
+            when (uiState.value.chosenComponentType) {
+                ComponentDetailedType.Discord -> {
+                    _uiState.update {
+                        it.copy(
+                            currentPage = AddComponentPage.Additional,
+                            bottomNavData = getBottomNavData(AddComponentPage.Additional),
+                            discordChannels = generateDiscordChannels()
+                        )
+                    }
+                }
+
+                else -> {
+                    // TODO: set error
+                    _uiState.update {
+                        it.copy(
+                            currentPage = AddComponentPage.Additional,
+                            bottomNavData = getBottomNavData(AddComponentPage.Additional)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkIfChosenComponentDiscord() =
+        _uiState.value.chosenComponentType == ComponentDetailedType.Discord
+
+    private fun openDiscord() {
+        viewModelScope.launch {
+            try {
+                val discordKey = integrationRepository.getDiscordKey() ?: kotlin.run {
+                    toast.toast("Operation failed.")
+                    return@launch
+                }
+                _discordKey = discordKey
+
+                val discordUrl = integrationRepository.getDiscordUrl(discordKey) ?: kotlin.run {
+                    toast.toast("Operation failed.")
+                    return@launch
+                }
+
+                _uiState.update {
+                    it.copy(discordUrl = discordUrl)
+                }
+                event.event(DISCORD_EVENT)
+            } catch (e: Exception) {
+                Log.e("Trigger", "Cannot open discord web", e)
+                toast.toast("Operation failed.")
+            }
         }
     }
 
@@ -142,17 +223,33 @@ class AddComponentViewModel(
 
     private fun getComponentDtoData(): ComponentDto? {
         val locUiState = _uiState.value
-        // TODO: think of something better
         return ComponentDto(
-            componentType = ComponentType.INPUT.name, // TODO
-            type = locUiState.chosenComponentType?.name ?: return null,
-            size = 1, // TODO
+            componentType = locUiState.chosenComponentType?.belongsTo?.name ?: return null,
+            type = locUiState.chosenComponentType.name,
+            size = locUiState.chosenComponentType.size,
             topic = locUiState.chosenTopic?.toDto(),
             name = locUiState.settings[SettingType.Name]?.inputFieldData?.text,
             onSendValue = locUiState.settings[SettingType.OnClickSend]?.inputFieldData?.text ?: locUiState.settings[SettingType.OnToggleOnSend]?.inputFieldData?.text,
-            onSendAlternativeValue = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
+            onSendAlternative = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
             maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,
-            minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text
+            minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text,
+            actionDestinationDTO = locUiState.discordChannels.toActionDestinationDTO() ?: getEmailActionDestinationDto(),
+            pattern = locUiState.settings[SettingType.Description]?.inputFieldData?.text
+        )
+    }
+
+    private fun List<DiscordChannel>.toActionDestinationDTO(): ActionDestinationDTO? {
+        return ActionDestinationDTO(
+            id = null,
+            type = EActionDestinationType.DISCORD,
+            token = this.firstOrNull { it.isChecked }?.id ?: return null
+        )
+    }
+
+    private fun getEmailActionDestinationDto(): ActionDestinationDTO? {
+        return ActionDestinationDTO(
+            type = EActionDestinationType.EMAIL,
+            token = uiState.value.settings[SettingType.Title]?.inputFieldData?.text ?: return null
         )
     }
 
@@ -168,9 +265,21 @@ class AddComponentViewModel(
     }
 
     private fun getBottomNavData(page: AddComponentPage) = when (page) {
-        AddComponentPage.ChooseComponent -> BottomNavDataList[0]
-        AddComponentPage.ChooseTopic -> BottomNavDataList[1]
-        AddComponentPage.Settings -> BottomNavDataList[2]
+        AddComponentPage.ChooseComponent -> BottomNavData()
+        AddComponentPage.ChooseTopic -> BottomNavData(hasPrevButton = true)
+        AddComponentPage.Settings -> {
+            if (checkIfChosenComponentDiscord())
+                BottomNavData(hasPrevButton = true)
+            else
+                BottomNavData(
+                    nextButtonText = R.string.confirm,
+                    hasPrevButton = true
+                )
+        }
+        AddComponentPage.Additional -> BottomNavData(
+            nextButtonText = R.string.confirm,
+            hasPrevButton = true
+        )
     }
 
     private fun generateSettings(): Map<SettingType, SettingData> {
@@ -233,12 +342,61 @@ class AddComponentViewModel(
                 )
             )
 
+            ComponentDetailedType.Discord -> mapOf(
+                SettingType.Description to SettingData(
+                    title = R.string.a_s52,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
+
+            ComponentDetailedType.Email -> mapOf(
+                SettingType.Title to SettingData(
+                    title = R.string.s54,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s54
+                    ),
+                    isDescription = true
+                ),
+                SettingType.Description to SettingData(
+                    title = R.string.a_s52,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
+
             else -> emptyMap()
 
         }
 
         return defaultFields + specificFields
     }
+
+    private suspend fun generateDiscordChannels(): List<DiscordChannel> {
+        try {
+            val discordKey = _discordKey ?: return emptyList()
+            val guildId = integrationRepository.getGuildId(discordKey) ?: kotlin.run {
+                toast.toast("Operation failed.")
+                return emptyList()
+            }
+            val channels = integrationRepository.getDiscordChannels(guildId)
+            return channels.map {
+                it.toDiscordChannel()
+            }
+        } catch (e: Exception) {
+            toast.toast("Operation failed.")
+            return emptyList()
+        }
+    }
+
+    private fun DiscordChannelDto.toDiscordChannel() = DiscordChannel(
+        id = id,
+        title = name
+    )
 
     private fun generateInputComponents() = listOf(
         ComponentChoiceData(
@@ -258,6 +416,27 @@ class AddComponentViewModel(
         )
     )
 
+    private fun generateOutputComponents() = listOf(
+        ComponentChoiceData(
+            titleId = R.string.s55,
+            iconRes = R.drawable.ic_graph_time,
+            type = ComponentDetailedType.LineGraph
+        ),
+    )
+
+    private fun generateTriggerComponents() = listOf(
+        ComponentChoiceData(
+            titleId = R.string.a_s50,
+            iconRes = R.drawable.ic_discord,
+            type = ComponentDetailedType.Discord
+        ),
+        ComponentChoiceData(
+            titleId = R.string.s53,
+            iconRes = R.drawable.ic_mail,
+            type = ComponentDetailedType.Email
+        ),
+    )
+
     data class BottomNavData(
         @StringRes val nextButtonText: Int = R.string.next,
         val hasPrevButton: Boolean = false,
@@ -272,7 +451,14 @@ class AddComponentViewModel(
     data class SettingData(
         @StringRes val title: Int,
         @StringRes val description: Int? = null,
-        val inputFieldData: InputFieldData
+        val inputFieldData: InputFieldData,
+        val isDescription: Boolean = false
+    )
+
+    data class DiscordChannel(
+        val id: String,
+        val title: String,
+        val isChecked: Boolean = false
     )
 
     enum class SettingType {
@@ -282,11 +468,30 @@ class AddComponentViewModel(
         OnToggleOffSend,
         MaxValue,
         MinValue,
+        Description,
+        Title
     }
 
     companion object {
         const val ADD_COMPONENT_SUCCESS_EVENT = "addComponentSuccess"
         const val SUCCESS_TOAST_MESSAGE = "Successfully added new component"
         const val FAILURE_TOAST_MESSAGE = "Could not add new component"
+        const val DISCORD_EVENT = "DISCORD"
+    }
+}
+
+open class GetWebActivityResultContract : ActivityResultContract<String, Uri?>() {
+    @CallSuper
+    override fun createIntent(context: Context, input: String): Intent {
+        return Intent(Intent.ACTION_VIEW, Uri.parse(input))
+    }
+
+    final override fun getSynchronousResult(
+        context: Context,
+        input: String
+    ): SynchronousResult<Uri?>? = null
+
+    final override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+        return intent.takeIf { resultCode == Activity.RESULT_OK }?.data
     }
 }

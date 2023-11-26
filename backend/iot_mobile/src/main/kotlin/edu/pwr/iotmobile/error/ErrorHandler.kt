@@ -20,7 +20,8 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
         ProjectNotFoundException::class,
         InvitationNotFoundException::class,
         QueueException::class,
-        DiscordNotFoundException::class
+        DiscordNotFoundException::class,
+        TopicNotFoundException::class
     )
     fun handleNotFound(ex: Exception): ResponseEntity<String> {
         logError(ex)

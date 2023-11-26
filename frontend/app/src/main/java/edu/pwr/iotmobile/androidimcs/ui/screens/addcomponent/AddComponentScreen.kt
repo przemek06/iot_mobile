@@ -1,5 +1,9 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
+import android.content.ActivityNotFoundException
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +30,6 @@ import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
-import edu.pwr.iotmobile.androidimcs.ui.theme.gray
 import org.koin.androidx.compose.koinViewModel
 
 private val BOTTOM_BAR_HEIGHT = 80.dp
@@ -42,9 +45,32 @@ fun AddComponentScreen(navigation: AddComponentNavigation) {
         viewModel.init(it)
     }
 
+    val webActivity = rememberLauncherForActivityResult(
+        contract = GetWebActivityResultContract(),
+        onResult = {
+            viewModel.handleUri()
+        }
+    )
+
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        navigation.onReturn()
+        when (it) {
+            AddComponentViewModel.ADD_COMPONENT_SUCCESS_EVENT ->
+                navigation.onReturn()
+
+            AddComponentViewModel.DISCORD_EVENT -> {
+                try {
+                    uiState.discordUrl?.let { url ->
+                        webActivity.launch(url)
+                    }
+                } catch (e: ActivityNotFoundException) {
+                    Log.e("Trigger", "Could not start the web activity", e)
+                    Toast.makeText(context, "Could not launch Discord", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            else -> { /*Nothing*/ }
+        }
     }
     viewModel.toast.CollectToast(context)
 
@@ -62,6 +88,7 @@ private fun AddComponentScreenContent(
             AddComponentPage.ChooseComponent -> ChooseComponentScreenContent(uiState, uiInteraction)
             AddComponentPage.ChooseTopic -> ChooseTopicScreenContent(uiState, uiInteraction, navigation)
             AddComponentPage.Settings -> SettingsScreenContent(uiState, uiInteraction)
+            AddComponentPage.Additional -> AdditionalScreenContent(uiState, uiInteraction)
         }
     }
 }
@@ -83,8 +110,12 @@ private fun NavigationWrapper(
                 onReturn = navigation::onReturn
             )
             Dimensions.space14.HeightSpacer()
-            Column(modifier = Modifier.padding(horizontal = Dimensions.space22)) {
+            Column(
+                modifier = Modifier
+                    .padding(start = Dimensions.space22, end = Dimensions.space22, bottom = BOTTOM_BAR_HEIGHT)
+            ) {
                 content()
+                Dimensions.space22.HeightSpacer()
             }
         }
         BottomNavigationBar(
@@ -107,7 +138,7 @@ private fun BottomNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(BOTTOM_BAR_HEIGHT)
-            .background(color = MaterialTheme.colorScheme.gray)
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
         Box(modifier = Modifier
             .fillMaxSize()

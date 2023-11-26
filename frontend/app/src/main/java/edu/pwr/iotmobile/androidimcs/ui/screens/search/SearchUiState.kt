@@ -2,6 +2,8 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.search
 
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.User
+import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 
 data class SearchUiState (
     val searchInputFieldData: String,
@@ -9,7 +11,9 @@ data class SearchUiState (
     val searchedUsers: List<User>,
     val selectedUser: User?,
     val data: SearchViewModel.ScreenData,
-    val isDialogVisible: Boolean
+    val isDialogVisible: Boolean,
+    val userRoles: List<ProjectRoleDto>,
+    val selectedRole: UserProjectRole
 ) {
      companion object {
          fun default(
@@ -21,14 +25,18 @@ data class SearchUiState (
                  topBarText = R.string.nothing,
                  buttonText = R.string.nothing
              ),
-             isDialogVisible: Boolean = false
+             isDialogVisible: Boolean = false,
+             userRoles: List<ProjectRoleDto> = emptyList(),
+             selectedRole: UserProjectRole = UserProjectRole.VIEWER
          ) = SearchUiState (
              searchInputFieldData = searchInputFieldData,
              users = users,
              searchedUsers = searchedUsers,
              selectedUser = selectedUser,
              data = data,
-             isDialogVisible = isDialogVisible
+             isDialogVisible = isDialogVisible,
+             userRoles = userRoles,
+             selectedRole = selectedRole
          )
      }
 }

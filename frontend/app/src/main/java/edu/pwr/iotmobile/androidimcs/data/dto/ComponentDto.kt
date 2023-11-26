@@ -9,21 +9,19 @@ data class ComponentDto(
     val topic: TopicDto? = null,
     val name: String? = null,
     val onSendValue: String? = null,
-    val onSendAlternativeValue: String? = null,
+    val onSendAlternative: String? = null,
     val maxValue: String? = null,
     val minValue: String? = null,
     val actionDestinationDTO: ActionDestinationDTO? = null,
-    val eventSourceDTO: EventSourceDTO? = null
+    val pattern: String? = null
 )
 
 data class ActionDestinationDTO(
-    val id: Int?,
-    val type: String,
+    val id: Int? = null,
+    val type: EActionDestinationType,
     val token: String,
 )
 
-data class EventSourceDTO(
-    val id: Int?,
-    val type: String,
-    val token: String,
-)
+enum class EActionDestinationType {
+    DISCORD, EMAIL, TELEGRAM, SLACK
+}

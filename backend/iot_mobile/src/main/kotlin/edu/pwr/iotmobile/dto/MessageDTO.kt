@@ -10,13 +10,13 @@ data class MessageDTO(
     val topic: TopicDTO = TopicDTO(),
     @field:NotNull
     @field:Size(max = 1024)
-    val message: String="",
+    val message: String,
     @field:NotNull
-    val connectionKey: String="",
-    val tsSent: LocalDateTime=LocalDateTime.now(),
+    val connectionKey: String,
+    val tsSent: String,
     val id: Int?=null
 ){
-    //TODO: project name to be added here
+
     fun toEntity(): Message{
         return Message(
             topic.toEntity(), message, tsSent, id
