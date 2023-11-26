@@ -15,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap
 @Component
 class IntegrationManager(
     private val discordBot: DiscordBot,
+    private val slackBot: SlackBot,
+    private val telegramBot: TelegramBot,
     private val mailService: MailService,
     private val projectService: ProjectService,
     private val componentService: ComponentService,
@@ -44,6 +46,15 @@ class IntegrationManager(
             val integrationAction = createMailIntegrationAction(component)
             addIntegrationAction(component, integrationAction, connectionKey)
         }
+        else if (component.actionDestination.type == EActionDestinationType.SLACK){
+            val integrationAction =createSlackIntegrationAction(component)
+            addIntegrationAction(component, integrationAction)
+        }
+        else if (component.actionDestination.type == EActionDestinationType.TELEGRAM){
+            val integrationAction = createTelegramIntegrationFunction(component)
+            addIntegrationAction(component, integrationAction)
+        }
+
     }
 
     private fun addIntegrationAction(
@@ -76,5 +87,13 @@ class IntegrationManager(
         val wrapper = integrationActionMap.remove(componentId) ?: return
         rabbitListener.cancelConsumer(wrapper.consumerTag)
         wrapper.subscription.dispose()
+    }
+
+    private fun createSlackIntegrationAction(component: TriggerComponent): SlackIntegrationAction{
+        return SlackIntegrationAction(component.actionDestination.token, slackBot)
+    }
+
+    private fun createTelegramIntegrationFunction(component: TriggerComponent): TelegramIntegrationAction{
+        return TelegramIntegrationAction(component.actionDestination.token, telegramBot)
     }
 }

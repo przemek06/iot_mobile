@@ -10,7 +10,7 @@ class DiscordIntegrationAction(
 ) :
     IntegrationAction {
 
-    val logger: Logger = LoggerFactory.getLogger("IntegrationAction")
+    val logger: Logger = LoggerFactory.getLogger("DiscordIntegrationAction")
 
     override fun performAction(data: String) {
         try {
