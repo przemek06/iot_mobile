@@ -208,6 +208,11 @@ class DashboardViewModel(
         }
 
         viewModelScope.launch(Dispatchers.Default) {
+            if (message == null) {
+                toast.toast("Error while sending message.")
+                return@launch
+            }
+
             val connectionKey = getConnectionKey()
             val messageDto = item.toMessageDto(
                 value = message.toString(),
@@ -322,7 +327,7 @@ class DashboardViewModel(
 
             // Calculate the current distance squared.
             val currComponent = components.getOrNull(currentItemIndex) ?: return null
-            val width = if (draggedComponent.isFullLine) windowWidth else windowWidth/2
+            val width = if (draggedComponent.size == 2) windowWidth else windowWidth/2
             val draggedCenterPos = draggedComponent.absolutePosition + Offset(width/2, draggedComponent.height.value/2)
             val currCenterPos = currComponent.absolutePosition + Offset(width/2, currComponent.height.value/2)
             val currDiff = (draggedCenterPos - currCenterPos).getDistanceSquared()
