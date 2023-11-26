@@ -318,7 +318,7 @@ class AddComponentViewModel(
                 ),
                 SettingType.OnToggleOffSend to SettingData(
                     title = R.string.s36,
-                    description = R.string.s53,
+                    description = R.string.a_s53,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
@@ -328,14 +328,14 @@ class AddComponentViewModel(
             ComponentDetailedType.Slider -> mapOf(
                 SettingType.MaxValue to SettingData(
                     title = R.string.s37,
-                    description = R.string.s54,
+                    description = R.string.a_s54,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
                 ),
                 SettingType.MinValue to SettingData(
                     title = R.string.s38,
-                    description = R.string.s55,
+                    description = R.string.a_s55,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
