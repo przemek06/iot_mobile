@@ -1,17 +1,12 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.account
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
-import edu.pwr.iotmobile.androidimcs.data.StatData
-import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
-import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
-import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
-import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,63 +29,93 @@ class AccountViewModel(
         ) { navigation.openChangePassword() }
 
         viewModelScope.launch {
-            val result = userRepository.getActiveUserInfo()
-            val user = result.getOrNull()?.toUser() ?: return@launch
+            try {
+                val result = userRepository.getActiveUserInfo()
 
-            _uiState.update {
-                it.copy(user = user)
+                if (result.isSuccess) {
+                    val user = result.getOrNull()?.toUser() ?: return@launch
+
+                    _uiState.update {
+                        it.copy(
+                            user = user,
+                            changePasswordOption = changePasswordOption,
+                            isError = false
+                        )
+                    }
+                } else {
+                    Log.d("Account", "Error while getting user data")
+                    _uiState.update {
+                        it.copy(
+                            isError = true
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("Account", "Error while getting user data", e)
+                _uiState.update {
+                    it.copy(
+                        isError = true
+                    )
+                }
             }
         }
-
-        _uiState.update {
-            it.copy(
-                changePasswordOption = changePasswordOption
-            )
-        }
     }
+
     fun setDisplayName(displayName: String) {
+        if (displayName.isBlank()) {
+            _uiState.update {
+                it.copy(inputField = it.inputField.copy(isError = true))
+            }
+            return
+        }
 
-        if(displayName.isNotBlank()){
-            viewModelScope.launch {
-
-                val result = userRepository.updateActiveUser(UserDto(
-                    email = uiState.value.user.email,
-                    password = "12345678", // TODO: xD?
-                    name = displayName
-                ))
+        viewModelScope.launch {
+            try {
+                val result = userRepository.updateActiveUser(
+                    UserDto(
+                        email = uiState.value.user.email,
+                        password = "12345678",
+                        name = displayName
+                    )
+                )
 
                 result.onSuccess {
-
                     val user = userRepository
                         .getActiveUserInfo()
                         .getOrNull()
                         ?.toUser() ?: return@launch
 
                     _uiState.update {
-                        it.copy(user = user)
+                        it.copy(
+                            user = user,
+                            inputField = it.inputField.copy(isError = false)
+                        )
                     }
 
-                    toast.toast("Updated display name")
+                    toast.toast("Successfully updated display name")
                 }
-            }
-        } else {
-            _uiState.update {
-                it.copy(inputField = it.inputField.copy(isError = true))
+            } catch (e: Exception) {
+                Log.e("Account", "Error when updating user data.", e)
+                toast.toast("Could not update display name")
             }
         }
     }
 
     fun deleteAccount(navigation: AccountNavigation) {
         viewModelScope.launch {
-            val result = userRepository.deleteActiveUser()
+            try {
+                val result = userRepository.deleteActiveUser()
 
-            result.onSuccess {
-                toast.toast("Deleted account")
-                navigation.openLogin()
-                return@launch
+                result.onSuccess {
+                    toast.toast("Successfully deleted account")
+                    navigation.openLogin()
+                    return@launch
+                }
+                toast.toast("Failed to delete user account.")
+            } catch (e: Exception) {
+                Log.e("Account", "Error while logging out.", e)
+                toast.toast("Failed to delete user account.")
             }
-            toast.toast("Failed deleting account")
-
         }
     }
 
@@ -102,13 +127,17 @@ class AccountViewModel(
 
     fun logout(navigation: AccountNavigation) {
         viewModelScope.launch {
-            val result = userRepository.logout()
-            result.onSuccess {
-                toast.toast("Logged out")
-                navigation.openLogin()
-            }
-            result.onFailure {
-                toast.toast("Couldn't log out")
+            try {
+                val result = userRepository.logout()
+                result.onSuccess {
+                    toast.toast("Successfully logged out")
+                    navigation.openLogin()
+                }
+                result.onFailure {
+                    toast.toast("Could not log out")
+                }
+            } catch (e: Exception) {
+                Log.e("Account", "Error while logging out.", e)
             }
         }
     }

@@ -191,4 +191,6 @@
     <string name="a_s54">Title</string>
     <string name="a_s55">Graph</string>
     <string name="s56">Operation failed.</string>
+    <string name="s57">Something went wrong</string>
+    <string name="s58">Please try again</string>
 </resources>
