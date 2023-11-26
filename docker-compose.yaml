@@ -31,6 +31,7 @@ services:
     expose:
       - "5672"
       - "15672"
+      
   iot-mobile-backend:
     build:
       context: ./backend/iot_mobile

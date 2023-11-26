@@ -32,7 +32,7 @@ class DeviceIncomingMessageWebSocketHandler(
         val topicConnection = objectMapper.readValue<TopicConnectionDTO>(message.payload)
         if (!hasAccess(topicConnection.uniqueName, topicConnection.connectionKey)) throw NotAllowedException()
 
-        val pair = rabbitListener.registerConsumer(topicConnection.uniqueName)
+        val pair = rabbitListener.registerConsumer(topicConnection.uniqueName, topicConnection.connectionKey)
         val consumerTag = pair.first
         val source = pair.second
 

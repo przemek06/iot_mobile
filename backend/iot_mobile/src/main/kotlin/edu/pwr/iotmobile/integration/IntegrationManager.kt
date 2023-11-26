@@ -20,7 +20,11 @@ class IntegrationManager(
     private val componentService: ComponentService,
     private val rabbitListener: RabbitListener
 ) {
-    class IntegrationWrapper(val integrationAction: IntegrationAction, val consumerTag: String, val subscription: Disposable)
+    class IntegrationWrapper(
+        val integrationAction: IntegrationAction,
+        val consumerTag: String,
+        val subscription: Disposable
+    )
 
     val integrationActionMap: MutableMap<Int, IntegrationWrapper> = ConcurrentHashMap()
 
@@ -28,23 +32,26 @@ class IntegrationManager(
     fun loadIntegrations() {
         val triggerComponents = componentService.findAllTriggerComponents()
 
-        triggerComponents.forEach { addIntegrationAction(it) }
+        triggerComponents.forEach { addIntegrationAction(it, it.topic.project.connectionKey) }
     }
 
-    fun addIntegrationAction(component: TriggerComponent) {
+    fun addIntegrationAction(component: TriggerComponent, connectionKey: String) {
         if (component.actionDestination.type == EActionDestinationType.DISCORD) {
             val integrationAction = createDiscordIntegrationAction(component)
-            addIntegrationAction(component, integrationAction)
+            addIntegrationAction(component, integrationAction, connectionKey)
 
         } else if (component.actionDestination.type == EActionDestinationType.EMAIL) {
             val integrationAction = createMailIntegrationAction(component)
-            addIntegrationAction(component, integrationAction)
+            addIntegrationAction(component, integrationAction, connectionKey)
         }
     }
 
-    private fun addIntegrationAction(component : TriggerComponent, integrationAction: IntegrationAction) {
-        println(component.id)
-        val tagFlux = rabbitListener.registerConsumer(component.topic.uniqueName)
+    private fun addIntegrationAction(
+        component: TriggerComponent,
+        integrationAction: IntegrationAction,
+        connectionKey: String
+    ) {
+        val tagFlux = rabbitListener.registerConsumer(component.topic.uniqueName, connectionKey)
         val subscription = tagFlux.second.subscribe { integrationAction.performAction(it.message) }
         val wrapper = IntegrationWrapper(integrationAction, tagFlux.first, subscription)
 

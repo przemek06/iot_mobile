@@ -3,6 +3,8 @@ package edu.pwr.iotmobile.websocket
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import edu.pwr.iotmobile.dto.MessageDTO
+import edu.pwr.iotmobile.entities.Topic
+import edu.pwr.iotmobile.error.exception.InvalidStateException
 import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.error.exception.NotAllowedException
 import edu.pwr.iotmobile.rabbit.RabbitListener
@@ -32,9 +34,14 @@ class IncomingMessageWebSocketHandler(
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
         val userId = userService.findUserByEmail(session.principal?.name ?: throw NoAuthenticationException())?.id
             ?: throw NoAuthenticationException()
-        if (!hasAccess(userId, message)) throw NotAllowedException()
 
-        val tagFluxList = registerQueues(message)
+        val topics = getTopicList(message)
+
+        if (!hasAccess(userId, topics)) throw NotAllowedException()
+
+        val connectionKey = retrieveConnectionKey(topics)
+
+        val tagFluxList = registerQueues(message, connectionKey)
         val fluxList = tagFluxList.map { it.second }
         val consumerTags = objectMapper.writeValueAsString(tagFluxList.map { it.first })
         val source = Flux.merge(fluxList)
@@ -51,15 +58,29 @@ class IncomingMessageWebSocketHandler(
         session.attributes["consumerTags"] = consumerTags
     }
 
-    fun hasAccess(userId: Int, message: TextMessage) : Boolean {
+    fun getTopicList(message: TextMessage) : List<Topic> {
         val topicNames = splitTopics(message)
-        val topics = topicService.findAllByUniqueNames(topicNames)
+        return topicService.findAllByUniqueNames(topicNames)
+    }
 
-        if (topics.map { it.project.id }.distinct().size != 1) {
+    fun retrieveConnectionKey(topics: List<Topic>) : String {
+        val connectionKeys = topics.map { it.project.connectionKey }.distinct()
+
+        if (connectionKeys.size != 1) {
+            throw InvalidStateException()
+        }
+
+        return connectionKeys[0]
+    }
+
+    fun hasAccess(userId: Int, topics: List<Topic>) : Boolean {
+        val topicIds = topics.map { it.project.id }.distinct()
+
+        if (topicIds.size != 1) {
             return false
         }
 
-        val projectId = topics.map { it.project.id }.distinct()[0] ?: return false
+        val projectId = topicIds[0] ?: return false
 
         return projectService.isInProject(userId, projectId)
     }
@@ -70,9 +91,9 @@ class IncomingMessageWebSocketHandler(
             .split(",")
     }
 
-    private fun registerQueues(message: TextMessage): List<Pair<String, Flux<MessageDTO>>> {
+    private fun registerQueues(message: TextMessage, connectionKey: String): List<Pair<String, Flux<MessageDTO>>> {
         return splitTopics(message)
-            .map { rabbitListener.registerConsumer(it) }
+            .map { rabbitListener.registerConsumer(it, connectionKey) }
     }
 
     override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {
