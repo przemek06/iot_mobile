@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
-import edu.pwr.iotmobile.androidimcs.ui.theme.gray
 
 @Composable
 fun ChooseComponentScreenContent(
@@ -72,6 +71,14 @@ fun ChooseComponentScreenContent(
             Dimensions.space10.HeightSpacer()
         }
 
+        items(uiState.outputComponents) {
+            ComponentItem(
+                isSelected = uiState.chosenComponentType == it.type,
+                data = it,
+                uiInteraction = uiInteraction
+            )
+        }
+
         item(span = { GridItemSpan(2) }) {
             Text(
                 text = stringResource(id = R.string.s32),
@@ -103,7 +110,7 @@ private fun ComponentItem(
         if (isSelected) MaterialTheme.colorScheme.primary
         else MaterialTheme.colorScheme.secondary
     val backgroundColor =
-        if (isSelected) MaterialTheme.colorScheme.gray  // TODO: change based on
+        if (isSelected) MaterialTheme.colorScheme.secondaryContainer
         else MaterialTheme.colorScheme.background
     Card(
         modifier = Modifier

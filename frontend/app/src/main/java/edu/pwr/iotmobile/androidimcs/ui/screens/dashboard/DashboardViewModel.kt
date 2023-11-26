@@ -55,6 +55,7 @@ class DashboardViewModel(
 
     override fun onCleared() {
         componentsListener?.closeWebSocket()
+        messageReceivedListener?.closeWebSocket()
     }
 
     fun init(dashboardId: Int, projectId: Int?) {
@@ -182,9 +183,6 @@ class DashboardViewModel(
     }
 
     fun onComponentClick(item: ComponentData, value: Any?) {
-        // TODO: implement - different behaviour based on type,
-        Log.d("Check", "value")
-        Log.d("Check", value.toString())
         val message = when (item.type) {
 
             ComponentDetailedType.Button -> { item.onSendValue }

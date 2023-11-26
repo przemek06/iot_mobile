@@ -51,14 +51,16 @@ data class ComponentData(
 ) {
     companion object {
         fun ComponentDto.toComponentData(currentValue: String?): ComponentData? {
+            val componentDetailedType = type.asEnum<ComponentDetailedType>() ?: return null
             return ComponentData(
                 id = id ?: return null,
                 name = name ?: "",
                 index = index,
                 size = size,
+                height = if (componentDetailedType == ComponentDetailedType.LineGraph) 200.dp else 140.dp,
                 currentValue = currentValue,
                 componentType = componentType.asEnum<ComponentType>() ?: return null,
-                type = type.asEnum<ComponentDetailedType>() ?: return null,
+                type = componentDetailedType,
                 topic = topic?.toTopic(),
                 onSendValue = onSendValue,
                 onSendAlternativeValue = onSendAlternative,

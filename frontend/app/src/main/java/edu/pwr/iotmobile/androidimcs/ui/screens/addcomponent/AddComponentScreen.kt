@@ -30,7 +30,6 @@ import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
-import edu.pwr.iotmobile.androidimcs.ui.theme.gray
 import org.koin.androidx.compose.koinViewModel
 
 private val BOTTOM_BAR_HEIGHT = 80.dp
@@ -135,7 +134,7 @@ private fun BottomNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(BOTTOM_BAR_HEIGHT)
-            .background(color = MaterialTheme.colorScheme.gray)
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
         Box(modifier = Modifier
             .fillMaxSize()

@@ -181,4 +181,7 @@
     <string name="a_s50">Discord</string>
     <string name="a_s51">Choose discord channels to send the message to</string>
     <string name="a_s52">Description</string>
+    <string name="s53">Email</string>
+    <string name="s54">Title</string>
+    <string name="s55">Graph</string>
 </resources>

@@ -55,6 +55,7 @@ class AddComponentViewModel(
                 _uiState.update {
                     it.copy(
                         inputComponents = generateInputComponents(),
+                        outputComponents = generateOutputComponents(),
                         triggerComponents = generateTriggerComponents(),
                         topics = topics,
                     )
@@ -230,7 +231,7 @@ class AddComponentViewModel(
             onSendAlternative = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
             maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,
             minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text,
-            actionDestinationDTO = locUiState.discordChannels.toActionDestinationDTO(),
+            actionDestinationDTO = locUiState.discordChannels.toActionDestinationDTO() ?: getEmailActionDestinationDto(),
             pattern = locUiState.settings[SettingType.Description]?.inputFieldData?.text
         )
     }
@@ -240,6 +241,13 @@ class AddComponentViewModel(
             id = null,
             type = EActionDestinationType.DISCORD,
             token = this.firstOrNull { it.isChecked }?.id ?: return null
+        )
+    }
+
+    private fun getEmailActionDestinationDto(): ActionDestinationDTO? {
+        return ActionDestinationDTO(
+            type = EActionDestinationType.EMAIL,
+            token = uiState.value.settings[SettingType.Title]?.inputFieldData?.text ?: return null
         )
     }
 
@@ -339,6 +347,23 @@ class AddComponentViewModel(
                 )
             )
 
+            ComponentDetailedType.Email -> mapOf(
+                SettingType.Title to SettingData(
+                    title = R.string.s54,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s54
+                    ),
+                    isDescription = true
+                ),
+                SettingType.Description to SettingData(
+                    title = R.string.a_s52,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
+
             else -> emptyMap()
 
         }
@@ -386,13 +411,25 @@ class AddComponentViewModel(
         )
     )
 
+    private fun generateOutputComponents() = listOf(
+        ComponentChoiceData(
+            titleId = R.string.s55,
+            iconRes = R.drawable.ic_graph_time,
+            type = ComponentDetailedType.LineGraph
+        ),
+    )
+
     private fun generateTriggerComponents() = listOf(
         ComponentChoiceData(
             titleId = R.string.a_s50,
             iconRes = R.drawable.ic_discord,
             type = ComponentDetailedType.Discord
         ),
-        // TODO: add email
+        ComponentChoiceData(
+            titleId = R.string.s53,
+            iconRes = R.drawable.ic_mail,
+            type = ComponentDetailedType.Email
+        ),
     )
 
     data class BottomNavData(
@@ -426,7 +463,8 @@ class AddComponentViewModel(
         OnToggleOffSend,
         MaxValue,
         MinValue,
-        Description
+        Description,
+        Title
     }
 
     companion object {
