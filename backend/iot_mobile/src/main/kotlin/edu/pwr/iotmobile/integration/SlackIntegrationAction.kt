@@ -9,7 +9,7 @@ class SlackIntegrationAction(
     private val slackBot: SlackBot
 ) : IntegrationAction {
 
-    private val logger: Logger = LoggerFactory.getLogger("EmailIntegrationAction")
+    private val logger: Logger = LoggerFactory.getLogger("SlackIntegrationAction")
 
     override fun performAction(data: String) {
         try {
