@@ -11,8 +11,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler
 import reactor.core.Disposable
 
 @Component
-class InvitationAlertWebSocketHandler(
-    val invitationAlertService: InvitationAlertService,
+class NotificationWebSocketHandler(
+    val notificationService: NotificationService,
     val userService: UserService
 ) : TextWebSocketHandler() {
         private val objectMapper = ObjectMapper()
@@ -21,7 +21,7 @@ class InvitationAlertWebSocketHandler(
         override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
             val userId = userService.findUserIdByEmail(session.principal?.name ?: throw NoAuthenticationException())
 
-            val subscription = invitationAlertService
+            val subscription = notificationService
                     .getInvitationFlow(userId)
                     .subscribe {
                         if (session.isOpen) {

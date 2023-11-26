@@ -6,6 +6,7 @@ import edu.pwr.iotmobile.error.exception.InvalidStateException
 import edu.pwr.iotmobile.rabbit.RabbitListener
 import edu.pwr.iotmobile.service.ComponentService
 import edu.pwr.iotmobile.service.MailService
+import edu.pwr.iotmobile.service.NotificationService
 import edu.pwr.iotmobile.service.ProjectService
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
@@ -18,7 +19,8 @@ class IntegrationManager(
     private val mailService: MailService,
     private val projectService: ProjectService,
     private val componentService: ComponentService,
-    private val rabbitListener: RabbitListener
+    private val rabbitListener: RabbitListener,
+    private val notificationService: NotificationService
 ) {
     class IntegrationWrapper(
         val integrationAction: IntegrationAction,
@@ -39,9 +41,11 @@ class IntegrationManager(
         if (component.actionDestination.type == EActionDestinationType.DISCORD) {
             val integrationAction = createDiscordIntegrationAction(component)
             addIntegrationAction(component, integrationAction, connectionKey)
-
         } else if (component.actionDestination.type == EActionDestinationType.EMAIL) {
             val integrationAction = createMailIntegrationAction(component)
+            addIntegrationAction(component, integrationAction, connectionKey)
+        } else if (component.actionDestination.type == EActionDestinationType.NOTIFICATION) {
+            val integrationAction = createNotificationIntegrationAction(component)
             addIntegrationAction(component, integrationAction, connectionKey)
         }
     }
@@ -52,7 +56,7 @@ class IntegrationManager(
         connectionKey: String
     ) {
         val tagFlux = rabbitListener.registerConsumer(component.topic.uniqueName, connectionKey)
-        val subscription = tagFlux.second.subscribe { integrationAction.performAction(it.message) }
+        val subscription = tagFlux.second.subscribe { integrationAction.performAction(it) }
         val wrapper = IntegrationWrapper(integrationAction, tagFlux.first, subscription)
 
         component.id?.let { integrationActionMap.put(it, wrapper) }
@@ -70,6 +74,10 @@ class IntegrationManager(
             component.pattern,
             component.actionDestination.token
         )
+    }
+
+    private fun createNotificationIntegrationAction(component: TriggerComponent): NotificationIntegrationAction {
+        return NotificationIntegrationAction(projectService, notificationService)
     }
 
     fun removeIntegrationAction(componentId: Int) {
