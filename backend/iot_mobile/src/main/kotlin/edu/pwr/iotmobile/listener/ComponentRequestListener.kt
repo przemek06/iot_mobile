@@ -7,6 +7,7 @@ import edu.pwr.iotmobile.error.exception.InvalidStateException
 import edu.pwr.iotmobile.integration.IntegrationManager
 import edu.pwr.iotmobile.service.ComponentChangeService
 import edu.pwr.iotmobile.service.ComponentService
+import edu.pwr.iotmobile.service.DashboardService
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -27,6 +28,9 @@ class ComponentRequestListener {
 
     @Autowired
     private lateinit var integrationManager: IntegrationManager
+
+    @Autowired
+    private lateinit var dashboardService: DashboardService
 
     @Around(
         "execution(* edu.pwr.iotmobile.controller.ComponentController.updateAll(..)) && args(componentListDTO)",
@@ -53,8 +57,12 @@ class ComponentRequestListener {
             resultComponentListDTO.components.filter { it.id !in oldComponentListDto.components.map { it2 -> it2.id } }
                 .filter { it.componentType == EComponentType.TRIGGER }
 
-        val connectionKey = entities.map { it.dashboard.project.connectionKey }.distinct().firstOrNull()
-        connectionKey?.let { toAdd.forEach { c -> integrationManager.addIntegrationAction(c.toEntity(dashboardId) as TriggerComponent, it) } }
+        var connectionKey = entities.map { it.dashboard.project.connectionKey }.distinct().firstOrNull()
+        if (connectionKey == null) {
+            connectionKey = dashboardService.findEntityById(dashboardId).project.connectionKey
+        }
+
+        toAdd.forEach { integrationManager.addIntegrationAction(it.toEntity(dashboardId) as TriggerComponent, connectionKey) }
         toDelete.forEach { it.id?.let { it1 -> integrationManager.removeIntegrationAction(it1) } }
 
         componentChangeService.processEntityChange(resultComponentListDTO)

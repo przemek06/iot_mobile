@@ -1,7 +1,7 @@
 package edu.pwr.iotmobile.service
 
-import edu.pwr.iotmobile.dto.GroupMessageDTO
-import edu.pwr.iotmobile.dto.MessageDTO
+import edu.pwr.iotmobile.dto.GroupNotificationDTO
+import edu.pwr.iotmobile.dto.NotificationDTO
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,12 +14,12 @@ import reactor.core.publisher.Sinks.Many
 @Service
 class NotificationService {
 
-    private var fluxSink: Many<GroupMessageDTO> = Sinks
+    private var fluxSink: Many<GroupNotificationDTO> = Sinks
         .many()
         .multicast()
         .onBackpressureBuffer()
 
-    private var connectableFlux: ConnectableFlux<GroupMessageDTO> =
+    private var connectableFlux: ConnectableFlux<GroupNotificationDTO> =
         fluxSink
             .asFlux()
             .publish()
@@ -29,7 +29,7 @@ class NotificationService {
         connectableFlux.connect()
     }
 
-    fun getInvitationFlow(userId: Int): Flux<MessageDTO> {
+    fun getInvitationFlow(userId: Int): Flux<NotificationDTO> {
         return connectableFlux
             .autoConnect()
             .filter { userId in it.userIds }
@@ -37,7 +37,7 @@ class NotificationService {
     }
 
     @Transactional
-    fun processEntityChange(notification: GroupMessageDTO) {
+    fun processEntityChange(notification: GroupNotificationDTO) {
         fluxSink.tryEmitNext(notification).orThrow()
     }
 }

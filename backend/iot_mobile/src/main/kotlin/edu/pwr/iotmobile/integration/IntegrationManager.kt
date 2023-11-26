@@ -49,16 +49,13 @@ class IntegrationManager(
         } else if (component.actionDestination.type == EActionDestinationType.NOTIFICATION) {
             val integrationAction = createNotificationIntegrationAction(component)
             addIntegrationAction(component, integrationAction, connectionKey)
-        }
-        else if (component.actionDestination.type == EActionDestinationType.SLACK){
-            val integrationAction =createSlackIntegrationAction(component)
-            addIntegrationAction(component, integrationAction)
-        }
-        else if (component.actionDestination.type == EActionDestinationType.TELEGRAM){
+        } else if (component.actionDestination.type == EActionDestinationType.SLACK) {
+            val integrationAction = createSlackIntegrationAction(component)
+            addIntegrationAction(component, integrationAction, connectionKey)
+        } else if (component.actionDestination.type == EActionDestinationType.TELEGRAM) {
             val integrationAction = createTelegramIntegrationFunction(component)
-            addIntegrationAction(component, integrationAction)
+            addIntegrationAction(component, integrationAction, connectionKey)
         }
-
     }
 
     private fun addIntegrationAction(
@@ -88,7 +85,7 @@ class IntegrationManager(
     }
 
     private fun createNotificationIntegrationAction(component: TriggerComponent): NotificationIntegrationAction {
-        return NotificationIntegrationAction(projectService, notificationService)
+        return NotificationIntegrationAction(projectService, notificationService, component)
     }
 
     fun removeIntegrationAction(componentId: Int) {
@@ -97,11 +94,11 @@ class IntegrationManager(
         wrapper.subscription.dispose()
     }
 
-    private fun createSlackIntegrationAction(component: TriggerComponent): SlackIntegrationAction{
+    private fun createSlackIntegrationAction(component: TriggerComponent): SlackIntegrationAction {
         return SlackIntegrationAction(component.actionDestination.token, slackBot)
     }
 
-    private fun createTelegramIntegrationFunction(component: TriggerComponent): TelegramIntegrationAction{
+    private fun createTelegramIntegrationFunction(component: TriggerComponent): TelegramIntegrationAction {
         return TelegramIntegrationAction(component.actionDestination.token, telegramBot)
     }
 }

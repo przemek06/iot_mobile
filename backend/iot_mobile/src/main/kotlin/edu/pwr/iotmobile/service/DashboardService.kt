@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.service
 
 import edu.pwr.iotmobile.dto.DashboardDTO
+import edu.pwr.iotmobile.entities.Dashboard
 import edu.pwr.iotmobile.error.exception.DashboardAlreadyExistsException
 import edu.pwr.iotmobile.error.exception.DashboardNotFoundException
 import edu.pwr.iotmobile.error.exception.NoAuthenticationException
@@ -57,6 +58,10 @@ class DashboardService(
 
     fun findById(dashboardId: Int): DashboardDTO {
         return dashboardRepository.findById(dashboardId).orElseThrow { DashboardNotFoundException() }.toDTO()
+    }
+
+    fun findEntityById(dashboardId: Int): Dashboard {
+        return dashboardRepository.findById(dashboardId).orElseThrow { DashboardNotFoundException() }
     }
 
 }
