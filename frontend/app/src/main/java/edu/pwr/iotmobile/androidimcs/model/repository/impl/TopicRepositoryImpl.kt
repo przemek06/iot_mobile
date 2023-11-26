@@ -2,7 +2,7 @@ package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
 import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.dto.TopicDto
-import edu.pwr.iotmobile.androidimcs.data.result.CreateTopicResult
+import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.TopicRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 
@@ -11,15 +11,15 @@ private const val TAG = "TopicRepo"
 class TopicRepositoryImpl(
     private val remoteDataSource: TopicRemoteDataSource
 ) : TopicRepository {
-    override suspend fun createTopic(topicDto: TopicDto): CreateTopicResult {
+    override suspend fun createTopic(topicDto: TopicDto): CreateResult {
         val result = remoteDataSource.createTopic(topicDto)
         val code = result.code()
         Log.d(TAG, "create topic result code: $code")
         return when (code) {
-            200 -> CreateTopicResult.Success
-            401 -> CreateTopicResult.NotAuthorized
-            409 -> CreateTopicResult.AlreadyExists
-            else -> CreateTopicResult.Failure
+            200 -> CreateResult.Success
+            401 -> CreateResult.NotAuthorized
+            409 -> CreateResult.AlreadyExists
+            else -> CreateResult.Failure
         }
     }
 

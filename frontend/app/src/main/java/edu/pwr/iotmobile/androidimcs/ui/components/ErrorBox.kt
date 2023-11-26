@@ -25,7 +25,10 @@ fun ErrorBox(
     isFullScreen: Boolean = true
 ) {
     Box(modifier = modifier.conditional(isFullScreen) { fillMaxSize() }) {
-        Column(modifier = Modifier.align(Alignment.Center)) {
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Image(
                 modifier = Modifier.size(240.dp),
                 painter = painterResource(id = R.drawable.ic_thinking),

@@ -1,5 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.projects
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +21,9 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -35,11 +40,23 @@ fun ProjectsScreen(
     val context = LocalContext.current
     viewModel.toast.CollectToast(context)
 
-    ProjectsScreenContent(
-        uiState = uiState,
-        uiInteraction = uiInteraction,
-        navigation = navigation
-    )
+    if (uiState.isError) {
+        ErrorBox()
+    } else if (uiState.isLoading) {
+        LoadingBox()
+    }
+
+    AnimatedVisibility(
+        visible = !uiState.isError && !uiState.isLoading,
+        enter = fadeIn(initialAlpha = 0.3f),
+        exit = fadeOut()
+    ) {
+        ProjectsScreenContent(
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            navigation = navigation
+        )
+    }
 }
 
 @Composable
@@ -52,10 +69,10 @@ fun ProjectsScreenContent(
     if (uiState.isDialogVisible) {
         SimpleDialog(
             title = stringResource(R.string.add_new_project_dialog),
+            isLoading = uiState.isDialogLoading,
             onCloseDialog = { uiInteraction.setDialogInvisible() },
             onConfirm = {
                 uiInteraction.addNewProject(uiState.inputFiled.text)
-                uiInteraction.setDialogInvisible()
             }
         ) {
             Text(
@@ -110,6 +127,8 @@ private fun ProjectsInputField(
     InputField(
         text = uiState.inputFiled.text,
         label = stringResource(id = uiState.inputFiled.label),
+        isError = uiState.inputFiled.isError,
+        errorText = stringResource(id = uiState.inputFiled.errorMessage),
         onValueChange = { uiInteraction.onTextChange(it) }
     )
 }

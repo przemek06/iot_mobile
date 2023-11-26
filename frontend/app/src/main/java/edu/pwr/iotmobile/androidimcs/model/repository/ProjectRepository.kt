@@ -5,10 +5,11 @@ import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
+import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 
 interface ProjectRepository {
 
-    suspend fun createProject(projectDto: ProjectDto): Result<Unit>
+    suspend fun createProject(projectDto: ProjectDto): CreateResult
     suspend fun regenerateConnectionKey(projectId: Int): Result<ProjectDto> // 401 - not allowed
     suspend fun getProjects(): List<ProjectDto>
     suspend fun getUsersByProjectId(id: Int): List<UserInfoDto>

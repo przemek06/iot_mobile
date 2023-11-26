@@ -1,22 +1,28 @@
 package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
+import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDto
 import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
+import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ProjectRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 
 class ProjectRepositoryImpl(
     private val remoteDataSource: ProjectRemoteDataSource
 ) : ProjectRepository {
-    override suspend fun createProject(projectDto: ProjectDto): Result<Unit> {
+    override suspend fun createProject(projectDto: ProjectDto): CreateResult {
         val result = remoteDataSource.createProject(projectDto)
-        return if (result.isSuccessful)
-            Result.success(Unit)
-        else
-            Result.failure(Exception("Create project failed"))
+        val code = result.code()
+        Log.d("ProjectRepo", "createDashboard result code: $code")
+        return when (code) {
+            200 -> CreateResult.Success
+            401 -> CreateResult.NotAuthorized
+            409 -> CreateResult.AlreadyExists
+            else -> CreateResult.Failure
+        }
     }
 
     override suspend fun regenerateConnectionKey(projectId: Int): Result<ProjectDto> {

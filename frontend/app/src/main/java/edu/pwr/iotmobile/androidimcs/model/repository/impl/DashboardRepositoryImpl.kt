@@ -2,7 +2,7 @@ package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
 import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
-import edu.pwr.iotmobile.androidimcs.data.result.CreateDashboardResult
+import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.DashboardRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 
@@ -11,15 +11,15 @@ private const val TAG = "DashboardRepo"
 class DashboardRepositoryImpl(
     private val remoteDataSource: DashboardRemoteDataSource
 ) : DashboardRepository {
-    override suspend fun createDashboard(dashboardDto: DashboardDto): CreateDashboardResult {
+    override suspend fun createDashboard(dashboardDto: DashboardDto): CreateResult {
         val result = remoteDataSource.createDashboard(dashboardDto)
         val code = result.code()
         Log.d(TAG, "createDashboard result code: $code")
         return when (code) {
-            200 -> CreateDashboardResult.Success
-            401 -> CreateDashboardResult.NotAuthorized
-            409 -> CreateDashboardResult.AlreadyExists
-            else -> CreateDashboardResult.Failure
+            200 -> CreateResult.Success
+            401 -> CreateResult.NotAuthorized
+            409 -> CreateResult.AlreadyExists
+            else -> CreateResult.Failure
         }
     }
 

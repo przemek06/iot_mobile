@@ -29,6 +29,7 @@ fun ButtonCommon(
     text: String = "",
     type: ButtonCommonType = ButtonCommonType.Primary,
     width: Dp? = null,
+    isDisabled: Boolean = false,
     onClick: () -> Unit
 ) {
     val textColor =
@@ -59,6 +60,7 @@ fun ButtonCommon(
         shape = MaterialTheme.shapes.medium,
         colors = colors,
         border = border,
+        enabled = !isDisabled,
         contentPadding = PaddingValues(horizontal = Dimensions.space22, vertical = Dimensions.space14),
         interactionSource = remember { MutableInteractionSource() },
         onClick = onClick

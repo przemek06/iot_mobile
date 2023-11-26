@@ -193,4 +193,6 @@
     <string name="s56">Operation failed.</string>
     <string name="s57">Something went wrong</string>
     <string name="s58">Please try again</string>
+    <string name="s59">Project name cannot be empty</string>
+    <string name="s60">Project with this name already exists</string>
 </resources>
