@@ -7,6 +7,7 @@ interface AddTopicUiInteraction {
     fun onTextChange(text: String, type: AddTopicViewModel.InputFieldType)
     fun selectTopic(topic: TopicDataType)
     fun addTopic(projectId: Int?)
+    fun checkInputFieldData()
 
     companion object {
         fun default(
@@ -22,6 +23,10 @@ interface AddTopicUiInteraction {
 
             override fun addTopic(projectId: Int?) {
                 viewModel.addTopic(projectId)
+            }
+
+            override fun checkInputFieldData() {
+                viewModel.checkInputFieldData()
             }
         }
     }

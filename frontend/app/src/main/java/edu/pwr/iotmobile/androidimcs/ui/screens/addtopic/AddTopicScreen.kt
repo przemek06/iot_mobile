@@ -73,8 +73,7 @@ private fun AddTopicScreenContent(
             .fillMaxSize()
             .clickable(interactionSource = MutableInteractionSource(), indication = null) {
                 keyboardFocus.clear()
-                // TODO:
-//                uiInteraction.checkData()
+                uiInteraction.checkInputFieldData()
             }
     ) {
         TopBar(text = stringResource(R.string.add_topic)) {
@@ -105,7 +104,9 @@ private fun AddTopicScreenContent(
                     Dimensions.space18.HeightSpacer()
                     InputField(
                         text = it.value.inputFieldData.text,
-                        label = stringResource(it.value.inputFieldData.label)
+                        label = stringResource(it.value.inputFieldData.label),
+                        isError = it.value.inputFieldData.isError,
+                        errorText = stringResource(it.value.inputFieldData.errorMessage)
                     ) { text ->
                         uiInteraction.onTextChange(
                             type = it.key,
@@ -139,6 +140,7 @@ private fun AddTopicScreenContent(
                     ButtonCommon(
                         modifier = Modifier.align(Alignment.Center),
                         text = stringResource(id = R.string.confirm),
+                        isDisabled = uiState.isLoading,
                         width = Dimensions.buttonWidth
                     ) { uiInteraction.addTopic(projectId = navigation.projectId) }
                 }

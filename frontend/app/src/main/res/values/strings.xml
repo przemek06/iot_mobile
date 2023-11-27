@@ -151,7 +151,7 @@
     <string name="s20">Edit dashboard</string>
     <string name="s21">Delete dashboard</string>
     <string name="s22">This is the name which will be displayed throughout this app</string>
-    <string name="s23">This is the name, which will represent your topic when you want to access it on your IoT device.</string>
+    <string name="s23">The name of your topic, must be unique. Use it on your IoT device when you want to access messages sent from the mobile app.</string>
     <string name="s24">Enter a unique name</string>
     <string name="s25">Unique name</string>
     <string name="s26">Previous</string>
@@ -201,4 +201,5 @@
     <string name="s64">Are you sure you want to delete this dashboard (%s)?</string>
     <string name="s65">The dashboard will be deleted for all users.</string>
     <string name="s66">This field cannot be empty</string>
+    <string name="s67">Topic with this name already exists</string>
 </resources>

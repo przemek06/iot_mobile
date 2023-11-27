@@ -75,12 +75,12 @@ fun TopicsScreenContent(
         items(uiState.topics) {
             if (uiState.userProjectRole == UserProjectRole.VIEWER) {
                 NonErasableBlock(
-                    primaryText = it.title + ": " + it.name,
+                    primaryText = it.name,
                     secondaryText = it.dataType.name.firstUppercaseRestLowercase(),
                 )
             } else {
                 ErasableBlock(
-                    primaryText = it.title + ": " + it.name,
+                    primaryText = it.name,
                     secondaryText = it.dataType.name.firstUppercaseRestLowercase(),
                     onErase = { dialogTopic = it }
                 )
