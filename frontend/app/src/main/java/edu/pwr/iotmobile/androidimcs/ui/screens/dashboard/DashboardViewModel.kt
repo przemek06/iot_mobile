@@ -127,6 +127,9 @@ class DashboardViewModel(
     private fun onComponentChangeMessage(data: ComponentListDto) {
         Log.d("Web", "onComponentChangeMessage called")
         Log.d("Web", data.toString())
+        componentListDto = componentListDto?.copy(
+            components = data.components.sortedBy { it.index }
+        )
         _uiState.update { ui ->
             ui.copy(
                 components = data.components

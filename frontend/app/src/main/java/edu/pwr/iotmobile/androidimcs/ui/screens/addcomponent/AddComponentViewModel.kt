@@ -298,9 +298,15 @@ class AddComponentViewModel(
             }
             val componentListDto = ComponentsListState.getScoped(scopeID)?.componentListDto ?: return@launch
 
+            Log.d("CompList", "componentListDto")
+            Log.d("CompList", componentListDto.toString())
+
             val newComponents = (componentListDto.components + listOf(data))
                 .mapIndexed { index, item -> item.copy(index = index) }
             val newDto = componentListDto.copy(components = newComponents)
+
+            Log.d("Comp", "newDto")
+            Log.d("Comp", newDto.toString())
 
             kotlin.runCatching {
                 componentRepository.updateComponentList(newDto)
