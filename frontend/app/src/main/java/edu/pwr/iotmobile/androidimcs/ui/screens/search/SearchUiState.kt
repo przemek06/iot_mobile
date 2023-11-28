@@ -13,7 +13,9 @@ data class SearchUiState (
     val data: SearchViewModel.ScreenData,
     val isDialogVisible: Boolean,
     val userRoles: List<ProjectRoleDto>,
-    val selectedRole: UserProjectRole
+    val selectedRole: UserProjectRole,
+    val isLoading: Boolean = false,
+    val isError: Boolean = false,
 ) {
      companion object {
          fun default(

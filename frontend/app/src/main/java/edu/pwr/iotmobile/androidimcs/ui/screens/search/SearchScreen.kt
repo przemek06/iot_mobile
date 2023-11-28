@@ -17,8 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
-import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
-import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ActionOption
 import edu.pwr.iotmobile.androidimcs.ui.components.RadioButtonWithText
 import edu.pwr.iotmobile.androidimcs.ui.components.SearchField
@@ -90,49 +88,47 @@ private fun SearchScreenContent(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Dimensions.space22),
-    ) {
-
+    Column(modifier = Modifier.fillMaxSize()) {
         TopBar(text = stringResource(uiState.data.topBarText)) {
             navigation.goBack()
         }
+        Column(
+            modifier = Modifier.padding(horizontal = Dimensions.space22),
+        ) {
+            Dimensions.space10.HeightSpacer()
 
-        Dimensions.space10.HeightSpacer()
+            Text(
+                text = stringResource(id = R.string.search_screen_1),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
 
-        Text(
-            text = stringResource(id = R.string.search_screen_1),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+            Dimensions.space10.HeightSpacer()
 
-        Dimensions.space10.HeightSpacer()
+            SearchField(
+                text = uiState.searchInputFieldData,
+                modifier = Modifier.fillMaxWidth()
+            ) { uiInteraction.onTextChange(it) }
 
-        SearchField(
-            text = uiState.searchInputFieldData,
-            modifier = Modifier.fillMaxWidth()
-        ) { uiInteraction.onTextChange(it) }
+            Dimensions.space40.HeightSpacer()
 
-        Dimensions.space40.HeightSpacer()
-
-        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-            items(uiState.searchedUsers) {
-                ActionOption(
-                    user = it,
-                    userProjectRole = UserProjectRole.VIEWER,
-                    buttonText = if(!uiState.data.alternative(it)) {
-                        stringResource(uiState.data.buttonText)
-                    } else {
-                        stringResource(uiState.data.buttonTextAlternative)
+            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
+                items(uiState.searchedUsers) {
+                    ActionOption(
+                        user = it,
+                        userProjectRole = UserProjectRole.VIEWER,
+                        buttonText = if (!uiState.data.alternative(it)) {
+                            stringResource(uiState.data.buttonText)
+                        } else {
+                            stringResource(uiState.data.buttonTextAlternative)
+                        }
+                    ) {
+                        uiInteraction.setSelectedUser(it)
+                        uiState.data.buttonFunction(it)
+                        uiInteraction.setDialogVisible()
                     }
-                ) {
-                    uiInteraction.setSelectedUser(it)
-                    uiState.data.buttonFunction(it)
-                    uiInteraction.setDialogVisible()
+                    Dimensions.space10.HeightSpacer()
                 }
-                Dimensions.space10.HeightSpacer()
             }
         }
     }

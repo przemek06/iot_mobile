@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.search
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,9 +13,9 @@ import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto.Companion.toDto
+import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
-import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -54,7 +55,7 @@ class SearchViewModel(
                 dialogTitle = R.string.search_block_1,
                 dialogTitleAlternative = R.string.search_block_2,
                 dialogButton2Function = {
-                    toggleBlockUser(it)                      // TODO:
+                    toggleBlockUser(it)
                     setDialogInvisible()
                 },
                 dialogButton2FunctionAlternative = {
@@ -161,56 +162,87 @@ class SearchViewModel(
     }
 
     fun addAdmin(userId: Int, projectId: Int?) {
-        projectId?.let { viewModelScope.launch {
-            val result = projectRepository.addProjectAdmin(
-                userId = userId,
-                projectId = projectId
-            )
-            if(result.isSuccess) {
-                toast.toast("Added admin")
-                return@launch
+        viewModelScope.launch {
+            try {
+                projectId?.let {
+                    val result = projectRepository.addProjectAdmin(
+                        userId = userId,
+                        projectId = projectId
+                    )
+                    if (result.isSuccess) {
+                        toast.toast("Successfully added admin")
+                        return@launch
+                    }
+                    toast.toast("Could not add admin.")
+                }
+            } catch (e: Exception) {
+                Log.e("Search", "Could not add admin.", e)
+                toast.toast("Could not add admin.")
             }
-            toast.toast("Failure")
-        } }
+        }
     }
+    // TODO: implement
     fun toggleBlockUser(user: User) {
 
     }
     private fun inviteUser(userId: Int, projectId: Int?) {
+        if (projectId == null) {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
         viewModelScope.launch {
-            projectId?.let { projectId ->
-                val result = projectRepository.createInvitation(InvitationDtoSend(
-                    project = ProjectDto(
-                        id = projectId,
-                        name = "",
-                        createdBy = 0
-                    ),
-                    userId = userId
-                ))
-                if(result.isSuccess) {
-                    toast.toast("Invited user")
+            try {
+                val result = projectRepository.createInvitation(
+                    InvitationDtoSend(
+                        project = ProjectDto(
+                            id = projectId,
+                            name = "",
+                            createdBy = 0
+                        ),
+                        userId = userId
+                    )
+                )
+                if (result.isSuccess) {
+                    toast.toast("Successfully invited user.")
                     return@launch
                 }
+                toast.toast("Could not invite user.")
+            } catch (e: Exception) {
+                Log.e("Search", "Could not invite user", e)
+                toast.toast("Could not invite user.")
             }
-            toast.toast("Failure")
         }
     }
 
     private fun revokeAccess(userId: Int, projectId: Int?) {
-        projectId?.let { viewModelScope.launch {
-            val result = projectRepository.revokeAccess(
-                userId = userId,
-                projectId = projectId
-            )
-            if(result.isSuccess) {
-                toast.toast("Revoked access")
-                return@launch
+        if (projectId == null) {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val result = projectRepository.revokeAccess(
+                    userId = userId,
+                    projectId = projectId
+                )
+                if (result.isSuccess) {
+                    toast.toast("Successfully revoked access")
+                    return@launch
+                }
+                toast.toast("Could not revoke access to user.")
+            } catch (e: Exception) {
+                Log.e("Search", "Could not revoke access to user.", e)
+                toast.toast("Could not revoke access to user.")
             }
-            toast.toast("Failure")
-        } }
+        }
     }
 
     private fun editRole(user: User, projectId: Int?) {
+        if (projectId == null) {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
         projectId?.let { viewModelScope.launch {
             val projectRoleDto = ProjectRoleDto(
                 projectId = projectId,
@@ -219,13 +251,17 @@ class SearchViewModel(
             )
             val result = projectRepository.editProjectRole(projectRoleDto)
             if(result.isSuccess) {
-                toast.toast("Changed role")
+                toast.toast("Successfully changed role.")
                 return@launch
             }
-            toast.toast("Failure")
+            toast.toast("Operation failed.")
         } }
     }
     private fun getRoles(projectId: Int?) {
+        if (projectId == null) {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
         projectId?.let { id -> viewModelScope.launch {
             val result = projectRepository.findAllProjectRolesByProjectId(id)
             result.onSuccess { list ->
@@ -237,6 +273,7 @@ class SearchViewModel(
     }
 
     private fun getAllUsers() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val result = userRepository.getAllUserInfo()
             result.onSuccess { list ->
@@ -244,26 +281,48 @@ class SearchViewModel(
                 _uiState.update { state ->
                     state.copy(
                         users = users,
-                        searchedUsers = users
+                        searchedUsers = users,
+                        isError = false,
+                        isLoading = false
                     )
                 }
             }
-            result.onFailure { toast.toast("Cannot list users") }
+            result.onFailure {
+                toast.toast("Cannot list users")
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isError = true
+                    )
+                }
+            }
         }
     }
     private fun getProjectUsers(projectId: Int?) {
-        projectId?.let {
-            viewModelScope.launch {
-
+        if (projectId == null) {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            try {
                 val list = projectRepository.getUsersByProjectId(projectId)
                 val users = list.mapNotNull { it.toUser() }
 
                 _uiState.update { state ->
                     state.copy(
                         users = users,
-                        searchedUsers = users
+                        searchedUsers = users,
+                        isError = false,
+                        isLoading = true
                     )
                 }
+            } catch (e: Exception) {
+                Log.e("Search", "Cannot get project users", e)
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    isError = true
+                ) }
             }
         }
     }
