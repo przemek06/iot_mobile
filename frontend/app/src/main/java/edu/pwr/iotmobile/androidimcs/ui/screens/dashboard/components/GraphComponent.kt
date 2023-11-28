@@ -1,8 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components
 
 import android.graphics.Paint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
@@ -77,6 +75,7 @@ fun LazyStaggeredGridItemScope.GraphComponent(
             data.minBy { it.second }.second * 0.8f
         }
         val density = LocalDensity.current
+
         val textPaint = remember(density) {
             Paint().apply {
                 color = android.graphics.Color.WHITE
@@ -91,7 +90,6 @@ fun LazyStaggeredGridItemScope.GraphComponent(
                 color = onBackground.toArgb()
                 textSize = textFontSize
                 textAlign = android.graphics.Paint.Align.CENTER
-                //typeface = Typeface.createFromAsset(context.assets, "font/readexpro_regular.ttf")
             }
         }
         Canvas(
@@ -207,17 +205,6 @@ fun LazyStaggeredGridItemScope.GraphComponent(
                     pathEffect = dashedLine
                 )
             }
-
-//        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-//        Canvas(Modifier.fillMaxWidth().height(1.dp)) {
-//
-//            drawLine(
-//                color = Color.Red,
-//                start = Offset(0f, 0f),
-//                end = Offset(size.width, 0f),
-//                pathEffect = pathEffect
-//            )
-//        }
         }
     }
 }
