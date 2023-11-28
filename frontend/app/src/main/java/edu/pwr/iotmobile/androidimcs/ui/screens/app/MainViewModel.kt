@@ -1,10 +1,10 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.app
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
+import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val userRepository: UserRepository,
+    private val projectRepository: ProjectRepository,
     val toast: Toast,
     val event: Event
 ) : ViewModel() {
@@ -22,23 +23,22 @@ class MainViewModel(
     val uiState = _uiState.asStateFlow()
 
     init {
-        Log.d("User", "init called")
         viewModelScope.launch(Dispatchers.Default) {
-            userRepository.getLoggedInUser().collect { user ->
-                _uiState.update {
-                    it.copy(isUserLoggedIn = user != null)
-                }
-                Log.d("User", user.toString())
+            kotlin.runCatching {
+                userRepository.getLoggedInUser().collect { user ->
+                    _uiState.update {
+                        it.copy(isUserLoggedIn = user != null)
+                    }
 
-                if (_uiState.value.isLoading) {
-                    _uiState.update { it.copy(isLoading = false) }
+                    if (_uiState.value.isLoading) {
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
                 }
+
+                val invitations = projectRepository.findAllPendingInvitationsForActiveUser()
+                val isInvitation = invitations.isNotEmpty()
+                _uiState.update { it.copy(isInvitation = isInvitation) }
             }
         }
-    }
-
-    companion object {
-        const val USER_LOGGED_IN = "userLoggedIn"
-        const val USER_LOGGED_OUT = "userLoggedOut"
     }
 }

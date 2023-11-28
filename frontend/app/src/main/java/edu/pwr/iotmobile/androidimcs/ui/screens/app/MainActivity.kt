@@ -7,6 +7,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -16,9 +18,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.model.listener.InvitationAlertWebSocketListener
 import edu.pwr.iotmobile.androidimcs.ui.navigation.BottomNavigationBar
 import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
@@ -92,11 +97,18 @@ private fun AppContent(isInvitation: Boolean) {
         if (uiState.isUserLoggedIn) Screen.Main.path
         else Screen.Login.path
 
-    if (!uiState.isLoading) {
+    AnimatedVisibility(visible = !uiState.isLoading) {
         BottomNavigationBar(
             navController = navController,
             startDestination = startDestination,
-            isInvitation = isInvitation
+            isInvitation = isInvitation || uiState.isInvitation
+        )
+    }
+    AnimatedVisibility(visible = uiState.isLoading) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_dog_cosmos),
+            contentDescription = "Dog in cosmos",
+            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
         )
     }
 }
