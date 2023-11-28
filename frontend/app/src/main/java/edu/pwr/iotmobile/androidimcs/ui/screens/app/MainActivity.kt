@@ -25,9 +25,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.model.listener.InvitationAlertWebSocketListener
+import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import edu.pwr.iotmobile.androidimcs.ui.navigation.BottomNavigationBar
 import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
 import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
@@ -36,17 +40,24 @@ class MainActivity : ComponentActivity() {
     private var activity: MutableState<Activity?> = mutableStateOf(null)
     private var isInvitation: MutableState<Boolean> = mutableStateOf(false)
     private var invitationAlertWebSocketListener: InvitationAlertWebSocketListener? = null
+    private val userRepository: UserRepository by inject()
     private val client: OkHttpClient by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity.value = this
 
-        invitationAlertWebSocketListener?.closeWebSocket()
-        invitationAlertWebSocketListener = InvitationAlertWebSocketListener(
-            client = client,
-            onNewInvitation = { data -> onNewInvitation(data) }
-        )
+        CoroutineScope(Dispatchers.Default).launch {
+            userRepository.getLoggedInUser().collect {
+                if (it != null) {
+                    invitationAlertWebSocketListener?.closeWebSocket()
+                    invitationAlertWebSocketListener = InvitationAlertWebSocketListener(
+                        client = client,
+                        onNewInvitation = { data -> onNewInvitation(data) }
+                    )
+                }
+            }
+        }
 
         setContent {
             AndroidIMCSTheme {

@@ -25,6 +25,7 @@ fun MainScreen(navigation: MainScreenNavigation) {
     val viewModel: MainScreenViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
+    // TODO: Loading and error screens and animation
     MainScreenContent(
         uiState = uiState,
         navigation = navigation
@@ -40,11 +41,23 @@ private fun MainScreenContent(
         modifier = Modifier.padding(horizontal = Dimensions.space22)
     ) {
         item {
+            Dimensions.space60
+            Text(
+                text = stringResource(id = R.string.a_s58, uiState.user?.displayName ?: ""),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Dimensions.space30.HeightSpacer()
+        }
+
+        item {
             Invitations(
                 isVisible = uiState.isInvitation,
                 navigation = navigation
             )
         }
+
+
     }
 }
 
@@ -69,5 +82,16 @@ private fun Invitations(
                 ) { navigation.openInvitations() }
             }
         }
+    }
+}
+
+@Composable
+private fun NewToApp() {
+    Column {
+        Text(
+            text = stringResource(id = R.string.a_s57),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
