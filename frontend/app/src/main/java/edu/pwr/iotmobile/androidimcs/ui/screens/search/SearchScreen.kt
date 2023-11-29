@@ -129,8 +129,8 @@ private fun SearchScreenContent(
                     }
                 ) {
                     uiInteraction.setSelectedUser(it)
-                    uiState.data.buttonFunction(it)
-                    uiInteraction.setDialogVisible()
+                    if (uiState.data.buttonFunction(it) == null)
+                        uiInteraction.setDialogVisible()
                 }
                 Dimensions.space10.HeightSpacer()
             }

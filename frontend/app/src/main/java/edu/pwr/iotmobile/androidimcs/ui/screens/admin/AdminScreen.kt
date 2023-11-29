@@ -28,16 +28,23 @@ fun AdminScreen(navigation: AdminNavigation) {
 
     val viewModel = koinViewModel<AdminViewModel>()
     val uiState by viewModel.uiState.collectAsState()
+    val uiInteraction = AdminUiInteraction.default(viewModel, navigation)
 
     LaunchedEffect(Unit) {
         viewModel.init(navigation)
     }
 
-    AdminScreenContent(uiState)
+    AdminScreenContent(
+        uiState = uiState,
+        uiInteraction = uiInteraction
+    )
 }
 
 @Composable
-fun AdminScreenContent(uiState: AdminUiState) {
+fun AdminScreenContent(
+    uiState: AdminUiState,
+    uiInteraction: AdminUiInteraction
+) {
 
     val isLogOutDialogVisible = remember { mutableStateOf(false) }
     val isDeleteAccountDialogVisible = remember { mutableStateOf(false) }
@@ -48,7 +55,10 @@ fun AdminScreenContent(uiState: AdminUiState) {
             closeButtonText = stringResource(id = R.string.no),
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isLogOutDialogVisible.value = false },
-            onConfirm = { isLogOutDialogVisible.value = false }
+            onConfirm = {
+                uiInteraction.logout()
+                isLogOutDialogVisible.value = false
+            }
         )
     }
     if (isDeleteAccountDialogVisible.value) {
@@ -57,7 +67,10 @@ fun AdminScreenContent(uiState: AdminUiState) {
             closeButtonText = stringResource(id = R.string.no),
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isDeleteAccountDialogVisible.value = false },
-            onConfirm = { isDeleteAccountDialogVisible.value = false },
+            onConfirm = {
+                uiInteraction.deleteAccount()
+                isDeleteAccountDialogVisible.value = false
+            },
             content = { AccountDeletionContent() }
         )
     }

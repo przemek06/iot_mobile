@@ -10,6 +10,7 @@ interface AdminNavigation {
     fun openBannedUsers()
 
     fun openChangePassword()
+    fun openLogin()
 
     companion object {
         fun default(navController: NavHostController)
@@ -26,6 +27,10 @@ interface AdminNavigation {
 
             override fun openChangePassword() {
                 navController.navigate(Screen.ChangePassword.path)
+            }
+
+            override fun openLogin() {
+                navController.navigate(Screen.Login.path)
             }
         }
     }

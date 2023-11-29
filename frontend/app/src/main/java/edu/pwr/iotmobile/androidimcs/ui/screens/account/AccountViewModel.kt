@@ -82,15 +82,15 @@ class AccountViewModel(
 
     fun deleteAccount(navigation: AccountNavigation) {
         viewModelScope.launch {
-            val result = userRepository.deleteActiveUser()
-
-            result.onSuccess {
+            kotlin.runCatching {
+                userRepository.deleteActiveUser()
+            }.onSuccess {
                 toast.toast("Deleted account")
                 navigation.openLogin()
                 return@launch
+            }.onFailure {
+                toast.toast("Failed deleting account")
             }
-            toast.toast("Failed deleting account")
-
         }
     }
 
@@ -102,12 +102,12 @@ class AccountViewModel(
 
     fun logout(navigation: AccountNavigation) {
         viewModelScope.launch {
-            val result = userRepository.logout()
-            result.onSuccess {
+            kotlin.runCatching {
+                userRepository.logout()
+            }.onSuccess {
                 toast.toast("Logged out")
                 navigation.openLogin()
-            }
-            result.onFailure {
+            }.onFailure {
                 toast.toast("Couldn't log out")
             }
         }
