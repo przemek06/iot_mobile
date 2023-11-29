@@ -4,7 +4,6 @@ import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
 import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 import edu.pwr.iotmobile.androidimcs.data.entity.DashboardEntity
-import edu.pwr.iotmobile.androidimcs.data.result.CreateDashboardResult
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.dao.DashboardDao
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.DashboardRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository

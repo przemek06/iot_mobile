@@ -14,7 +14,7 @@ class AdminViewModel : ViewModel() {
 
     fun init(navigation: AdminNavigation) {
 
-        var adminOptions = listOf(
+        val adminOptions = listOf(
             MenuOption(
                 titleId = R.string.admin_3,
                 onClick = { navigation.openBanUsers() }
@@ -29,7 +29,7 @@ class AdminViewModel : ViewModel() {
             )
         )
 
-        var changePasswordOption = MenuOption(
+        val changePasswordOption = MenuOption(
             titleId = R.string.change_password,
             onClick = { navigation.openChangePassword() }
         )

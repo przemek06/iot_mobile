@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.data.result.ActivateAccountResult
@@ -21,6 +22,14 @@ class ActivateAccountViewModel(
     private val _uiState = MutableStateFlow(ActivateAccountUiState.default())
     val uiState = _uiState.asStateFlow()
 
+    private var _email: String? = null
+
+    fun init(email: String?) {
+        if (email != _email) {
+            _email = email
+        }
+    }
+
     fun onTextChange(text: String) {
         _uiState.update {
             val inputField = it.inputField.copy(text = text)
@@ -32,8 +41,7 @@ class ActivateAccountViewModel(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val code = _uiState.value.inputField
-            val result = repository.verifyUser(code.text)
-            when (result) {
+            when (repository.verifyUser(code.text)) {
                 ActivateAccountResult.Success -> {
                     _uiState.update {
                         it.copy(
@@ -61,7 +69,27 @@ class ActivateAccountViewModel(
     }
 
     fun onResendCode() {
-        // TODO: send email + show toast message
+        val locEmail = _email ?: run {
+            viewModelScope.launch {
+                toast.toast("Could not resend activation code.")
+            }
+            return
+        }
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            try {
+                val result = repository.resendVerificationCode(locEmail)
+                if (result.isSuccess) {
+                    toast.toast("Successfully sent a new activation code. Check your email!")
+                } else {
+                    toast.toast("Could not resend activation code.")
+                }
+            } catch (e: Exception) {
+                Log.e("Activate", "Could not resend activation code.", e)
+                toast.toast("Could not resend activation code.")
+            }
+            _uiState.update { it.copy(isLoading = false) }
+        }
     }
 
     companion object {

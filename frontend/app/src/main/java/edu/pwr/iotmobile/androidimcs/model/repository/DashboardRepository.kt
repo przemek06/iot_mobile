@@ -2,7 +2,6 @@ package edu.pwr.iotmobile.androidimcs.model.repository
 
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
 import edu.pwr.iotmobile.androidimcs.data.entity.DashboardEntity
-import edu.pwr.iotmobile.androidimcs.data.result.CreateDashboardResult
 import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 
 interface DashboardRepository {

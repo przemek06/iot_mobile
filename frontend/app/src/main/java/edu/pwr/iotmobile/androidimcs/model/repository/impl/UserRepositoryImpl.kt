@@ -3,6 +3,7 @@ package edu.pwr.iotmobile.androidimcs.model.repository.impl
 import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
+import edu.pwr.iotmobile.androidimcs.data.dto.EmailDto
 import edu.pwr.iotmobile.androidimcs.data.dto.PasswordBody
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
@@ -94,6 +95,15 @@ class UserRepositoryImpl(
             400 -> RegisterUserResult.AccountExists
             else -> RegisterUserResult.Failure
         }
+    }
+
+    override suspend fun resendVerificationCode(email: String): Result<Unit> {
+        val dto = EmailDto(address = email)
+        val response = remoteDataSource.resendVerificationCode(dto)
+        return if (response.isSuccessful)
+            Result.success(Unit)
+        else
+            Result.failure(Exception("Resend verification code failed"))
     }
 
     override suspend fun getLoggedInUser(): Flow<User?> =
