@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class AccountViewModel(
     private val userRepository: UserRepository,
-    private val toast: Toast
+    val toast: Toast
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AccountUiState.default())

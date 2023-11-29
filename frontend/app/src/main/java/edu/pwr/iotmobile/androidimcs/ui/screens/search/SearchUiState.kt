@@ -15,6 +15,7 @@ data class SearchUiState (
     val userRoles: List<ProjectRoleDto>,
     val selectedRole: UserProjectRole,
     val isLoading: Boolean = false,
+    val isDialogLoading: Boolean = false,
     val isError: Boolean = false,
 ) {
      companion object {

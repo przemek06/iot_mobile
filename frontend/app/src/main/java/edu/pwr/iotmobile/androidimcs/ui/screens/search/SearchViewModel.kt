@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 class SearchViewModel(
     private val userRepository: UserRepository,
     private val projectRepository: ProjectRepository,
-    private val toast: Toast
+    val toast: Toast
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState.default())
@@ -161,27 +161,33 @@ class SearchViewModel(
         }
     }
 
-    fun addAdmin(userId: Int, projectId: Int?) {
+    private fun addAdmin(userId: Int, projectId: Int?) {
+        if (projectId == null) {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
+        _uiState.update { it.copy(isDialogLoading = true) }
+
         viewModelScope.launch {
             try {
-                projectId?.let {
-                    val result = projectRepository.addProjectAdmin(
-                        userId = userId,
-                        projectId = projectId
-                    )
-                    if (result.isSuccess) {
-                        toast.toast("Successfully added admin")
-                        return@launch
-                    }
-                    toast.toast("Could not add admin.")
+                val result = projectRepository.addProjectAdmin(
+                    userId = userId,
+                    projectId = projectId
+                )
+                if (result.isSuccess) {
+                    toast.toast("Successfully added admin")
+                    _uiState.update { it.copy(isDialogLoading = false) }
+                    setDialogInvisible()
+                    return@launch
                 }
+                toast.toast("Could not add admin.")
             } catch (e: Exception) {
                 Log.e("Search", "Could not add admin.", e)
                 toast.toast("Could not add admin.")
             }
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
-    // TODO: implement
     fun toggleBlockUser(user: User) {
 
     }
@@ -190,6 +196,8 @@ class SearchViewModel(
             _uiState.update { it.copy(isError = true) }
             return
         }
+        _uiState.update { it.copy(isDialogLoading = true) }
+
         viewModelScope.launch {
             try {
                 val result = projectRepository.createInvitation(
@@ -204,6 +212,8 @@ class SearchViewModel(
                 )
                 if (result.isSuccess) {
                     toast.toast("Successfully invited user.")
+                    _uiState.update { it.copy(isDialogLoading = false) }
+                    setDialogInvisible()
                     return@launch
                 }
                 toast.toast("Could not invite user.")
@@ -211,6 +221,7 @@ class SearchViewModel(
                 Log.e("Search", "Could not invite user", e)
                 toast.toast("Could not invite user.")
             }
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
 
@@ -219,6 +230,7 @@ class SearchViewModel(
             _uiState.update { it.copy(isError = true) }
             return
         }
+        _uiState.update { it.copy(isDialogLoading = true) }
 
         viewModelScope.launch {
             try {
@@ -228,6 +240,8 @@ class SearchViewModel(
                 )
                 if (result.isSuccess) {
                     toast.toast("Successfully revoked access")
+                    _uiState.update { it.copy(isDialogLoading = false) }
+                    setDialogInvisible()
                     return@launch
                 }
                 toast.toast("Could not revoke access to user.")
@@ -235,6 +249,7 @@ class SearchViewModel(
                 Log.e("Search", "Could not revoke access to user.", e)
                 toast.toast("Could not revoke access to user.")
             }
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
 
@@ -243,33 +258,52 @@ class SearchViewModel(
             _uiState.update { it.copy(isError = true) }
             return
         }
-        projectId?.let { viewModelScope.launch {
-            val projectRoleDto = ProjectRoleDto(
-                projectId = projectId,
-                user = user.toDto(),
-                role = _uiState.value.selectedRole.name
-            )
-            val result = projectRepository.editProjectRole(projectRoleDto)
-            if(result.isSuccess) {
-                toast.toast("Successfully changed role.")
-                return@launch
+        _uiState.update { it.copy(isDialogLoading = true) }
+
+        viewModelScope.launch {
+            try {
+                val projectRoleDto = ProjectRoleDto(
+                    projectId = projectId,
+                    user = user.toDto(),
+                    role = _uiState.value.selectedRole.name
+                )
+                val result = projectRepository.editProjectRole(projectRoleDto)
+                if (result.isSuccess) {
+                    toast.toast("Successfully changed role.")
+                    _uiState.update { it.copy(isDialogLoading = false) }
+                    setDialogInvisible()
+                    return@launch
+                }
+                toast.toast("Could not user change role.")
+            } catch (e: Exception) {
+                Log.e("Search", "Could not user change role.", e)
+                toast.toast("Could not user change role.")
             }
-            toast.toast("Operation failed.")
-        } }
+            _uiState.update { it.copy(isDialogLoading = false) }
+        }
     }
     private fun getRoles(projectId: Int?) {
         if (projectId == null) {
             _uiState.update { it.copy(isError = true) }
             return
         }
-        projectId?.let { id -> viewModelScope.launch {
-            val result = projectRepository.findAllProjectRolesByProjectId(id)
-            result.onSuccess { list ->
-                _uiState.update {
-                    it.copy(userRoles = list)
+        viewModelScope.launch {
+            try {
+                val result = projectRepository.findAllProjectRolesByProjectId(projectId)
+                result.onSuccess { list ->
+                    _uiState.update {
+                        it.copy(
+                            userRoles = list,
+                            isError = false
+                        )
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e("Search", "Could not get user roles.", e)
+                toast.toast("Operation failed")
             }
-        } }
+            _uiState.update { it.copy(isDialogLoading = false) }
+        }
     }
 
     private fun getAllUsers() {
@@ -314,7 +348,7 @@ class SearchViewModel(
                         users = users,
                         searchedUsers = users,
                         isError = false,
-                        isLoading = true
+                        isLoading = false
                     )
                 }
             } catch (e: Exception) {

@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
@@ -44,6 +45,9 @@ fun AccountScreen(navigation: AccountNavigation) {
         viewModel.init(navigation)
     }
 
+    val context = LocalContext.current
+    viewModel.toast.CollectToast(context)
+
     ErrorBox(
         isVisible = uiState.isError,
         onReturn = navigation::onReturn
@@ -52,7 +56,7 @@ fun AccountScreen(navigation: AccountNavigation) {
 
     AnimatedVisibility(
         visible = !uiState.isError && !uiState.isLoading,
-        enter = fadeIn(initialAlpha = 0.3f),
+        enter = fadeIn(),
         exit = fadeOut()
     ) {
         AccountScreenContent(

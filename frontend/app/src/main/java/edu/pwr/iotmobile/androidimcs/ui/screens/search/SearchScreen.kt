@@ -1,5 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.search
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,10 +17,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ActionOption
+import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.RadioButtonWithText
 import edu.pwr.iotmobile.androidimcs.ui.components.SearchField
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
@@ -37,11 +43,26 @@ fun SearchScreen(navigation: SearchNavigation) {
         viewModel.init(navigation)
     }
 
-    SearchScreenContent(
-        uiInteraction = uiInteraction,
-        uiState = uiState,
-        navigation = navigation
+    val context = LocalContext.current
+    viewModel.toast.CollectToast(context)
+
+    ErrorBox(
+        isVisible = uiState.isError,
+        onReturn = navigation::goBack
     )
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isError && !uiState.isLoading,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        SearchScreenContent(
+            uiInteraction = uiInteraction,
+            uiState = uiState,
+            navigation = navigation
+        )
+    }
 }
 
 @Composable
@@ -61,6 +82,7 @@ private fun SearchScreenContent(
                     uiState.data.dialogTitleAlternative,
                     uiState.selectedUser?.displayName ?: "USER_NAME"
                 ) },
+            isLoading = uiState.isDialogLoading,
             onCloseDialog = { uiInteraction.setDialogInvisible() },
             onConfirm = {
                 if (!alternative) {
@@ -72,7 +94,6 @@ private fun SearchScreenContent(
                         uiState.data.dialogButton2FunctionAlternative(it)
                     }
                 }
-                uiInteraction.setDialogInvisible()
             }
         ) {
             if(navigation.mode == SearchMode.EDIT_ROLES) {
