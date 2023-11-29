@@ -95,6 +95,7 @@ object AppKoin {
         // Local
         singleOf(::UserSessionLocalDataSourceImpl) bind UserSessionLocalDataSource::class
         singleOf(::UserLocalDataSourceImpl) bind UserLocalDataSource::class
+        single { get<AppDatabase>().dashboardDao() }
     }
 
     // Module for repositories accessing data sources

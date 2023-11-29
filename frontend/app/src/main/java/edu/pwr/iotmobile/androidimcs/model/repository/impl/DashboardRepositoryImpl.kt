@@ -2,14 +2,17 @@ package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
 import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
+import edu.pwr.iotmobile.androidimcs.data.entity.DashboardEntity
 import edu.pwr.iotmobile.androidimcs.data.result.CreateDashboardResult
+import edu.pwr.iotmobile.androidimcs.model.datasource.local.dao.DashboardDao
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.DashboardRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 
 private const val TAG = "DashboardRepo"
 
 class DashboardRepositoryImpl(
-    private val remoteDataSource: DashboardRemoteDataSource
+    private val remoteDataSource: DashboardRemoteDataSource,
+    private val localDataSource: DashboardDao
 ) : DashboardRepository {
     override suspend fun createDashboard(dashboardDto: DashboardDto): CreateDashboardResult {
         val result = remoteDataSource.createDashboard(dashboardDto)
@@ -38,5 +41,16 @@ class DashboardRepositoryImpl(
             body
         else
             emptyList()
+    }
+
+    override suspend fun getLastAccessedDashboards(): List<DashboardEntity> = localDataSource.getAll()
+    override suspend fun saveLastAccessedDashboard(dashboardEntity: DashboardEntity) {
+        val currentDashboards = localDataSource
+            .getByDashboardId(dashboardEntity.dashboardId)
+            .toTypedArray()
+        if (currentDashboards.isNotEmpty()) {
+            localDataSource.deleteDashboards(*currentDashboards)
+        }
+        localDataSource.insertDashboard(dashboardEntity)
     }
 }

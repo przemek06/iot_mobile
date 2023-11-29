@@ -186,9 +186,11 @@
     <string name="s55">Graph</string>
     <string name="s56">Operation failed.</string>
     <string name="a_s57">You have new invitations!</string>
-    <string name="a_s58">Welcome, %s</string>
+    <string name="a_s58">Welcome</string>
     <string name="a_s59">New to app?</string>
     <string name="a_s60">Create a new project and access your device</string>
-    <string name="a_s61">Check out tutorial and learn how to operate your devices remotely!</string>
+    <string name="a_s61">Check out the tutorial and learn how to operate your devices remotely!</string>
     <string name="a_s62">You have no last accessed dashboards</string>
+    <string name="learn">Learn</string>
+    <string name="a_s63">Go to projects</string>
 </resources>

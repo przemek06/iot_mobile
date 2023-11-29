@@ -2,6 +2,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +14,8 @@ import kotlinx.coroutines.launch
 
 class MainScreenViewModel(
     private val projectRepository: ProjectRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val dashboardRepository: DashboardRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainScreenUiState())
@@ -32,11 +34,15 @@ class MainScreenViewModel(
                     ) }
                     return@launch
                 }
+
+                val dashboards = dashboardRepository.getLastAccessedDashboards().take(5).reversed()
+
                 _uiState.update { it.copy(
                     isInvitation = isInvitation,
                     user = user,
                     isLoading = false,
-                    isError = false
+                    isError = false,
+                    dashboards = dashboards
                 ) }
             }
         }
