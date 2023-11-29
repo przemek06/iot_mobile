@@ -29,13 +29,17 @@ class ActivateAccountViewModel(
     }
 
     fun onActivate() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val code = _uiState.value.inputField
             val result = repository.verifyUser(code.text)
             when (result) {
                 ActivateAccountResult.Success -> {
                     _uiState.update {
-                        it.copy(isAccountActivated = true)
+                        it.copy(
+                            isAccountActivated = true,
+                            isLoading = false
+                        )
                     }
                     delay(3000)
                     event.event(ACTIVATE_ACCOUNT_SUCCESS_EVENT)
@@ -43,9 +47,15 @@ class ActivateAccountViewModel(
                 }
                 ActivateAccountResult.IncorrectCode -> _uiState.update {
                     val updatedInputField = code.copy(isError = true)
-                    it.copy(inputField = updatedInputField)
+                    it.copy(
+                        inputField = updatedInputField,
+                        isLoading = false
+                    )
                 }
-                ActivateAccountResult.Failure -> toast.toast("Error - could not activate account.")
+                ActivateAccountResult.Failure -> {
+                    toast.toast("Error - could not activate account.")
+                    _uiState.update { it.copy(isLoading = false) }
+                }
             }
         }
     }

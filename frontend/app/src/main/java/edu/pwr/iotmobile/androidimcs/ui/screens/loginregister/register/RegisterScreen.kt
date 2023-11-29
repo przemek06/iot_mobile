@@ -2,6 +2,9 @@
 
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -34,6 +37,7 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
 import edu.pwr.iotmobile.androidimcs.ui.components.PasswordInputField
 import edu.pwr.iotmobile.androidimcs.ui.components.TextLink
@@ -56,11 +60,19 @@ fun RegisterScreen(navigation: RegisterNavigation) {
     }
     viewModel.toast.CollectToast(context)
 
-    RegisterScreenContent(
-        uiState = uiState,
-        uiInteraction = uiInteraction,
-        navigation = navigation
-    )
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isLoading,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        RegisterScreenContent(
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            navigation = navigation
+        )
+    }
 }
 
 @Composable
