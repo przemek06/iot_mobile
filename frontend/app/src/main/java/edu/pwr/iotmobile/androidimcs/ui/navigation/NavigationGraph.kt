@@ -31,6 +31,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreenNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsNavigation
@@ -50,7 +51,9 @@ fun NavGraph(
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Main.path) {
-            MainScreen()
+            MainScreen(
+                navigation = MainScreenNavigation.default(navController)
+            )
         }
 
         composable(Screen.Projects.path) {

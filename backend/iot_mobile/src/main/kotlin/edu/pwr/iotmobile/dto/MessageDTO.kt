@@ -5,7 +5,8 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
 
-data class MessageDTO(
+data class
+MessageDTO(
     @field:NotNull
     val topic: TopicDTO = TopicDTO(),
     @field:NotNull
@@ -13,7 +14,7 @@ data class MessageDTO(
     val message: String,
     @field:NotNull
     val connectionKey: String,
-    val tsSent: String,
+    val tsSent: String = LocalDateTime.now().toString(),
     val id: Int?=null
 ){
 

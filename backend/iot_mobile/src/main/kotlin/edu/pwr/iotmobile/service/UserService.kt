@@ -151,7 +151,7 @@ class UserService(
         return updateUser(id, user)
     }
 
-    fun deleteActiveUser() : Unit {
+    fun deleteActiveUser() {
         val id = getActiveUserId() ?: throw NoAuthenticationException()
         deleteUserById(id)
     }
@@ -190,5 +190,9 @@ class UserService(
             return updateUserPassword(id, passwordDTO)
         }
         throw TokenCodeIncorrectException()
+    }
+
+    fun findUserIdByEmail(email: String) : Int {
+        return findUserByEmail(email)?.id ?: throw NoAuthenticationException()
     }
 }

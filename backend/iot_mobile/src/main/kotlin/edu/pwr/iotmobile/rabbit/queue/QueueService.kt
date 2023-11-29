@@ -20,10 +20,10 @@ class QueueService(
     /**
      * Send string message to queue with exchange of the same name
      */
-    fun sendMessage(exchangeName: String, message: String) {
+    fun sendMessage(exchangeName: String, message: String, connectionKey: String) {
         try {
             log.info(message)
-            rabbitTemplate.convertAndSend(exchangeName, exchangeName, message)
+            rabbitTemplate.convertAndSend(exchangeName, connectionKey, message)
         } catch (_: Exception) {
             throw QueueException()
         }
@@ -42,12 +42,12 @@ class QueueService(
 //        rabbitAdmin.declareBinding(binding)
     }
 
-    fun addQueue(exchangeName: String) : String {
+    fun addQueue(exchangeName: String, connectionKey: String) : String {
         val queue = Queue("", true, false, false)
         val queueName = rabbitAdmin.declareQueue(queue) ?: throw InvalidStateException()
 //        val queue = rabbitAdmin.declareQueue() ?: throw InvalidStateException()
         println("queueName = $queue")
-        val binding = Binding(queueName, Binding.DestinationType.QUEUE, exchangeName, exchangeName, null)
+        val binding = Binding(queueName, Binding.DestinationType.QUEUE, exchangeName, connectionKey, null)
         rabbitAdmin.declareBinding(binding)
         return queueName
     }

@@ -19,7 +19,7 @@ class MessageController(
         return ResponseEntity.ok(messageService.sendMessage(message))
     }
 
-    @PostMapping("/user/messages/device")
+    @PostMapping("/anon/messages/device")
     fun sendMessageFromDevice(@RequestBody message: MessageDTO): ResponseEntity<MessageDTO> {
         return ResponseEntity.ok(messageService.sendMessageFromDevice(message))
     }
