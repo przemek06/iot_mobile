@@ -20,4 +20,7 @@ interface DashboardDao {
 
     @Delete
     fun deleteDashboards(vararg dashboards: DashboardEntity)
+
+    @Query("DELETE FROM dashboards WHERE dashboardId LIKE :id")
+    fun deleteDashboardById(id: Int)
 }

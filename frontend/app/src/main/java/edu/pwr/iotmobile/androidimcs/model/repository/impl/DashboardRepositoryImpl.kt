@@ -28,10 +28,12 @@ class DashboardRepositoryImpl(
 
     override suspend fun deleteDashboard(id: Int): Result<Unit> {
         val result = remoteDataSource.deleteDashboard(id)
-        return if (result.isSuccessful)
+        return if (result.isSuccessful) {
+            localDataSource.deleteDashboardById(id)
             Result.success(Unit)
-        else
+        } else {
             Result.failure(Exception("Delete dashboard failed."))
+        }
     }
 
     override suspend fun getDashboardsByProjectId(projectId: Int): List<DashboardDto> {
