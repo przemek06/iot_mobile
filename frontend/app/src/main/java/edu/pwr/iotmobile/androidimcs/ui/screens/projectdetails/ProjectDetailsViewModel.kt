@@ -43,7 +43,7 @@ class ProjectDetailsViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var _projectId: Int? = null
-    private var _userProjectRole: UserProjectRole? = UserProjectRole.ADMIN
+    private var _userProjectRole: UserProjectRole? = null
 
     private var projectDeletedListener: ProjectDeletedWebSocketListener? = null
 

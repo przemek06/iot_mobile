@@ -112,6 +112,7 @@ fun ComponentsList(
                 }
             }
         }
+
         for (item in uiState.components) {
             val itemSpan =
                 if (item.size == 2) StaggeredGridItemSpan.FullLine

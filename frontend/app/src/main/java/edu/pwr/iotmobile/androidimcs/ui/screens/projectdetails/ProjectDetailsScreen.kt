@@ -96,6 +96,7 @@ private fun ProjectDetailsScreenContent(
     ShowAccessDialog(
         isVisible = isAccessDialogVisible,
         connectionString = uiState.projectData.connectionKey ?: "",
+        uiState = uiState,
         uiInteraction =  uiInteraction,
         onCloseDialog = { isAccessDialogVisible = false }
     )
@@ -220,6 +221,7 @@ private fun DeleteProjectDialog(
 private fun ShowAccessDialog(
     isVisible: Boolean,
     connectionString: String,
+    uiState: ProjectDetailsUiState,
     uiInteraction: ProjectDetailsUiInteraction,
     onCloseDialog: () -> Unit
 ) {
@@ -238,13 +240,15 @@ private fun ShowAccessDialog(
                         clipboardManager.setText(AnnotatedString(text = connectionString))
                     }
                 )
-                Dimensions.space10.HeightSpacer()
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    ButtonCommon(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = stringResource(id = R.string.s46),
-                        onClick = uiInteraction::regenerateConnectionKey
-                    )
+                if (uiState.userProjectRole == UserProjectRole.ADMIN) {
+                    Dimensions.space10.HeightSpacer()
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        ButtonCommon(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = stringResource(id = R.string.s46),
+                            onClick = uiInteraction::regenerateConnectionKey
+                        )
+                    }
                 }
                 Dimensions.space22.HeightSpacer()
                 Text(
