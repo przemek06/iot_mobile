@@ -12,6 +12,7 @@ import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
 import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
 import edu.pwr.iotmobile.androidimcs.data.dto.TopicMessagesDto
+import edu.pwr.iotmobile.androidimcs.data.entity.DashboardEntity
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.listener.ComponentChangeWebSocketListener
@@ -58,12 +59,27 @@ class DashboardViewModel(
         messageReceivedListener?.closeWebSocket()
     }
 
-    fun init(dashboardId: Int, projectId: Int?) {
+    fun init(dashboardId: Int, projectId: Int?, dashboardName: String) {
         if (dashboardId == _dashboardId) return
         _uiState.update { it.copy(isLoading = true) }
 
         _projectId = projectId
         _dashboardId = dashboardId
+
+        projectId?.let {
+            viewModelScope.launch(Dispatchers.IO) {
+                val entity = DashboardEntity(
+                    projectId = projectId,
+                    dashboardId = dashboardId,
+                    dashboardName = dashboardName,
+                )
+                try {
+                    dashboardRepository.saveLastAccessedDashboard(entity)
+                } catch (e: Exception) {
+                    Log.e("LastAccessed", "Could not save dashboard $dashboardId to last accessed.", e)
+                }
+            }
+        }
 
         componentsListener?.closeWebSocket()
         componentsListener = ComponentChangeWebSocketListener(

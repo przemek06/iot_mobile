@@ -83,6 +83,10 @@ class ComponentService(
         return ComponentListDTO(dashboardId, savedDTO)
     }
 
+    fun findAllEntitiesByDashboardIdNoSecurity(dashboardId: Int) : List<Component> {
+        return componentRepository.findAllByDashboardId(dashboardId)
+    }
+
     fun findAllByDashboardIdNoSecurity(dashboardId: Int): ComponentListDTO {
         val entities = componentRepository.findAllByDashboardId(dashboardId)
 
@@ -91,7 +95,7 @@ class ComponentService(
         return ComponentListDTO(dashboardId, savedDTO)
     }
 
-    private fun entitiesToDTOs(entities: List<Component>): List<ComponentDTO> {
+    fun entitiesToDTOs(entities: List<Component>): List<ComponentDTO> {
         return entities.map {
             if (it is InputComponent) {
                 it.toDTO()

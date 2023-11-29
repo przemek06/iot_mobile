@@ -33,7 +33,7 @@ class RabbitListener(
     /**
      * Register new consumer for existing topic
      */
-    fun registerConsumer(exchangeName: String): Pair<String, Flux<MessageDTO>> {
+    fun registerConsumer(exchangeName: String, connectionKey: String): Pair<String, Flux<MessageDTO>> {
         val sink = Sinks.many().unicast().onBackpressureBuffer<MessageDTO>()
 
         val consumer = object : DefaultConsumer(channel) {
@@ -53,7 +53,7 @@ class RabbitListener(
             }
         }
 
-        val queueName = queueService.addQueue(exchangeName)
+        val queueName = queueService.addQueue(exchangeName, connectionKey)
         channel.basicConsume(queueName, true, queueName, consumer)
         return queueName to sink.asFlux()
     }
