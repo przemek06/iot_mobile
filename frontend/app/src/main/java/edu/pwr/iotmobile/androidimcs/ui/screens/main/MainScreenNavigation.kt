@@ -9,6 +9,7 @@ interface MainScreenNavigation {
     fun openDashboardScreen(projectId: Int, dashboardId: Int, dashboardName: String)
 
     fun openProjects()
+    fun openAdmin()
 
     companion object {
         fun default(navController: NavHostController) =
@@ -33,6 +34,10 @@ interface MainScreenNavigation {
 
                 override fun openProjects() {
                     navController.navigate(Screen.Projects.path)
+                }
+
+                override fun openAdmin() {
+                    navController.navigate(Screen.Admin.path)
                 }
             }
     }

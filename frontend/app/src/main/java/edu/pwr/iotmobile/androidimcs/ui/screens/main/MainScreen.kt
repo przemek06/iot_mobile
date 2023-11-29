@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
@@ -31,6 +32,9 @@ import org.koin.androidx.compose.koinViewModel
 fun MainScreen(navigation: MainScreenNavigation) {
     val viewModel: MainScreenViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
+
+    if (uiState.role == UserRole.ADMIN_ROLE)
+        navigation.openAdmin()
 
     // TODO: Loading and error screens and animation
     MainScreenContent(
