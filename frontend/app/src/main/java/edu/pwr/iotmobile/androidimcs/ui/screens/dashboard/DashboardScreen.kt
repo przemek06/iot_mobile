@@ -36,7 +36,7 @@ fun DashboardScreen(navigation: DashboardNavigation) {
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        navigation.onReturn()
+        navigation.onReturn(isDashboardDeleted = true)
     }
     viewModel.toast.CollectToast(context)
 

@@ -52,7 +52,7 @@ fun NavGraph(
     ) {
         composable(Screen.Main.path) {
             MainScreen(
-                navigation = MainScreenNavigation.default(navController)
+                navigation = MainScreenNavigation.default(navController, it)
             )
         }
 

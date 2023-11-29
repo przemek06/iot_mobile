@@ -27,7 +27,7 @@ fun ErrorBox(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
     isFullScreen: Boolean = true,
-    onReturn: () -> Unit
+    onReturn: (() -> Unit)? = null
 ) {
     AnimatedVisibility(
         visible = isVisible,
@@ -57,9 +57,11 @@ fun ErrorBox(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                Dimensions.space30.HeightSpacer()
-                ButtonCommon(text = stringResource(id = R.string.return_text)) {
-                    onReturn()
+                if (onReturn != null) {
+                    Dimensions.space30.HeightSpacer()
+                    ButtonCommon(text = stringResource(id = R.string.return_text)) {
+                        onReturn()
+                    }
                 }
             }
         }

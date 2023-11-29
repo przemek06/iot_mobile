@@ -47,4 +47,15 @@ class MainScreenViewModel(
             }
         }
     }
+
+    fun updateLastAccessed() {
+        viewModelScope.launch(Dispatchers.Default) {
+            kotlin.runCatching {
+                val dashboards = dashboardRepository.getLastAccessedDashboards().take(5).reversed()
+                _uiState.update {
+                    it.copy(dashboards = dashboards)
+                }
+            }
+        }
+    }
 }
