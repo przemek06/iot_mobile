@@ -49,9 +49,8 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.invoke {
             authorizeRequests {
-                authorize("/user/**", hasAuthority(ERole.USER_ROLE.name))
+                authorize("/user/**", hasAnyAuthority(ERole.USER_ROLE.name, ERole.ADMIN_ROLE.name))
                 authorize("/admin/**", hasAuthority(ERole.ADMIN_ROLE.name))
-                authorize("/integration/**", access = "hasIpAddress('127.0.0.1')")
                 authorize("/anon/**", permitAll)
                 authorize("/login", permitAll)
                 authorize("/logout", permitAll)
