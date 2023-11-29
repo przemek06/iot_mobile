@@ -8,6 +8,7 @@ import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDeletedDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData.Companion.toProjectData
@@ -78,6 +79,11 @@ class ProjectDetailsViewModel(
                     val projectRole = projectUserInfo.toUserProjectRole() ?: return@launch
                     _userProjectRole = projectRole
 
+                    val roles = projectRepository
+                        .findAllProjectRolesByProjectId(localProjectId)
+                        .getOrNull()
+                        ?: emptyList()
+
                     val projectData = projectRepository
                         .getProjectById(localProjectId)
                         ?.toProjectData()
@@ -99,6 +105,7 @@ class ProjectDetailsViewModel(
                             user = projectUserInfo.user,
                             userRoleDescriptionId = getUserRoleDescription(projectRole),
                             userProjectRole = projectRole,
+                            roles = roles,
                             userOptionsList = generateUserOptions(projectRole, navigation),
                             menuOptionsList = generateMenuOptions(projectRole),
                             dashboards = getDashboards(),

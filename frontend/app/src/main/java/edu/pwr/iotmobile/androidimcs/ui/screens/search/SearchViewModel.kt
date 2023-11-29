@@ -8,6 +8,7 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
@@ -40,13 +41,25 @@ class SearchViewModel(
                 buttonText = R.string.add_admin,
                 dialogTitle = R.string.search_admin_1,
                 dialogButton2Function = {
-                    addAdmin(
+                    addAdmin(it)
+                    setDialogInvisible()
+                },
+                getUsersFunction = { getAllUsers() },
+                excludeUsersFunction = { excludeAdmins() }
+            )
+            SearchMode.ADD_PROJECT_ADMIN -> ScreenData(
+                topBarText = R.string.add_admin,
+                buttonText = R.string.add_admin,
+                dialogTitle = R.string.search_admin_1,
+                dialogButton2Function = {
+                    addProjectAdmin(
                         userId = it.id,
                         projectId = navigation.projectId
                     )
                     setDialogInvisible()
                 },
-                getUsersFunction = { getProjectUsers(navigation.projectId) }
+                getUsersFunction = { getProjectUsers(navigation.projectId) },
+                excludeUsersFunction = { excludeProjectsAdmins(navigation.projectId) }
             )
             SearchMode.BLOCK_USERS -> ScreenData(
                 topBarText = R.string.block_users,
@@ -64,19 +77,21 @@ class SearchViewModel(
                 },
                 alternative = {
                     it.isBlocked
-                }
+                },
+                getUsersFunction = { getAllUsers() }
             )
             SearchMode.INVITE_USERS -> ScreenData(
                 topBarText = R.string.invite_users,
                 buttonText = R.string.invite,
                 dialogTitle = R.string.sure_invite,
-                dialogButton2Function = {
+                buttonFunction = {
                     inviteUser(
                         userId = it.id,
                         projectId = navigation.projectId
                     )
                 },
-                getUsersFunction = { getAllUsers() }
+                getUsersFunction = { getAllUsers() },
+                excludeUsersFunction = { excludeProjectUsers(navigation.projectId) }
             )
             SearchMode.REVOKE_ACCESS -> ScreenData(
                 topBarText = R.string.revoke_access,
@@ -89,18 +104,19 @@ class SearchViewModel(
                     )
                     setDialogInvisible()
                 },
-                getUsersFunction = { getProjectUsers(navigation.projectId) }
+                getUsersFunction = { getProjectUsers(navigation.projectId) },
+                excludeUsersFunction = { excludeProjectsAdmins(navigation.projectId) }
             )
             SearchMode.EDIT_ROLES -> ScreenData(
                 topBarText = R.string.edit_roles,
                 buttonText = R.string.edit,
                 buttonFunction = {
-                    getRoles(navigation.projectId)
                     _uiState.value.selectedUser?.let { selectedUser ->
                         selectRole(_uiState.value.userRoles.firstOrNull { dto ->
                             dto.user.name == selectedUser.displayName
                         }?.toUserProjectRole() ?: UserProjectRole.VIEWER)
-                    }?: Unit
+                    }
+                    null
                 },
                 dialogTitle = R.string.edit_role_dialog,
                 dialogButton2Function = {
@@ -108,7 +124,6 @@ class SearchViewModel(
                         user = it,
                         projectId = navigation.projectId
                     )
-                    getRoles(navigation.projectId)
                     setDialogInvisible()
                 },
                 getUsersFunction = {
@@ -121,12 +136,16 @@ class SearchViewModel(
                 buttonText = R.string.nothing
             )
         }
-        data.getUsersFunction()
         _uiState.update {
             it.copy(data = data)
         }
+        updateList()
     }
-
+    private fun updateList() {
+        val data = uiState.value.data
+        data.getUsersFunction()
+        data.excludeUsersFunction()
+    }
     fun onTextChange(text: String) {
 
         val searchedUsers = uiState.value.users.filter {
@@ -185,11 +204,35 @@ class SearchViewModel(
                 Log.e("Search", "Could not add admin.", e)
                 toast.toast("Could not add admin.")
             }
-            _uiState.update { it.copy(isDialogLoading = false) }
+        }
+    }
+
+    private fun addProjectAdmin(userId: Int, projectId: Int?) {
+        projectId?.let {
+            viewModelScope.launch {
+                val result = projectRepository.addProjectAdmin(
+                    userId = userId,
+                    projectId = projectId
+                )
+                if (result.isSuccess) {
+                    toast.toast("Added admin")
+                    return@launch
+                }
+                _uiState.update { it.copy(isDialogLoading = false) }
+            }
         }
     }
     fun toggleBlockUser(user: User) {
-
+        viewModelScope.launch {
+            kotlin.runCatching {
+                userRepository.toggleUserBlocked(user.id)
+            }.onSuccess {
+                toast.toast("Success")
+            }.onFailure {
+                toast.toast("Failure")
+            }
+            updateList()
+        }
     }
     private fun inviteUser(userId: Int, projectId: Int?) {
         if (projectId == null) {
@@ -272,6 +315,7 @@ class SearchViewModel(
                     toast.toast("Successfully changed role.")
                     _uiState.update { it.copy(isDialogLoading = false) }
                     setDialogInvisible()
+                    getRoles(projectId)
                     return@launch
                 }
                 toast.toast("Could not user change role.")
@@ -315,7 +359,7 @@ class SearchViewModel(
                 _uiState.update { state ->
                     state.copy(
                         users = users,
-                        searchedUsers = users,
+                        searchedUsers = = users.filter { !state.excludedUsers.contains(it) },
                         isError = false,
                         isLoading = false
                     )
@@ -346,7 +390,7 @@ class SearchViewModel(
                 _uiState.update { state ->
                     state.copy(
                         users = users,
-                        searchedUsers = users,
+                        searchedUsers = users.filter { !state.excludedUsers.contains(it) },
                         isError = false,
                         isLoading = false
                     )
@@ -361,23 +405,84 @@ class SearchViewModel(
         }
     }
 
+    private fun excludeProjectUsers(projectId: Int?) {
+        projectId?.let {
+            viewModelScope.launch {
+                kotlin.runCatching {
+                    val list = projectRepository.getUsersByProjectId(projectId)
+                    list.mapNotNull { it.toUser() }
+                }.onSuccess { excludedUsers ->
+                    _uiState.update {
+                        it.copy(
+                            searchedUsers = it.users.filter { !excludedUsers.contains(it) },
+                            excludedUsers = excludedUsers
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun excludeProjectsAdmins(projectId: Int?) {
+        projectId?.let {
+            viewModelScope.launch {
+                kotlin.runCatching {
+                    val roles = projectRepository.findAllProjectRolesByProjectId(it).getOrNull() ?: return@launch
+                    val users = projectRepository.getUsersByProjectId(projectId)
+                    users.filter { user ->
+                        roles.find { it.user.equals(user) }?.role == UserProjectRole.ADMIN.name
+                    }.mapNotNull { it.toUser() }
+                }.onSuccess { excludedUsers ->
+                    _uiState.update {
+                        it.copy(
+                            searchedUsers = it.users.filter { !excludedUsers.contains(it) },
+                            excludedUsers = excludedUsers
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun excludeAdmins() {
+        viewModelScope.launch {
+            kotlin.runCatching {
+                userRepository
+                    .getAllUserInfo()
+                    .getOrNull()
+                    ?.filter { it.role == UserRole.ADMIN_ROLE.name }
+                    ?.mapNotNull { it.toUser() }
+                    ?: emptyList()
+            }.onSuccess { excludedUsers ->
+                _uiState.update {
+                    it.copy(
+                        searchedUsers = it.users.filter { !excludedUsers.contains(it) },
+                        excludedUsers = excludedUsers
+                    )
+                }
+            }
+        }
+    }
+
     data class ScreenData(
         val topBarText: Int,
         val buttonText: Int,
         val buttonTextAlternative: Int = R.string.nothing,
-        val buttonFunction: (user: User) -> Any = {},
+        val buttonFunction: (user: User) -> Any? = { null },
         val dialogTitle: Int = R.string.nothing,
         val dialogTitleAlternative: Int = R.string.nothing,
         val dialogContent: @Composable () -> Unit = {},
         val dialogButton2Function: (user: User) -> Unit = {},
         val dialogButton2FunctionAlternative: (user: User) -> Unit = {},
         val alternative: (user: User) -> Boolean = { false },
-        val getUsersFunction: () -> Unit = {}
+        val getUsersFunction: () -> Unit = {},
+        val excludeUsersFunction: () -> Unit = {}
     )
 }
 
 enum class SearchMode {
     ADD_ADMIN,
+    ADD_PROJECT_ADMIN,
     BLOCK_USERS,
     INVITE_USERS,
     REVOKE_ACCESS,

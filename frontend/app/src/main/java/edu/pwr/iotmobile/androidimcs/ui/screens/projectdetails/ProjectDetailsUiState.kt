@@ -4,6 +4,7 @@ import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
 import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
@@ -12,6 +13,7 @@ data class ProjectDetailsUiState(
     val selectedTabIndex: Int,
     val user: UserInfoDto,
     val userProjectRole: UserProjectRole,
+    val roles: List<ProjectRoleDto>,
     val userRoleDescriptionId: Int?,
     val userOptionsList: List<MenuOption>,
     val menuOptionsList: List<MenuOption>,
@@ -31,6 +33,7 @@ data class ProjectDetailsUiState(
             selectedTabIndex: Int = 0,
             user: UserInfoDto = UserInfoDto.empty(),
             userProjectRole: UserProjectRole = UserProjectRole.VIEWER,
+            roles: List<ProjectRoleDto> = emptyList(),
             userRoleDescriptionId: Int? = null,
             userOptionsList: List<MenuOption> = emptyList(),
             menuOptionsList: List<MenuOption> = emptyList(),
@@ -44,6 +47,7 @@ data class ProjectDetailsUiState(
             selectedTabIndex = selectedTabIndex,
             user = user,
             userProjectRole = userProjectRole,
+            roles = roles,
             userRoleDescriptionId = userRoleDescriptionId,
             userOptionsList = userOptionsList,
             dashboards = dashboards,

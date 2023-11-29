@@ -29,6 +29,7 @@
     <string name="modify_desc">You can access and edit any dashboards and topics in this group.</string>
     <string name="view_desc">You can access the dashboards and view the topics.</string>
     <string name="admin">admin</string>
+    <string name="editor">editor</string>
     <string name="invite_users">Invite users</string>
     <string name="edit_roles">Edit roles</string>
     <string name="revoke_access">Revoke access</string>
