@@ -28,10 +28,6 @@ class AdminViewModel(
                 onClick = { navigation.openBanUsers() }
             ),
             MenuOption(
-                titleId = R.string.admin_4,
-                onClick = { navigation.openBannedUsers() }
-            ),
-            MenuOption(
                 titleId = R.string.admin_5,
                 onClick = { navigation.openAddAdmin() }
             )

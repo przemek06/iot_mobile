@@ -58,7 +58,7 @@ interface ProjectDetailsNavigation {
 
             override fun openSearchAddAdmin() {
                 projectId?.let {
-                    navController.navigate(Screen.Search.path.appendArguments(SearchMode.ADD_ADMIN, it))
+                    navController.navigate(Screen.Search.path.appendArguments(SearchMode.ADD_PROJECT_ADMIN, it))
                 }
             }
 
