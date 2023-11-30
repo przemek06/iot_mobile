@@ -21,9 +21,12 @@ data class ProjectDetailsUiState(
     val topics: List<Topic>,
     val members: List<UserInfoDto>,
     val isDialogVisible: Boolean,
-    val isInfoVisible: Boolean,
+    val isDeleteProjectDialogVisible: Boolean = false,
     val inputFieldDashboard: InputFieldData,
-    val projectData: ProjectData
+    val projectData: ProjectData,
+    val isLoading: Boolean = true,
+    val isDialogLoading: Boolean = false,
+    val isError: Boolean = false
 ) {
     companion object {
         fun default(
@@ -38,7 +41,6 @@ data class ProjectDetailsUiState(
             topics: List<Topic> = emptyList(),
             members: List<UserInfoDto> = emptyList(),
             isDialogVisible: Boolean = false,
-            isInfoVisible: Boolean = false,
             inputFieldDashboard: InputFieldData = InputFieldData(),
             projectData: ProjectData = ProjectData.empty()
         ) = ProjectDetailsUiState(
@@ -54,7 +56,6 @@ data class ProjectDetailsUiState(
             menuOptionsList = menuOptionsList,
             isDialogVisible = isDialogVisible,
             inputFieldDashboard = inputFieldDashboard,
-            isInfoVisible = isInfoVisible,
             projectData = projectData
         )
     }

@@ -7,7 +7,10 @@ import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData
 data class ProjectsUiState(
     val projects: List<ProjectData>,
     val isDialogVisible: Boolean,
-    val inputFiled: InputFieldData
+    val inputFiled: InputFieldData,
+    val isLoading: Boolean = true,
+    val isDialogLoading: Boolean = false,
+    val isError: Boolean = false
 ) {
     companion object {
         fun default(

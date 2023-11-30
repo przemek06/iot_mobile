@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -22,6 +23,7 @@ import edu.pwr.iotmobile.androidimcs.R
 
 @Composable
 fun PasswordInputField(
+    modifier: Modifier = Modifier,
     text: String,
     label: String,
     width: Dp? = null,
@@ -38,6 +40,7 @@ fun PasswordInputField(
         else PasswordVisualTransformation()
 
     InputField(
+        modifier = modifier,
         text = text,
         label = label,
         width = width,

@@ -19,6 +19,7 @@ fun SimpleDialog(
     confirmButtonText: String = stringResource(id = R.string.confirm),
     onCloseDialog: () -> Unit,
     onConfirm: () -> Unit,
+    isLoading: Boolean = false,
     content: @Composable () -> Unit = {}
 ) {
     AppDialog {
@@ -45,6 +46,7 @@ fun SimpleDialog(
             )
             ButtonCommon(
                 text = confirmButtonText,
+                isDisabled = isLoading,
                 onClick = onConfirm
             )
         }

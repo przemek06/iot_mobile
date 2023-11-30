@@ -1,21 +1,33 @@
-@file:OptIn(ExperimentalComposeUiApi::class)
+@file:OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -25,11 +37,13 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
 import edu.pwr.iotmobile.androidimcs.ui.components.PasswordInputField
 import edu.pwr.iotmobile.androidimcs.ui.components.TextLink
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -46,11 +60,19 @@ fun RegisterScreen(navigation: RegisterNavigation) {
     }
     viewModel.toast.CollectToast(context)
 
-    RegisterScreenContent(
-        uiState = uiState,
-        uiInteraction = uiInteraction,
-        navigation = navigation
-    )
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isLoading,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        RegisterScreenContent(
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            navigation = navigation
+        )
+    }
 }
 
 @Composable
@@ -59,12 +81,19 @@ private fun RegisterScreenContent(
     uiInteraction: RegisterUiInteraction,
     navigation: RegisterNavigation
 ) {
-
     // Used to clear focus and hide keyboard when clicked outside input fields
     val focusManager = LocalFocusManager.current
     val keyboardFocus = KeyboardFocusController(
         keyboardController = LocalSoftwareKeyboardController.current,
         focusManager = focusManager
+    )
+    val scrollableState = rememberScrollState()
+    val scope = rememberCoroutineScope()
+    val bivrList = listOf(
+        remember { BringIntoViewRequester() },
+        remember { BringIntoViewRequester() },
+        remember { BringIntoViewRequester() },
+        remember { BringIntoViewRequester() },
     )
 
     Column(
@@ -74,7 +103,8 @@ private fun RegisterScreenContent(
                 keyboardFocus.clear()
                 uiInteraction.checkData()
             }
-            .padding(Dimensions.space22),
+            .padding(Dimensions.space22)
+            .verticalScroll(scrollableState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -89,9 +119,20 @@ private fun RegisterScreenContent(
         // Input fields
         uiState.inputFields.forEach { inputField ->
             val data = inputField.value
+            val bivr = bivrList[inputField.key.ordinal]
             if (inputField.key == RegisterViewModel.InputFieldType.Password
                 || inputField.key == RegisterViewModel.InputFieldType.ConfirmPassword) {
                 PasswordInputField(
+                    modifier = Modifier
+                        .bringIntoViewRequester(bivr)
+                        .onFocusEvent {
+                            if (it.isFocused) {
+                                scope.launch {
+                                    bivr.bringIntoView()
+                                }
+                            }
+                        }
+                        .focusTarget(),
                     text = data.text,
                     label = stringResource(id = data.label),
                     errorText = stringResource(id = data.errorMessage),
@@ -99,11 +140,22 @@ private fun RegisterScreenContent(
                     onValueChange = { uiInteraction.onTextChange(inputField.key, it) })
             } else {
                 InputField(
+                    modifier = Modifier
+                        .bringIntoViewRequester(bivr)
+                        .onFocusEvent {
+                            if (it.isFocused) {
+                                scope.launch {
+                                    bivr.bringIntoView()
+                                }
+                            }
+                        }
+                        .focusTarget(),
                     text = data.text,
                     label = stringResource(id = data.label),
                     errorText = stringResource(id = data.errorMessage),
                     isError = data.isError,
-                    onValueChange = { uiInteraction.onTextChange(inputField.key, it) }
+                    keyboardOptions = data.keyboardOptions,
+                    onValueChange = { uiInteraction.onTextChange(inputField.key, it.trim()) }
                 )
             }
             Dimensions.space18.HeightSpacer()

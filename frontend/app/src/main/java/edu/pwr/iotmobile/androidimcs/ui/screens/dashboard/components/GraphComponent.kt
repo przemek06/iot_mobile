@@ -1,8 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components
 
 import android.graphics.Paint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
@@ -20,9 +18,12 @@ import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.res.ResourcesCompat
+import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
@@ -75,11 +76,15 @@ fun LazyStaggeredGridItemScope.GraphComponent(
             data.minBy { it.second }.second * 0.8f
         }
         val density = LocalDensity.current
+
+        val context = LocalContext.current
+        val font = ResourcesCompat.getFont(context, R.font.readexpro_medium)
         val textPaint = remember(density) {
             Paint().apply {
                 color = android.graphics.Color.WHITE
                 textAlign = Paint.Align.CENTER
                 textSize = density.run { 12.sp.toPx() }
+                typeface = font
             }
         }
         Canvas(

@@ -1,6 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword
 
 import android.util.Patterns
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
@@ -70,15 +72,20 @@ class ForgotPasswordViewModel(
         checkData()
         if (_uiState.value.inputFields.any { it.value.isError }) return
 
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val email = _uiState.value.inputFields[InputFieldType.Email]?.text ?: return@launch
             val response = repository.sendResetPasswordEmail(email)
             if (response.isSuccess) {
                 _uiState.update {
-                    it.copy(isInputCode = true)
+                    it.copy(
+                        isInputCode = true,
+                        isLoading = false
+                    )
                 }
             } else {
                 toast.toast("Error - could not send email.")
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -87,6 +94,7 @@ class ForgotPasswordViewModel(
         checkData()
         if (_uiState.value.inputFields.any { it.value.isError }) return
 
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val inputFields = _uiState.value.inputFields
             val email = inputFields[InputFieldType.Email]?.text ?: return@launch
@@ -99,14 +107,25 @@ class ForgotPasswordViewModel(
                 passwordBody = password.toPasswordBody()
             )
             when (response) {
-                ForgotPasswordResult.Success -> _uiState.update { it.copy(isSuccess = true) }
+                ForgotPasswordResult.Success -> _uiState.update {
+                    it.copy(
+                        isSuccess = true,
+                        isLoading = false
+                    )
+                }
                 ForgotPasswordResult.CodeIncorrect -> _uiState.update {
                     val newInputFields = it.inputFields.toMutableMap()
                     val newCodeInputField = it.inputFields[InputFieldType.Code]?.copy(isError = true) ?: return@launch
                     newInputFields.replace(InputFieldType.Code, newCodeInputField)
-                    it.copy(inputFields = newInputFields)
+                    it.copy(
+                        inputFields = newInputFields,
+                        isLoading = false
+                    )
                 }
-                ForgotPasswordResult.Failure -> toast.toast("Error - could not reset password.")
+                ForgotPasswordResult.Failure -> {
+                    toast.toast("Error - could not reset password.")
+                    _uiState.update { it.copy(isLoading = false) }
+                }
             }
         }
     }
@@ -124,7 +143,10 @@ class ForgotPasswordViewModel(
     private fun generateInputFields() = mapOf(
         InputFieldType.Email to InputFieldData(
             label = R.string.email,
-            errorMessage = R.string.s11
+            errorMessage = R.string.s11,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email
+            )
         ),
         InputFieldType.Code to InputFieldData(
             label = R.string.code,

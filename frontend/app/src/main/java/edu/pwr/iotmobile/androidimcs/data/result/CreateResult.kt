@@ -1,6 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.data.result
 
-enum class CreateDashboardResult {
+enum class CreateResult {
     Success,
     NotAuthorized,
     AlreadyExists,

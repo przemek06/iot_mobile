@@ -6,7 +6,6 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
-import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,7 +21,7 @@ class AdminViewModel(
 
     fun init(navigation: AdminNavigation) {
 
-        var adminOptions = listOf(
+        val adminOptions = listOf(
             MenuOption(
                 titleId = R.string.admin_3,
                 onClick = { navigation.openBanUsers() }
@@ -33,7 +32,7 @@ class AdminViewModel(
             )
         )
 
-        var changePasswordOption = MenuOption(
+        val changePasswordOption = MenuOption(
             titleId = R.string.change_password,
             onClick = { navigation.openChangePassword() }
         )
@@ -51,11 +50,14 @@ class AdminViewModel(
             kotlin.runCatching {
                 userRepository.deleteActiveUser()
             }.onSuccess {
-                toast.toast("Deleted account")
-                navigation.openLogin()
-                return@launch
+                if (it.isSuccess) {
+                    toast.toast("Successfully deleted account.")
+                    navigation.openLogin()
+                } else {
+                    toast.toast("Failed deleting account.")
+                }
             }.onFailure {
-                toast.toast("Failed deleting account")
+                toast.toast("Failed deleting account.")
             }
         }
     }
@@ -65,10 +67,14 @@ class AdminViewModel(
             kotlin.runCatching {
                 userRepository.logout()
             }.onSuccess {
-                toast.toast("Logged out")
-                navigation.openLogin()
+                if (it.isSuccess) {
+                    toast.toast("Successfully logged out.")
+                    navigation.openLogin()
+                } else {
+                    toast.toast("Could not log out.")
+                }
             }.onFailure {
-                toast.toast("Couldn't log out")
+                toast.toast("Could not log out.")
             }
         }
     }

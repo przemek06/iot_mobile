@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.model.datasource.remote
 
+import edu.pwr.iotmobile.androidimcs.data.dto.EmailDto
 import edu.pwr.iotmobile.androidimcs.data.dto.PasswordBody
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
@@ -31,6 +32,11 @@ interface UserRemoteDataSource {
     suspend fun registerUser(
         @Body userDto: UserDto
     ): Response<UserDto>
+
+    @POST("/anon/users/verification/resend")
+    suspend fun resendVerificationCode(
+        @Body email: EmailDto
+    ): Response<Unit>
 
     @GET("/anon/users/info/{id}")
     suspend fun getUserInfoById(

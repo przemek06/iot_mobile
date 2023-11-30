@@ -4,7 +4,8 @@ import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 
 data class AddTopicUiState(
     val inputFields: Map<AddTopicViewModel.InputFieldType, AddTopicViewModel.Input>,
-    val selectedTopic: TopicDataType?
+    val selectedTopic: TopicDataType?,
+    val isLoading: Boolean = false
 ) {
     companion object {
         fun default(

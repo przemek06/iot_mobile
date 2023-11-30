@@ -116,8 +116,8 @@ private fun ComponentItem(
     Card(
         modifier = Modifier
             .height(120.dp)
-            .clickable { uiInteraction.onChooseComponent(data) }
-            .clip(CardDefaults.shape),
+            .clip(CardDefaults.shape)
+            .clickable { uiInteraction.onChooseComponent(data) },
         border = BorderStroke(width = borderWidth, color = borderColor),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor,
