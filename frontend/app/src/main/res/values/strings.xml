@@ -212,4 +212,5 @@
     <string name="learn">Learn</string>
     <string name="a_s63">Go to projects</string>
     <string name="s68">The password is incorrect</string>
+    <string name="s69">The value must be a number</string>
 </resources>
