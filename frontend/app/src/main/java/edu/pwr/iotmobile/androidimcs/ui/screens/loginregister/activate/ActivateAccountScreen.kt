@@ -2,6 +2,9 @@
 
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
@@ -44,43 +47,25 @@ fun ActivateAccountScreen(navigation: ActivateAccountNavigation) {
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        navigation.onReturn()
+        if (navigation.type == ActivateAccountType.AfterLogin)
+            navigation.onReturn()
+        else if (navigation.type == ActivateAccountType.AfterRegistration)
+            navigation.openLogin()
     }
     viewModel.toast.CollectToast(context)
 
-    if (uiState.isAccountActivated) {
-        ActivateAccountSuccessScreenContent()
-    } else {
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isLoading,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
         ActivateAccountScreenContent(
             uiState = uiState,
             uiInteraction = uiInteraction,
             navigation = navigation
         )
-    }
-}
-
-@Composable
-private fun ActivateAccountSuccessScreenContent() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = stringResource(id = R.string.s14),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center,
-                lineHeight = 34.sp
-            )
-            Dimensions.space10.HeightSpacer()
-            Text(
-                text = stringResource(id = R.string.s15),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center,
-                lineHeight = 34.sp
-            )
-            Dimensions.space22.HeightSpacer()
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
-        }
     }
 }
 

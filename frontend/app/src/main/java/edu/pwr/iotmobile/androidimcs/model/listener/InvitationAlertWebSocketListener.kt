@@ -1,8 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.model.listener
 
-import com.google.gson.Gson
+import android.util.Log
 import edu.pwr.iotmobile.androidimcs.BuildConfig
-import edu.pwr.iotmobile.androidimcs.data.dto.InvitationAlertDto
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -15,7 +14,7 @@ import okhttp3.WebSocketListener
  */
 class InvitationAlertWebSocketListener(
     client: OkHttpClient,
-    onNewInvitation: (data: InvitationAlertDto) -> Unit
+    onNewInvitation: (data: Boolean) -> Unit
 ) {
     private val request = Request.Builder()
         .url("ws://${BuildConfig.APP_NETWORK}:8080/invitations") // Replace with your server URL and WebSocket endpoint
@@ -23,26 +22,28 @@ class InvitationAlertWebSocketListener(
 
     private val webSocket = client.newWebSocket(request, object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
+            Log.d("Invitation", "onOpen WebSocket called")
             // WebSocket connection is established
-            // You can send the "dashboardId" here
             webSocket.send("")
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            // Handle incoming messages from the server
-            // You will receive an infinite stream of messages here
-            // Update your UI or perform any other necessary tasks
-            val obj = Gson().fromJson(text, InvitationAlertDto::class.java)
-            onNewInvitation(obj)
+            Log.d("Invitation", "onMessage WebSocket called")
+            Log.d("Invitation", "text: $text")
+            // Handle incoming messages from the serve
+            onNewInvitation(text.toBoolean())
             return
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             // WebSocket connection is closed
+            Log.d("Invitation", "onClosed WebSocket called")
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             // Handle connection failure
+            Log.e("Invitation", "onFailure WebSocket called", t)
+            Log.d("Invitation", "response: $response")
         }
     })
 

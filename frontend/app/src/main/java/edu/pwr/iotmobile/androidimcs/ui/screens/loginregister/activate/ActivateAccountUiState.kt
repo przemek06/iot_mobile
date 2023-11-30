@@ -4,7 +4,8 @@ import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 
 data class ActivateAccountUiState(
     val inputField: InputFieldData,
-    val isAccountActivated: Boolean
+    val isAccountActivated: Boolean,
+    val isLoading: Boolean = false
 ) {
     companion object {
         fun default(

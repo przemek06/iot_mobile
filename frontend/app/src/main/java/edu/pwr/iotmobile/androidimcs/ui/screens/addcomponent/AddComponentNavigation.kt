@@ -10,6 +10,7 @@ import org.koin.core.scope.ScopeID
 interface AddComponentNavigation {
     val projectId: Int?
     val scopeID: ScopeID?
+    val isTopicSuccess: Boolean
 
     fun onReturn()
     fun openAddNewTopic()
@@ -23,6 +24,8 @@ interface AddComponentNavigation {
                 get() = navBackStackEntry.getArguments().getOrNull(0)?.toIntOrNull()
             override val scopeID: ScopeID?
                 get() = navBackStackEntry.getArguments().getOrNull(1)
+            override val isTopicSuccess: Boolean
+                get() = navBackStackEntry.savedStateHandle.getLiveData<Boolean>("resultStatus").value ?: false
 
             override fun onReturn() {
                 navController.popBackStack()
@@ -41,6 +44,8 @@ interface AddComponentNavigation {
                 get() = null
             override val scopeID: ScopeID?
                 get() = null
+            override val isTopicSuccess: Boolean
+                get() = false
 
             override fun onReturn() {}
             override fun openAddNewTopic() {}

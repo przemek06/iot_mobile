@@ -12,7 +12,9 @@ data class AccountUiState(
     val changePasswordOption: MenuOption,
     val inputField: InputFieldData,
     val statList: List<StatData>,
-    val options: List<MenuOption>
+    val options: List<MenuOption>,
+    val isLoading: Boolean,
+    val isError: Boolean
 ) {
     companion object {
         fun default(
@@ -38,7 +40,9 @@ data class AccountUiState(
             inputField = inputField,
             statList = statList,
             options = options,
-            user = user
+            user = user,
+            isLoading = true,
+            isError = false
         )
     }
 }

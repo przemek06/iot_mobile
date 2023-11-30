@@ -51,6 +51,7 @@ sealed class Screen(
     object AddComponent : Screen("addComponent/{arguments}")
 
     object Invitations : Screen("invitations")
+    object Learn : Screen("learn")
 }
 
 

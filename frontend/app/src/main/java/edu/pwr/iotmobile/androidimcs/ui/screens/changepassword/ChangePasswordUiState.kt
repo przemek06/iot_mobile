@@ -5,7 +5,8 @@ import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 
 data class ChangePasswordUiState (
     val inputFieldPassword: InputFieldData,
-    val inputFieldPasswordNew: InputFieldData
+    val inputFieldPasswordNew: InputFieldData,
+    val isLoading: Boolean = false,
 ) {
     companion object {
         fun default(

@@ -19,6 +19,10 @@ interface AddTopicNavigation {
 
             override fun goBack() {
                 navController.popBackStack()
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    "resultStatus",
+                    true
+                )
             }
         }
     }

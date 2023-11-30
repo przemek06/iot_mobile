@@ -8,6 +8,7 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.data.dto.TopicDto
+import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
@@ -33,25 +34,86 @@ class AddTopicViewModel(
         ) }
     }
 
+    fun checkInputFieldData() {
+        _uiState.update { ui ->
+            ui.copy(
+                inputFields = ui.inputFields.map {
+                    if (it.key == InputFieldType.UniqueName)
+                        it.key to it.value.copy(
+                            inputFieldData = it.value.inputFieldData.copy(
+                                isError = it.value.inputFieldData.text.isBlank(),
+                                errorMessage = R.string.s66
+                            )
+                        )
+                    else it.key to it.value
+                }.toMap()
+            )
+        }
+    }
+
     fun addTopic(projectId: Int?) {
         if (projectId == null) return
+        checkInputFieldData()
         val inputFields = _uiState.value.inputFields
+        val isInputFieldError = inputFields.values.any { it.inputFieldData.isError }
+        val isDataTypeError = _uiState.value.selectedTopic == null
+        if (isDataTypeError) {
+            viewModelScope.launch {
+                toast.toast("Data type cannot be null.")
+            }
+        }
+        if (isInputFieldError || isDataTypeError) return
+        _uiState.update { it.copy(isLoading = true) }
+
         viewModelScope.launch(Dispatchers.Default) {
             val topicDto = TopicDto(
-                name = inputFields[InputFieldType.Name]?.inputFieldData?.text ?: return@launch,
-                uniqueName = inputFields[InputFieldType.UniqueName]?.inputFieldData?.text ?: return@launch,
-                valueType = _uiState.value.selectedTopic ?: return@launch,
+                name = "",
+                uniqueName = inputFields[InputFieldType.UniqueName]?.inputFieldData?.text ?: run {
+                    _uiState.update { it.copy(isLoading = false) }
+                    return@launch
+                },
+                valueType = _uiState.value.selectedTopic ?: run {
+                    _uiState.update { it.copy(isLoading = false) }
+                    return@launch
+                },
                 projectId = projectId
             )
+
             kotlin.runCatching {
                 topicRepository.createTopic(topicDto)
-            }.onSuccess {
-                event.event(ADD_TOPIC_SUCCESS_EVENT)
-                toast.toast("Topic added successfully.")
+            }.onSuccess { result ->
+                when (result) {
+                    CreateResult.Success -> {
+                        event.event(ADD_TOPIC_SUCCESS_EVENT)
+                        toast.toast("Topic added successfully.")
+                    }
+
+                    CreateResult.AlreadyExists -> {
+                        _uiState.update { ui ->
+                            ui.copy(
+                                inputFields = ui.inputFields.map {
+                                    if (it.key == InputFieldType.UniqueName)
+                                        it.key to it.value.copy(
+                                            inputFieldData = it.value.inputFieldData.copy(
+                                                isError = true,
+                                                errorMessage = R.string.s67
+                                            )
+                                        )
+                                    else it.key to it.value
+                                }.toMap(),
+                                isLoading = false
+                            )
+                        }
+                        return@launch
+                    }
+
+                    else -> toast.toast("Failed to add topic.")
+                }
             }.onFailure {
                 Log.d(TAG, "Add topic error")
-                toast.toast("Failed to add topic")
+                toast.toast("Failed to add topic.")
             }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -75,17 +137,10 @@ class AddTopicViewModel(
     }
 
     private fun generateInputs() = mapOf(
-        InputFieldType.Name to Input(
-            titleId = R.string.enter_topic_name,
-            descriptionId = R.string.s22,
-            inputFieldData = InputFieldData()
-        ),
         InputFieldType.UniqueName to Input(
-            titleId = R.string.s24,
+            titleId = R.string.enter_topic_name,
             descriptionId = R.string.s23,
-            inputFieldData = InputFieldData(
-                label = R.string.s25
-            )
+            inputFieldData = InputFieldData()
         )
     )
 
@@ -96,7 +151,6 @@ class AddTopicViewModel(
     )
 
     enum class InputFieldType {
-        Name,
         UniqueName
     }
 

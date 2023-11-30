@@ -9,9 +9,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_dog_cosmos"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_dog_cosmos"
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidIMCS"
         android:usesCleartextTraffic="true"
@@ -20,6 +20,7 @@
         <activity
             android:name=".ui.screens.app.MainActivity"
             android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:label="@string/app_name"
             android:theme="@style/Theme.AndroidIMCS"
             android:launchMode="singleTask">

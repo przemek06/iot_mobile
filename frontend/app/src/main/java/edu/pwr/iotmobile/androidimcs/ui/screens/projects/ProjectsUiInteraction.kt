@@ -16,10 +16,10 @@ interface ProjectsUiInteraction {
                 viewModel.addProject(name)
             }
             override fun setDialogVisible() {
-                viewModel.setDialogVisible()
+                viewModel.openDialog()
             }
             override fun setDialogInvisible() {
-                viewModel.setDialogInvisible()
+                viewModel.closeDialog()
             }
         }
     }
