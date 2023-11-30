@@ -180,7 +180,29 @@ class SearchViewModel(
         }
     }
 
-    private fun addAdmin(userId: Int, projectId: Int?) {
+    private fun addAdmin(user: User) {
+        _uiState.update { it.copy(isDialogLoading = true) }
+        viewModelScope.launch {
+            kotlin.runCatching {
+                userRepository.updateUserRole(
+                    id = user.id,
+                    role = UserRole.ADMIN_ROLE.name
+                )
+            }.onSuccess {
+                if (it.isSuccess) {
+                    toast.toast("Successfully added admin")
+                    updateList()
+                } else {
+                    toast.toast("Operation failed.")
+                }
+            }.onFailure {
+                toast.toast("Operation failed.")
+            }
+            _uiState.update { it.copy(isDialogLoading = false) }
+        }
+    }
+
+    private fun addProjectAdmin(userId: Int, projectId: Int?) {
         if (projectId == null) {
             _uiState.update { it.copy(isError = true) }
             return
@@ -204,36 +226,29 @@ class SearchViewModel(
                 Log.e("Search", "Could not add admin.", e)
                 toast.toast("Could not add admin.")
             }
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
 
-    private fun addProjectAdmin(userId: Int, projectId: Int?) {
-        projectId?.let {
-            viewModelScope.launch {
-                val result = projectRepository.addProjectAdmin(
-                    userId = userId,
-                    projectId = projectId
-                )
-                if (result.isSuccess) {
-                    toast.toast("Added admin")
-                    return@launch
-                }
-                _uiState.update { it.copy(isDialogLoading = false) }
-            }
-        }
-    }
     fun toggleBlockUser(user: User) {
+        _uiState.update { it.copy(isDialogLoading = true) }
         viewModelScope.launch {
             kotlin.runCatching {
                 userRepository.toggleUserBlocked(user.id)
             }.onSuccess {
-                toast.toast("Success")
+                if (it.isSuccess) {
+                    toast.toast("Success")
+                    updateList()
+                } else {
+                    toast.toast("Operation failed.")
+                }
             }.onFailure {
-                toast.toast("Failure")
+                toast.toast("Operation failed.")
             }
-            updateList()
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
+
     private fun inviteUser(userId: Int, projectId: Int?) {
         if (projectId == null) {
             _uiState.update { it.copy(isError = true) }
@@ -359,7 +374,7 @@ class SearchViewModel(
                 _uiState.update { state ->
                     state.copy(
                         users = users,
-                        searchedUsers = = users.filter { !state.excludedUsers.contains(it) },
+                        searchedUsers = users.filter { !state.excludedUsers.contains(it) },
                         isError = false,
                         isLoading = false
                     )
@@ -412,9 +427,9 @@ class SearchViewModel(
                     val list = projectRepository.getUsersByProjectId(projectId)
                     list.mapNotNull { it.toUser() }
                 }.onSuccess { excludedUsers ->
-                    _uiState.update {
-                        it.copy(
-                            searchedUsers = it.users.filter { !excludedUsers.contains(it) },
+                    _uiState.update { ui ->
+                        ui.copy(
+                            searchedUsers = ui.users.filter { !excludedUsers.contains(it) },
                             excludedUsers = excludedUsers
                         )
                     }
@@ -430,12 +445,12 @@ class SearchViewModel(
                     val roles = projectRepository.findAllProjectRolesByProjectId(it).getOrNull() ?: return@launch
                     val users = projectRepository.getUsersByProjectId(projectId)
                     users.filter { user ->
-                        roles.find { it.user.equals(user) }?.role == UserProjectRole.ADMIN.name
+                        roles.find { it.user == user }?.role == UserProjectRole.ADMIN.name
                     }.mapNotNull { it.toUser() }
                 }.onSuccess { excludedUsers ->
-                    _uiState.update {
-                        it.copy(
-                            searchedUsers = it.users.filter { !excludedUsers.contains(it) },
+                    _uiState.update { ui ->
+                        ui.copy(
+                            searchedUsers = ui.users.filter { !excludedUsers.contains(it) },
                             excludedUsers = excludedUsers
                         )
                     }
@@ -454,9 +469,9 @@ class SearchViewModel(
                     ?.mapNotNull { it.toUser() }
                     ?: emptyList()
             }.onSuccess { excludedUsers ->
-                _uiState.update {
-                    it.copy(
-                        searchedUsers = it.users.filter { !excludedUsers.contains(it) },
+                _uiState.update { ui ->
+                    ui.copy(
+                        searchedUsers = ui.users.filter { !excludedUsers.contains(it) },
                         excludedUsers = excludedUsers
                     )
                 }
