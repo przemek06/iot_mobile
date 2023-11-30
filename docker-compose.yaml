@@ -10,7 +10,7 @@ services:
     image: postgres
     restart: always
     env_file:
-      - dev.env
+      - prd.env
     networks:
       - iot-mobile-backend-network
     ports:
@@ -24,7 +24,7 @@ services:
     hostname: rabbitmq
     restart: always
     env_file:
-      - dev.env
+      - prd.env
     networks:
       - iot-mobile-backend-network
     expose:
@@ -41,11 +41,11 @@ services:
     networks:
       - iot-mobile-backend-network
     ports:
-      - "8080:8080"
+      - "80:80"
     expose:
-      - "8080"
+      - "80"
     env_file:
-      - dev.env
+      - prd.env
     depends_on:
       - db
       - rabbitmq
