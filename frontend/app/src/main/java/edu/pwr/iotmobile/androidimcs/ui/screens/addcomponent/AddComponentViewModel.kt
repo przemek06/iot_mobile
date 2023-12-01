@@ -498,6 +498,7 @@ class AddComponentViewModel(
             ComponentDetailedType.Discord -> mapOf(
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
+                    description = R.string.s71,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),
@@ -508,6 +509,7 @@ class AddComponentViewModel(
             ComponentDetailedType.Email -> mapOf(
                 SettingType.Title to SettingData(
                     title = R.string.a_s54,
+                    description = R.string.s70,
                     inputFieldData = InputFieldData(
                         label = R.string.a_s54
                     ),
@@ -515,6 +517,7 @@ class AddComponentViewModel(
                 ),
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
+                    description = R.string.s71,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),

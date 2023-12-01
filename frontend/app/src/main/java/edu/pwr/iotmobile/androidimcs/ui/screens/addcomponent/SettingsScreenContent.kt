@@ -57,6 +57,15 @@ fun SettingsScreenContent(
                 )
                 Dimensions.space4.HeightSpacer()
 
+                it.value.description?.let {
+                    Text(
+                        text = stringResource(id = it),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Dimensions.space4.HeightSpacer()
+                }
+
                 if (it.value.isDescription) {
                     DescriptionInputField(
                         text = it.value.inputFieldData.text,
