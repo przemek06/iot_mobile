@@ -391,7 +391,7 @@ class DashboardViewModel(
         // Needed to account for "Add component" button
         val toSubtract = if (_userProjectRole == UserProjectRole.VIEWER) 0 else 1
 
-        for (it in visibleItems.subList(toSubtract, visibleItems.size)) {
+        for (it in visibleItems.subList(toSubtract, visibleItems.size - 1)) {
             val currentItemIndex = it.index-toSubtract
             // Do not consider the original position of the currently dragged item.
             if (currentItemIndex == itemIndex) continue

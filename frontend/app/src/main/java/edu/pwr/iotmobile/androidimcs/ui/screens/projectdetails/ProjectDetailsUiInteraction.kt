@@ -4,6 +4,7 @@ interface ProjectDetailsUiInteraction {
     fun setSelectedTabIndex(tab: ProjectDetailsViewModel.ProjectTab)
     fun onTextChangeDashboard(text: String)
     fun addNewDashboard(name: String)
+    fun toggleAddDashboardDialog()
     fun deleteTopic(id: Int)
     fun deleteProject()
     fun toggleDeleteProjectDialog()
@@ -23,6 +24,10 @@ interface ProjectDetailsUiInteraction {
 
             override fun addNewDashboard(name: String) {
                 viewModel.addDashboard(name)
+            }
+
+            override fun toggleAddDashboardDialog() {
+                viewModel.toggleAddDashboardDialog()
             }
 
             override fun deleteTopic(id: Int) {

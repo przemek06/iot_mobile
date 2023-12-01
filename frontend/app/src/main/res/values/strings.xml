@@ -212,4 +212,7 @@
     <string name="learn">Learn</string>
     <string name="a_s63">Go to projects</string>
     <string name="s68">The password is incorrect</string>
+    <string name="s69">The value must be a number</string>
+    <string name="s70">The title of the email</string>
+    <string name="s71">The message to be sent. If you wish to include the message from topic, use "%s" in place of the actual value.</string>
 </resources>

@@ -135,6 +135,10 @@ fun ComponentsList(
                 )
             }
         }
+
+        item {
+            Dimensions.space30.HeightSpacer()
+        }
     }
 }
 

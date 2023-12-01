@@ -57,6 +57,15 @@ fun SettingsScreenContent(
                 )
                 Dimensions.space4.HeightSpacer()
 
+                it.value.description?.let {
+                    Text(
+                        text = stringResource(id = it),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Dimensions.space4.HeightSpacer()
+                }
+
                 if (it.value.isDescription) {
                     DescriptionInputField(
                         text = it.value.inputFieldData.text,
@@ -71,7 +80,8 @@ fun SettingsScreenContent(
                         label = stringResource(id = it.value.inputFieldData.label),
                         isError = it.value.inputFieldData.isError,
                         errorText = stringResource(id = it.value.inputFieldData.errorMessage),
-                        onValueChange = { text -> uiInteraction.onTextChange(it.key, text) }
+                        onValueChange = { text -> uiInteraction.onTextChange(it.key, text) },
+                        keyboardOptions = it.value.inputFieldData.keyboardOptions
                     )
                 }
                 Dimensions.space26.HeightSpacer()
