@@ -80,7 +80,8 @@ fun SettingsScreenContent(
                         label = stringResource(id = it.value.inputFieldData.label),
                         isError = it.value.inputFieldData.isError,
                         errorText = stringResource(id = it.value.inputFieldData.errorMessage),
-                        onValueChange = { text -> uiInteraction.onTextChange(it.key, text) }
+                        onValueChange = { text -> uiInteraction.onTextChange(it.key, text) },
+                        keyboardOptions = it.value.inputFieldData.keyboardOptions
                     )
                 }
                 Dimensions.space26.HeightSpacer()

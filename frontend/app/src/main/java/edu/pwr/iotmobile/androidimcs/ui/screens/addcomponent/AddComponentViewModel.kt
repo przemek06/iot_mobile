@@ -11,6 +11,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
@@ -76,7 +77,7 @@ class AddComponentViewModel(
     private fun Map.Entry<SettingType, SettingData>.getWithErrors(
         componentType: ComponentDetailedType,
     ): InputFieldData {
-        val numericFields = listOf(SettingType.MinValue, SettingType.MaxValue, SettingType.OnToggleOnSend, SettingType.OnClickSend)
+        val numericFields = listOf(SettingType.MinValue, SettingType.MaxValue, SettingType.OnClickSend)
         val numericComponentTypes = listOf(ComponentDetailedType.Slider, ComponentDetailedType.LineGraph)
         return if (key in numericFields && componentType in numericComponentTypes) {
             if (value.inputFieldData.text.isNotBlank()) {
@@ -483,14 +484,20 @@ class AddComponentViewModel(
                     title = R.string.s37,
                     description = R.string.s54,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
                     )
                 ),
                 SettingType.MinValue to SettingData(
                     title = R.string.s38,
                     description = R.string.s55,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
                     )
                 )
             )
