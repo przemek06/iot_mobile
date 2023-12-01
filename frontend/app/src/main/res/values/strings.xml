@@ -212,4 +212,6 @@
     <string name="learn">Learn</string>
     <string name="a_s63">Go to projects</string>
     <string name="s68">The password is incorrect</string>
+    <string name="a_s69">Slack</string>
+    <string name="a_s70">Telegram</string>
 </resources>

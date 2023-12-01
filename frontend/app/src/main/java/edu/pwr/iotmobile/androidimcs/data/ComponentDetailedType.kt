@@ -9,5 +9,7 @@ enum class ComponentDetailedType(
     Slider(ComponentType.INPUT, 2),
     Discord(ComponentType.TRIGGER, 1),
     Email(ComponentType.TRIGGER, 1),
+    Slack(ComponentType.TRIGGER, 1),
+    Telegram(ComponentType.TRIGGER, 1),
     LineGraph(ComponentType.OUTPUT, 2),
 }

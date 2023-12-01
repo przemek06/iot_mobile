@@ -469,6 +469,26 @@ class AddComponentViewModel(
                 )
             )
 
+            ComponentDetailedType.Slack -> mapOf(
+                SettingType.Description to SettingData(
+                    title = R.string.a_s52,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
+
+            ComponentDetailedType.Telegram -> mapOf(
+                SettingType.Description to SettingData(
+                    title = R.string.a_s52,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
+
             else -> emptyMap()
 
         }
@@ -532,6 +552,16 @@ class AddComponentViewModel(
             titleId = R.string.a_s53,
             iconRes = R.drawable.ic_mail,
             type = ComponentDetailedType.Email
+        ),
+        ComponentChoiceData(
+            titleId = R.string.a_s69,
+            iconRes = R.drawable.ic_slack,
+            type = ComponentDetailedType.Slack
+        ),
+        ComponentChoiceData(
+            titleId = R.string.a_s70,
+            iconRes = R.drawable.ic_telegram,
+            type = ComponentDetailedType.Telegram
         ),
     )
 
