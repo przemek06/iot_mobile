@@ -78,7 +78,7 @@ class AddComponentViewModel(
         componentType: ComponentDetailedType,
     ): InputFieldData {
         val numericFields = listOf(SettingType.MinValue, SettingType.MaxValue, SettingType.OnClickSend)
-        val numericComponentTypes = listOf(ComponentDetailedType.Slider, ComponentDetailedType.LineGraph)
+        val numericComponentTypes = listOf(ComponentDetailedType.Slider, ComponentDetailedType.LineGraph, ComponentDetailedType.SpeedGraph)
         return if (key in numericFields && componentType in numericComponentTypes) {
             if (value.inputFieldData.text.isNotBlank()) {
                 value.inputFieldData.copy(
@@ -399,7 +399,7 @@ class AddComponentViewModel(
     private suspend fun getFilteredTopics(projectId: Int): List<Topic> {
         val topics = getTopicsForProject(projectId)
         return when (_uiState.value.chosenComponentType) {
-            ComponentDetailedType.Slider, ComponentDetailedType.LineGraph ->
+            ComponentDetailedType.Slider, ComponentDetailedType.LineGraph, ComponentDetailedType.SpeedGraph ->
                 topics.filter { it.dataType in listOf(TopicDataType.FLOAT, TopicDataType.INT) }
 
             else -> topics
@@ -582,6 +582,11 @@ class AddComponentViewModel(
             titleId = R.string.a_s55,
             iconRes = R.drawable.ic_graph_time,
             type = ComponentDetailedType.LineGraph
+        ),
+        ComponentChoiceData(
+            titleId = R.string.a_s55,
+            iconRes = R.drawable.ic_graph_speed,
+            type = ComponentDetailedType.SpeedGraph
         ),
     )
 
