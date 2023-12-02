@@ -1,6 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components
 
-import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,8 +32,11 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
+import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
+import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import kotlinx.coroutines.CoroutineScope
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 @Composable
 fun LazyStaggeredGridItemScope.Speedometer(
@@ -83,9 +86,16 @@ fun LazyStaggeredGridItemScope.Speedometer(
             1.0f to Color.Green
         )
 
+        // Title of component
+        Text(
+            text = item.name,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Dimensions.space4.HeightSpacer()
+
         BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
 
@@ -149,20 +159,14 @@ fun LazyStaggeredGridItemScope.Speedometer(
 
                         // draw percentage text
                         canvas.nativeCanvas.drawText(
-                            currentValue.round(1).toString(),
+                            currentValue.roundToInt().toString(),
                             center.x,
                             textY,
                             textPaint
                         )
-                        canvas.nativeCanvas.drawText(
-                            item.name,
-                            center.x,
-                            textPaint.fontMetrics.ascent,
-                            textPaint
-                        )
 
-                        val minStr = min.round(1).toString()
-                        val maxStr = max.round(1).toString()
+                        val minStr = min.roundToInt().toString()
+                        val maxStr = max.roundToInt().toString()
                         canvas.nativeCanvas.drawText(
                             minStr,
                             textPaint.measureText(minStr) / 2,

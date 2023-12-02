@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import java.time.LocalDateTime
 
 private const val TAG = "DashboardViewModel"
 
@@ -150,9 +151,9 @@ class DashboardViewModel(
                 ui.copy(
                     components = components.mapNotNull { item ->
                         item.topic?.id?.let {
-                            val lastMessage = getLastMessage(it)
-                            item.toComponentData(lastMessage)
-                        } ?: item.toComponentData(null)
+                            val lastMessage = takeLastMessage(it)
+                            item.toComponentData(lastMessage, takeGraphData(it))
+                        } ?: item.toComponentData(null, emptyList())
                     },
                     menuOptionsList = generateMenuOptions(_userProjectRole),
                     userProjectRole = _userProjectRole,
@@ -178,9 +179,9 @@ class DashboardViewModel(
                     .sortedBy { it.index }
                     .mapNotNull { item ->
                         item.topic?.id?.let {
-                            val lastMessage = getLastMessage(it)
-                            item.toComponentData(lastMessage)
-                        } ?: item.toComponentData(null)
+                            val lastMessage = takeLastMessage(it)
+                            item.toComponentData(lastMessage, takeGraphData(it))
+                        } ?: item.toComponentData()
                     }
             )
         }
@@ -214,9 +215,15 @@ class DashboardViewModel(
         _uiState.update { ui ->
             ui.copy(components = ui.components.map { item ->
                 item.topic?.id?.let {
-                    val lastMessage = getLastMessage(it)
-                    item.copy(currentValue = lastMessage)
-                } ?: item.copy(currentValue = null)
+                    val lastMessage = takeLastMessage(it)
+                    item.copy(
+                        currentValue = lastMessage,
+                        graphData = takeGraphData(it)
+                    )
+                } ?: item.copy(
+                    currentValue = null,
+                    graphData = emptyList()
+                )
             })
         }
     }
@@ -423,10 +430,26 @@ class DashboardViewModel(
         }
     }
 
-    private fun getLastMessage(topicId: Int) = _lastMessages
+    private fun takeLastMessage(topicId: Int) = _lastMessages
         .firstOrNull { it.topicId == topicId }
         ?.messages?.lastOrNull()
         ?.message
+
+    private fun takeGraphData(topicId: Int) = _lastMessages
+        .firstOrNull { it.topicId == topicId }
+        ?.messages?.takeLast(10)
+        ?.mapNotNull { it.toGraphData() }
+        ?: emptyList()
+
+    private fun MessageDto.toGraphData(): Pair<LocalDateTime, Float>? {
+        return try {
+            val dateTime = LocalDateTime.parse(tsSent)
+            dateTime to message.toFloat()
+        } catch(e: Exception) {
+            Log.e("GraphData", "Error while converting to graph data", e)
+            null
+        }
+    }
 
     private suspend fun getConnectionKey(): String? {
         _projectId?.let {

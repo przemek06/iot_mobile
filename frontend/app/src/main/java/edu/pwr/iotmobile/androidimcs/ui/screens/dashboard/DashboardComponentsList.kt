@@ -180,7 +180,7 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
             coroutineScope = coroutineScope
         )
 
-        ComponentDetailedType.Speedometer -> Speedometer(
+        ComponentDetailedType.SpeedGraph -> Speedometer(
             item = item,
             uiInteraction = uiInteraction,
             onPlaceItem = onPlaceItem,
