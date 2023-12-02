@@ -54,6 +54,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.DiscordComp
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.EmailComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.GraphComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SliderComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.Speedometer
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ToggleComponent
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -173,6 +174,13 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
         )
         
         ComponentDetailedType.LineGraph -> GraphComponent(
+            item = item,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+
+        ComponentDetailedType.Speedometer -> Speedometer(
             item = item,
             uiInteraction = uiInteraction,
             onPlaceItem = onPlaceItem,
