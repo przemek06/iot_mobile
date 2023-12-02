@@ -59,15 +59,17 @@ data class ComponentData(
             graphData: List<Pair<LocalDateTime, Float>> = emptyList()
         ): ComponentData? {
             val componentDetailedType = type.asEnum<ComponentDetailedType>() ?: return null
+            val componentType = componentType.asEnum<ComponentType>() ?: return null
+
             return ComponentData(
                 id = id ?: return null,
                 name = name ?: "",
                 index = index,
                 size = size,
-                height = if (componentDetailedType == ComponentDetailedType.LineGraph) 240.dp else 140.dp,
+                height = if (componentDetailedType == ComponentDetailedType.SpeedGraph || componentDetailedType == ComponentDetailedType.LineGraph) 240.dp else 140.dp,// if (componentType == ComponentType.OUTPUT) 240.dp else 140.dp,
                 currentValue = currentValue,
                 graphData = graphData,
-                componentType = componentType.asEnum<ComponentType>() ?: return null,
+                componentType = componentType,
                 type = componentDetailedType,
                 topic = topic?.toTopic(),
                 onSendValue = onSendValue,

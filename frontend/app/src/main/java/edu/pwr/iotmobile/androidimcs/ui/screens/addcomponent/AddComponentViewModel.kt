@@ -74,11 +74,67 @@ class AddComponentViewModel(
         return this.toDoubleOrNull() != null
     }
 
+    /**
+     * Check if the maximum value in input field is bigger than minimum value.
+     */
+    private fun Map<SettingType, SettingData>.checkMinMaxFields(): Boolean {
+        val minInput = this[SettingType.MinValue]?.inputFieldData?.text
+        val maxInput = this[SettingType.MaxValue]?.inputFieldData?.text
+
+        if (maxInput.isNullOrBlank() || minInput.isNullOrBlank() || !maxInput.isNumeric() || !minInput.isNumeric())
+            return false
+
+        return if (maxInput.toFloat() < minInput.toFloat()) {
+            val currInputFields = _uiState.value.settings.toMutableMap()
+            val maxInputField = currInputFields[SettingType.MaxValue] ?: return false
+            val minInputField = currInputFields[SettingType.MinValue] ?: return false
+            currInputFields[SettingType.MaxValue] = maxInputField.copy(
+                inputFieldData = maxInputField.inputFieldData.copy(
+                    isError = true,
+                    errorMessage = R.string.s76
+                )
+            )
+            currInputFields[SettingType.MinValue] = minInputField.copy(
+                inputFieldData = minInputField.inputFieldData.copy(
+                    isError = true,
+                    errorMessage = R.string.s76
+                )
+            )
+
+            // Update UI
+            _uiState.update { it.copy(settings = currInputFields) }
+            true
+        } else if (maxInput.toFloat() == minInput.toFloat()) {
+            val currInputFields = _uiState.value.settings.toMutableMap()
+            val maxInputField = currInputFields[SettingType.MaxValue] ?: return false
+            val minInputField = currInputFields[SettingType.MinValue] ?: return false
+            currInputFields[SettingType.MaxValue] = maxInputField.copy(
+                inputFieldData = maxInputField.inputFieldData.copy(
+                    isError = true,
+                    errorMessage = R.string.s77
+                )
+            )
+            currInputFields[SettingType.MinValue] = minInputField.copy(
+                inputFieldData = minInputField.inputFieldData.copy(
+                    isError = true,
+                    errorMessage = R.string.s77
+                )
+            )
+
+            // Update UI
+            _uiState.update { it.copy(settings = currInputFields) }
+            true
+        } else {
+            false
+        }
+    }
+
     private fun Map.Entry<SettingType, SettingData>.getWithErrors(
         componentType: ComponentDetailedType,
     ): InputFieldData {
         val numericFields = listOf(SettingType.MinValue, SettingType.MaxValue, SettingType.OnClickSend)
         val numericComponentTypes = listOf(ComponentDetailedType.Slider, ComponentDetailedType.LineGraph, ComponentDetailedType.SpeedGraph)
+
         return if (key in numericFields && componentType in numericComponentTypes) {
             if (value.inputFieldData.text.isNotBlank()) {
                 value.inputFieldData.copy(
@@ -114,6 +170,7 @@ class AddComponentViewModel(
                 }.toMap()
             )
         }
+        uiState.value.settings.checkMinMaxFields()
     }
 
     fun navigateNext(scopeID: ScopeID) {
@@ -366,6 +423,7 @@ class AddComponentViewModel(
 
     private fun getComponentDtoData(): ComponentDto? {
         val locUiState = _uiState.value
+        Log.d("UI", "maxValue: ${locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text}")
         return ComponentDto(
             componentType = locUiState.chosenComponentType?.belongsTo?.name ?: return null,
             type = locUiState.chosenComponentType.name,
@@ -532,6 +590,29 @@ class AddComponentViewModel(
                 )
             )
 
+            ComponentDetailedType.SpeedGraph -> mapOf(
+                SettingType.MaxValue to SettingData(
+                    title = R.string.s37,
+                    description = R.string.s73,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
+                ),
+                SettingType.MinValue to SettingData(
+                    title = R.string.s38,
+                    description = R.string.s74,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
+                )
+            )
+
             else -> emptyMap()
 
         }
@@ -584,7 +665,7 @@ class AddComponentViewModel(
             type = ComponentDetailedType.LineGraph
         ),
         ComponentChoiceData(
-            titleId = R.string.a_s55,
+            titleId = R.string.s75,
             iconRes = R.drawable.ic_graph_speed,
             type = ComponentDetailedType.SpeedGraph
         ),
