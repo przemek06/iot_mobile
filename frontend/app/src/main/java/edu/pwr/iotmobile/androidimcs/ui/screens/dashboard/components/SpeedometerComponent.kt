@@ -27,6 +27,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.core.content.res.ResourcesCompat
+import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
@@ -63,14 +65,14 @@ fun LazyStaggeredGridItemScope.Speedometer(
 
         val onBackground = MaterialTheme.colorScheme.onBackground
         val needlePaint = remember { Paint().apply { color = onBackground } }
-        val font = MaterialTheme.typography.bodySmall.fontFamily
         val context = LocalContext.current
+        val font = ResourcesCompat.getFont(context, R.font.readexpro_medium)
         val textPaint = remember {
             android.graphics.Paint().apply {
                 color = onBackground.toArgb()
                 textSize = textFontSize
                 textAlign = android.graphics.Paint.Align.CENTER
-                //typeface = Typeface.createFromAsset(context.assets, "font/readexpro_regular.ttf")
+                typeface = font
             }
         }
 
@@ -87,7 +89,10 @@ fun LazyStaggeredGridItemScope.Speedometer(
             contentAlignment = Alignment.Center
         ) {
 
-            val canvasSize = min(constraints.maxWidth, (constraints.maxHeight * ratio).toInt())
+            val canvasSize = min(
+                constraints.maxWidth,
+                ((constraints.maxHeight * ratio) - 2 * textFontSize).toInt()
+            )
             val size = Size(canvasSize.toFloat(), canvasSize.toFloat())
             val canvasSizeDp = with(density) { canvasSize.toDp() }
             val w = size.width
