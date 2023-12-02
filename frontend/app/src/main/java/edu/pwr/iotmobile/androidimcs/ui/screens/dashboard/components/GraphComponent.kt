@@ -4,6 +4,7 @@ import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -87,6 +89,15 @@ fun LazyStaggeredGridItemScope.GraphComponent(
                 typeface = font
             }
         }
+        val textFontSize = with(density) { 16.dp.toPx() }
+        val onBackground = MaterialTheme.colorScheme.onBackground
+        val titleTextPaint = remember {
+            android.graphics.Paint().apply {
+                color = onBackground.toArgb()
+                textSize = textFontSize
+                textAlign = android.graphics.Paint.Align.CENTER
+            }
+        }
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
@@ -95,6 +106,14 @@ fun LazyStaggeredGridItemScope.GraphComponent(
             val priceStep = (upperValue - lowerValue) / 5
 
             if(labels) {
+                drawContext.canvas.nativeCanvas.apply {
+                    drawText(
+                        item.name,
+                        size.width / 2,
+                        - titleTextPaint.ascent(),
+                        titleTextPaint
+                    )
+                }
                 data.indices.forEach { i ->
                     val record = data[i]
                     val x = record.first.second.toString()
@@ -192,17 +211,6 @@ fun LazyStaggeredGridItemScope.GraphComponent(
                     pathEffect = dashedLine
                 )
             }
-
-//        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-//        Canvas(Modifier.fillMaxWidth().height(1.dp)) {
-//
-//            drawLine(
-//                color = Color.Red,
-//                start = Offset(0f, 0f),
-//                end = Offset(size.width, 0f),
-//                pathEffect = pathEffect
-//            )
-//        }
         }
     }
 }
