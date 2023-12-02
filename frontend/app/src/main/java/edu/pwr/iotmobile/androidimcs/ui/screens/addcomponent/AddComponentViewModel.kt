@@ -11,11 +11,13 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
+import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.dto.DiscordChannelDto
@@ -55,13 +57,11 @@ class AddComponentViewModel(
             _projectId = projectId
 
             viewModelScope.launch(Dispatchers.Default) {
-                val topics = getTopicsForProject(projectId)
                 _uiState.update {
                     it.copy(
                         inputComponents = generateInputComponents(),
                         outputComponents = generateOutputComponents(),
                         triggerComponents = generateTriggerComponents(),
-                        topics = topics,
                         isLoading = false,
                         isError = false
                     )
@@ -70,17 +70,107 @@ class AddComponentViewModel(
         }
     }
 
-    fun checkInputFields() {
-        _uiState.update { ui ->
-            ui.copy(
-                settings = ui.settings.map { it.key to it.value.copy(
-                    inputFieldData = it.value.inputFieldData.copy(
-                        isError = it.value.inputFieldData.text.isBlank(),
-                        errorMessage = R.string.s66
-                    )
-                ) }.toMap()
+    private fun String.isNumeric(): Boolean {
+        return this.toDoubleOrNull() != null
+    }
+
+    /**
+     * Check if the maximum value in input field is bigger than minimum value.
+     */
+    private fun Map<SettingType, SettingData>.checkMinMaxFields(): Boolean {
+        val minInput = this[SettingType.MinValue]?.inputFieldData?.text
+        val maxInput = this[SettingType.MaxValue]?.inputFieldData?.text
+
+        if (maxInput.isNullOrBlank() || minInput.isNullOrBlank() || !maxInput.isNumeric() || !minInput.isNumeric())
+            return false
+
+        return if (maxInput.toFloat() < minInput.toFloat()) {
+            val currInputFields = _uiState.value.settings.toMutableMap()
+            val maxInputField = currInputFields[SettingType.MaxValue] ?: return false
+            val minInputField = currInputFields[SettingType.MinValue] ?: return false
+            currInputFields[SettingType.MaxValue] = maxInputField.copy(
+                inputFieldData = maxInputField.inputFieldData.copy(
+                    isError = true,
+                    errorMessage = R.string.s76
+                )
+            )
+            currInputFields[SettingType.MinValue] = minInputField.copy(
+                inputFieldData = minInputField.inputFieldData.copy(
+                    isError = true,
+                    errorMessage = R.string.s76
+                )
+            )
+
+            // Update UI
+            _uiState.update { it.copy(settings = currInputFields) }
+            true
+        } else if (maxInput.toFloat() == minInput.toFloat()) {
+            val currInputFields = _uiState.value.settings.toMutableMap()
+            val maxInputField = currInputFields[SettingType.MaxValue] ?: return false
+            val minInputField = currInputFields[SettingType.MinValue] ?: return false
+            currInputFields[SettingType.MaxValue] = maxInputField.copy(
+                inputFieldData = maxInputField.inputFieldData.copy(
+                    isError = true,
+                    errorMessage = R.string.s77
+                )
+            )
+            currInputFields[SettingType.MinValue] = minInputField.copy(
+                inputFieldData = minInputField.inputFieldData.copy(
+                    isError = true,
+                    errorMessage = R.string.s77
+                )
+            )
+
+            // Update UI
+            _uiState.update { it.copy(settings = currInputFields) }
+            true
+        } else {
+            false
+        }
+    }
+
+    private fun Map.Entry<SettingType, SettingData>.getWithErrors(
+        componentType: ComponentDetailedType,
+    ): InputFieldData {
+        val numericFields = listOf(SettingType.MinValue, SettingType.MaxValue, SettingType.OnClickSend)
+        val numericComponentTypes = listOf(ComponentDetailedType.Slider, ComponentDetailedType.LineGraph, ComponentDetailedType.SpeedGraph)
+
+        return if (key in numericFields && componentType in numericComponentTypes) {
+            if (value.inputFieldData.text.isNotBlank()) {
+                value.inputFieldData.copy(
+                    isError = !value.inputFieldData.text.isNumeric(),
+                    errorMessage = R.string.s69
+                )
+            } else {
+                value.inputFieldData.copy(
+                    isError = value.inputFieldData.text.isBlank(),
+                    errorMessage = R.string.s66
+                )
+            }
+        } else {
+            value.inputFieldData.copy(
+                isError = value.inputFieldData.text.isBlank(),
+                errorMessage = R.string.s66
             )
         }
+    }
+
+    fun checkInputFields() {
+        val chosenComponent = _uiState.value.chosenComponentType ?: run {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
+
+        _uiState.update { ui ->
+            ui.copy(
+                settings = ui.settings.map {
+                    it.key to it.value.copy(
+                        inputFieldData = it.getWithErrors(chosenComponent)
+                    )
+                }.toMap()
+            )
+        }
+        uiState.value.settings.checkMinMaxFields()
     }
 
     fun navigateNext(scopeID: ScopeID) {
@@ -92,11 +182,21 @@ class AddComponentViewModel(
                     }
                     return
                 }
-                _uiState.update {
-                    it.copy(
-                        currentPage = AddComponentPage.ChooseTopic,
-                        bottomNavData = getBottomNavData(AddComponentPage.ChooseTopic)
-                    )
+                val locProjectId = _projectId
+                if (locProjectId == null) {
+                    _uiState.update { it.copy(isError = true) }
+                    return
+                }
+
+                viewModelScope.launch {
+                    val topics = getFilteredTopics(locProjectId)
+                    _uiState.update {
+                        it.copy(
+                            topics = topics,
+                            currentPage = AddComponentPage.ChooseTopic,
+                            bottomNavData = getBottomNavData(AddComponentPage.ChooseTopic)
+                        )
+                    }
                 }
             }
 
@@ -236,7 +336,7 @@ class AddComponentViewModel(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val projectId = _projectId ?: return@launch
-            val topics = getTopicsForProject(projectId)
+            val topics = getFilteredTopics(projectId)
             _uiState.update {
                 it.copy(
                     topics = topics,
@@ -320,8 +420,10 @@ class AddComponentViewModel(
         }
     }
 
+
     private fun getComponentDtoData(): ComponentDto? {
         val locUiState = _uiState.value
+        Log.d("UI", "maxValue: ${locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text}")
         return ComponentDto(
             componentType = locUiState.chosenComponentType?.belongsTo?.name ?: return null,
             type = locUiState.chosenComponentType.name,
@@ -350,6 +452,16 @@ class AddComponentViewModel(
             type = EActionDestinationType.EMAIL,
             token = uiState.value.settings[SettingType.Title]?.inputFieldData?.text ?: return null
         )
+    }
+
+    private suspend fun getFilteredTopics(projectId: Int): List<Topic> {
+        val topics = getTopicsForProject(projectId)
+        return when (_uiState.value.chosenComponentType) {
+            ComponentDetailedType.Slider, ComponentDetailedType.LineGraph, ComponentDetailedType.SpeedGraph ->
+                topics.filter { it.dataType in listOf(TopicDataType.FLOAT, TopicDataType.INT) }
+
+            else -> topics
+        }
     }
 
     private suspend fun getTopicsForProject(projectId: Int): List<Topic> {
@@ -430,14 +542,20 @@ class AddComponentViewModel(
                     title = R.string.s37,
                     description = R.string.s54,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
                     )
                 ),
                 SettingType.MinValue to SettingData(
                     title = R.string.s38,
                     description = R.string.s55,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
                     )
                 )
             )
@@ -445,6 +563,7 @@ class AddComponentViewModel(
             ComponentDetailedType.Discord -> mapOf(
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
+                    description = R.string.s71,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),
@@ -455,6 +574,7 @@ class AddComponentViewModel(
             ComponentDetailedType.Email -> mapOf(
                 SettingType.Title to SettingData(
                     title = R.string.a_s54,
+                    description = R.string.s70,
                     inputFieldData = InputFieldData(
                         label = R.string.a_s54
                     ),
@@ -462,10 +582,34 @@ class AddComponentViewModel(
                 ),
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
+                    description = R.string.s71,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),
                     isDescription = true
+                )
+            )
+
+            ComponentDetailedType.SpeedGraph -> mapOf(
+                SettingType.MaxValue to SettingData(
+                    title = R.string.s37,
+                    description = R.string.s73,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
+                ),
+                SettingType.MinValue to SettingData(
+                    title = R.string.s38,
+                    description = R.string.s74,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
                 )
             )
 
@@ -519,6 +663,11 @@ class AddComponentViewModel(
             titleId = R.string.a_s55,
             iconRes = R.drawable.ic_graph_time,
             type = ComponentDetailedType.LineGraph
+        ),
+        ComponentChoiceData(
+            titleId = R.string.s75,
+            iconRes = R.drawable.ic_graph_speed,
+            type = ComponentDetailedType.SpeedGraph
         ),
     )
 

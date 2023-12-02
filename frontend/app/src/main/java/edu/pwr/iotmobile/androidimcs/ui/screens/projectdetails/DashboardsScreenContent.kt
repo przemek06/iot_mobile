@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails
 
 import androidx.compose.foundation.lazy.LazyColumn
@@ -5,13 +7,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
@@ -26,12 +28,19 @@ fun DashboardsScreenContent(
     uiInteraction: ProjectDetailsUiInteraction,
     navigation: ProjectDetailsNavigation
 ) {
-    var isDialogVisible by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    val keyboardFocus = KeyboardFocusController(
+        keyboardController = LocalSoftwareKeyboardController.current,
+        focusManager = focusManager
+    )
+
     AddNewDashboardDialog(
-        isVisible = isDialogVisible,
         uiState = uiState,
         uiInteraction = uiInteraction,
-        onCloseDialog = { isDialogVisible = false }
+        onCloseDialog = {
+            keyboardFocus.clear()
+            uiInteraction.toggleAddDashboardDialog()
+        }
     )
     LazyColumn {
         item {
@@ -43,7 +52,7 @@ fun DashboardsScreenContent(
                 ButtonCommon(
                     text = stringResource(id = R.string.add_new_dashboard),
                     type = ButtonCommonType.Secondary
-                ) { isDialogVisible = true }
+                ) { uiInteraction.toggleAddDashboardDialog() }
                 Dimensions.space30.HeightSpacer()
             }
         }
@@ -60,12 +69,11 @@ fun DashboardsScreenContent(
 
 @Composable
 private fun AddNewDashboardDialog(
-    isVisible: Boolean,
     uiState: ProjectDetailsUiState,
     uiInteraction: ProjectDetailsUiInteraction,
     onCloseDialog: () -> Unit
 ) {
-    if (isVisible) {
+    if (uiState.isAddDialogVisible) {
         SimpleDialog(
             title = stringResource(R.string.add_new_dashboard_dialog),
             isLoading = uiState.isDialogLoading,
