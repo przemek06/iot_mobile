@@ -1,6 +1,5 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,9 +52,6 @@ fun LazyStaggeredGridItemScope.Speedometer(
         coroutineScope = coroutineScope
     ) {
         val currentValue = item.currentValue?.toFloatOrNull() ?: 0f
-        Log.d("Speed", "currentValue: $currentValue")
-        Log.d("Speed", "max value: ${item.maxValue}")
-        Log.d("Speed", "min value: ${item.minValue}")
 
         val density = LocalDensity.current
         val needleBaseSize = with(density) { 1.dp.toPx() }

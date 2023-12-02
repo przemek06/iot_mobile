@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,7 +23,6 @@ import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -38,6 +38,8 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import kotlinx.coroutines.CoroutineScope
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 @Composable
@@ -84,6 +86,10 @@ fun LazyStaggeredGridItemScope.GraphComponent(
         val yUpperValue = (data.maxBy { it.second }.second * 1.2f).roundToInt()
         val yLowerValue = (data.minBy { it.second }.second * 0.8f).roundToInt()
 
+        val xUpperValue = data.maxBy { it.first }.first.plusHours(1).truncatedTo(ChronoUnit.HOURS)
+        val xLowerValue = data.minBy { it.first }.first.truncatedTo(ChronoUnit.HOURS)
+        val xTimeDifference = ChronoUnit.HOURS.between(xUpperValue, xLowerValue).absoluteValue
+
         // Get proper text font
         val context = LocalContext.current
         val density = LocalDensity.current
@@ -98,21 +104,20 @@ fun LazyStaggeredGridItemScope.GraphComponent(
         }
 
         Canvas(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(end = Dimensions.space10)
         ) {
             val spacePerHour = (size.width - verticalSpacing) / (data.size + if(data.size == 1) 1 else -1)
-            val priceStep = (yUpperValue - yLowerValue) / 5
+            val yStep = (yUpperValue - yLowerValue) / 5
+            val xStep = if (xTimeDifference < 5) xTimeDifference else if (xTimeDifference > 10) xTimeDifference else xTimeDifference / 2
+            val spaceStep = (size.width - verticalSpacing) / (xStep)
 
             // Draw the x-axis values
             if(hasLabels) {
-                data.indices.forEach { i ->
-                    val record = data[i]
-                    val x = record.first.formatDate()
+                (0..xStep).forEach { i ->
                     drawContext.canvas.nativeCanvas.apply {
                         drawText(
-                            x,
-                            if(data.size == 1) (size.width + verticalSpacing) / 2
-                                else verticalSpacing + i * spacePerHour,
+                            xLowerValue.plusHours(1 * i).formatDate(),
+                            verticalSpacing + i * spaceStep,
                             size.height - 5,
                             textPaint
                         )
@@ -121,7 +126,7 @@ fun LazyStaggeredGridItemScope.GraphComponent(
                 (0..4).forEach { i ->
                     drawContext.canvas.nativeCanvas.apply {
                         drawText(
-                            (yLowerValue + priceStep * i).toString(),
+                            (yLowerValue + yStep * i).toString(),
                             30f,
                             size.height - horizontalSpacing - i * size.height / 5f,
                             textPaint
@@ -208,7 +213,7 @@ fun LazyStaggeredGridItemScope.GraphComponent(
 private fun LocalDateTime.formatDate(pattern: String = "HH:mm"): String {
     return try {
         val formatter = DateTimeFormatter.ofPattern(pattern)
-        this.format(formatter)
+        this.truncatedTo(ChronoUnit.HOURS).format(formatter)
     } catch (e: Exception) {
         Log.e("LineGraph", "Error while formatting date.", e)
         ""
