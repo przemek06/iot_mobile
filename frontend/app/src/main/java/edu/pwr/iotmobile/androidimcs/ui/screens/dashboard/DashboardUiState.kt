@@ -36,6 +36,7 @@ data class ComponentData(
     val size: Int,
 
     val currentValue: String?,
+    val graphData: List<Pair<LocalDateTime, Float>> = emptyList(),
 
     val absolutePosition: Offset = Offset.Zero,
 
@@ -53,15 +54,19 @@ data class ComponentData(
     val pattern: String? = null
 ) {
     companion object {
-        fun ComponentDto.toComponentData(currentValue: String?): ComponentData? {
+        fun ComponentDto.toComponentData(
+            currentValue: String? = null,
+            graphData: List<Pair<LocalDateTime, Float>> = emptyList()
+        ): ComponentData? {
             val componentDetailedType = type.asEnum<ComponentDetailedType>() ?: return null
             return ComponentData(
                 id = id ?: return null,
                 name = name ?: "",
                 index = index,
                 size = size,
-                height = if (componentDetailedType == ComponentDetailedType.LineGraph) 200.dp else 140.dp,
+                height = if (componentDetailedType == ComponentDetailedType.LineGraph) 240.dp else 140.dp,
                 currentValue = currentValue,
+                graphData = graphData,
                 componentType = componentType.asEnum<ComponentType>() ?: return null,
                 type = componentDetailedType,
                 topic = topic?.toTopic(),
