@@ -1,5 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login
 
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
@@ -43,17 +45,26 @@ class LoginViewModel(
     }
 
     fun onLoginClick() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val uiState = _uiState.value
 
+            val email = uiState.inputFields[InputFieldType.Email]?.text
+            val password = uiState.inputFields[InputFieldType.Password]?.text
+
+            if (email.isNullOrBlank() || password.isNullOrBlank()) {
+                toast.toast("Email and password cannot be empty.")
+                _uiState.update { it.copy(isLoading = false) }
+                return@launch
+            }
+
             kotlin.runCatching {
                 userRepository.login(
-                    email = uiState.inputFields[InputFieldType.Email]?.text ?: return@launch,
-                    password = uiState.inputFields[InputFieldType.Password]?.text ?: return@launch,
+                    email = email,
+                    password = password
                 )
             }.onSuccess { result ->
                 when (result) {
-                    // TODO: account doesn't exist error
                     LoginUserResult.Success -> event.event(LOGIN_SUCCESS_EVENT)
                     LoginUserResult.AccountInactive -> event.event(LOGIN_ACCOUNT_INACTIVE_EVENT)
                     LoginUserResult.Failure -> toast.toast("Email or password incorrect.")
@@ -61,12 +72,16 @@ class LoginViewModel(
             }.onFailure {
                 toast.toast("Error - could not log in.")
             }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
     private fun generateInputFields() = mapOf(
         InputFieldType.Email to InputFieldData(
             label = R.string.email,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email
+            )
         ),
         InputFieldType.Password to InputFieldData(
             label = R.string.password,

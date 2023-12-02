@@ -39,21 +39,30 @@ fun TopicsScreenContent(
     uiInteraction: ProjectDetailsUiInteraction,
     navigation: ProjectDetailsNavigation
 ) {
+    var isInfoDialogVisible by remember { mutableStateOf(false) }
     var dialogTopic by remember { mutableStateOf<Topic?>(null) }
-    TopicAccessDialog(uiState, uiInteraction)
+    TopicAccessDialog(
+        isVisible = isInfoDialogVisible,
+        onCloseDialog = { isInfoDialogVisible = false }
+    )
     DeleteTopicDialog(
         isVisible = dialogTopic != null,
         topic = dialogTopic,
+        uiState = uiState,
         uiInteraction = uiInteraction,
         onCloseDialog = { dialogTopic = null }
     )
     LazyColumn {
+        item {
+            Dimensions.space22.HeightSpacer()
+        }
+
         if (uiState.userProjectRole != UserProjectRole.VIEWER) {
             item {
                 ButtonCommon(
                     text = stringResource(id = R.string.how_to_access),
                     type = ButtonCommonType.Alternative
-                ) { uiInteraction.setInfoVisible() }
+                ) { isInfoDialogVisible = true }
                 Dimensions.space10.HeightSpacer()
                 ButtonCommon(
                     text = stringResource(id = R.string.add_new_topic),
@@ -66,12 +75,12 @@ fun TopicsScreenContent(
         items(uiState.topics) {
             if (uiState.userProjectRole == UserProjectRole.VIEWER) {
                 NonErasableBlock(
-                    primaryText = it.title + ": " + it.name,
+                    primaryText = it.name,
                     secondaryText = it.dataType.name.firstUppercaseRestLowercase(),
                 )
             } else {
                 ErasableBlock(
-                    primaryText = it.title + ": " + it.name,
+                    primaryText = it.name,
                     secondaryText = it.dataType.name.firstUppercaseRestLowercase(),
                     onErase = { dialogTopic = it }
                 )
@@ -83,13 +92,13 @@ fun TopicsScreenContent(
 
 @Composable
 private fun TopicAccessDialog(
-    uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    isVisible: Boolean,
+    onCloseDialog: () -> Unit
 ) {
-    if(uiState.isInfoVisible) {
+    if(isVisible) {
         InfoDialog(
             title = stringResource(id = R.string.how_to_access_1),
-            onCloseDialog = { uiInteraction.setInfoInvisible() }
+            onCloseDialog = { onCloseDialog() }
         ) {
             Text(
                 text = stringResource(id = R.string.how_to_access_2),
@@ -110,6 +119,7 @@ private fun TopicAccessDialog(
 private fun DeleteTopicDialog(
     isVisible: Boolean,
     topic: Topic?,
+    uiState: ProjectDetailsUiState,
     uiInteraction: ProjectDetailsUiInteraction,
     onCloseDialog: () -> Unit
 ) {
@@ -118,6 +128,7 @@ private fun DeleteTopicDialog(
             title = stringResource(id = R.string.s49, topic.name),
             closeButtonText = stringResource(id = R.string.no),
             confirmButtonText = stringResource(id = R.string.yes),
+            isLoading = uiState.isDialogLoading,
             onCloseDialog = onCloseDialog,
             onConfirm = { uiInteraction.deleteTopic(topic.id) }
         ) {

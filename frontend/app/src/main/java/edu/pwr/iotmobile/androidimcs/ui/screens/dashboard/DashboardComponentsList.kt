@@ -2,6 +2,7 @@
 
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.animateScrollBy
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -111,6 +113,7 @@ fun ComponentsList(
                 }
             }
         }
+
         for (item in uiState.components) {
             val itemSpan =
                 if (item.size == 2) StaggeredGridItemSpan.FullLine
@@ -132,6 +135,10 @@ fun ComponentsList(
                     coroutineScope = coroutineScope
                 )
             }
+        }
+
+        item {
+            Dimensions.space30.HeightSpacer()
         }
     }
 }
@@ -212,6 +219,11 @@ fun LazyStaggeredGridItemScope.ComponentWrapper(
 
     val zIndex = if (isDragged) 3f else 1f
 
+    val bgColor: Color by animateColorAsState(
+        if (isDragged) MaterialTheme.colorScheme.secondaryContainer
+        else MaterialTheme.colorScheme.background
+    )
+
     LaunchedEffect(interactionSource) {
         interactionSource.interactions.collect { interaction ->
             when (interaction) {
@@ -282,7 +294,7 @@ fun LazyStaggeredGridItemScope.ComponentWrapper(
                 .clip(CardDefaults.shape),
             border = BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.primary),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.background,
+                containerColor = bgColor,
             )
         ) {
             Column(

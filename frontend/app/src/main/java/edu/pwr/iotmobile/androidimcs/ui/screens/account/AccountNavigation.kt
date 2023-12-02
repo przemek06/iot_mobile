@@ -8,21 +8,26 @@ interface AccountNavigation {
     fun openChangePassword()
     fun openInvitations()
     fun openLogin()
+    fun onReturn()
 
     companion object {
-        fun default(navController: NavHostController)
-                = object : AccountNavigation {
-            override fun openChangePassword() {
-                navController.navigate(Screen.ChangePassword.path)
-            }
+        fun default(navController: NavHostController) =
+            object : AccountNavigation {
+                override fun openChangePassword() {
+                    navController.navigate(Screen.ChangePassword.path)
+                }
 
-            override fun openInvitations() {
-                navController.navigate(Screen.Invitations.path)
-            }
+                override fun openInvitations() {
+                    navController.navigate(Screen.Invitations.path)
+                }
 
-            override fun openLogin() {
-                navController.navigate(Screen.Login.path)
+                override fun openLogin() {
+                    navController.navigate(Screen.Login.path)
+                }
+
+                override fun onReturn() {
+                    navController.popBackStack()
+                }
             }
-        }
     }
 }

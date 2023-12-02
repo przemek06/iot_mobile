@@ -38,7 +38,7 @@ fun ChooseTopicScreenContent(
 
         items(uiState.topics) {
             RadioButtonWithText(
-                text = it.title,
+                text = it.name + ": " + it.dataType.name,
                 isSelected = uiState.chosenTopic?.id == it.id,
                 onClick = { uiInteraction.onChooseTopic(it) },
             )

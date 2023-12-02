@@ -11,6 +11,8 @@ interface DashboardUiInteraction {
     fun setDraggedComponentId(id: Int?)
     fun onPlaceDraggedComponent(visibleItems: List<LazyStaggeredGridItemInfo>, windowWidth: Float)
     fun onAddNewComponent()
+    fun toggleDeleteDashboardDialog()
+    fun deleteDashboard()
 
     companion object {
         fun default(
@@ -40,6 +42,14 @@ interface DashboardUiInteraction {
             override fun onAddNewComponent() {
                 val dto = viewModel.getComponentListDto() ?: return
                 openAddComponentScreen(dto)
+            }
+
+            override fun toggleDeleteDashboardDialog() {
+                viewModel.toggleDeleteDashboardDialog()
+            }
+
+            override fun deleteDashboard() {
+                viewModel.deleteDashboard()
             }
 
         }

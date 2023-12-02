@@ -9,11 +9,15 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.InputFieldData
+import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.dto.DiscordChannelDto
@@ -49,35 +53,120 @@ class AddComponentViewModel(
 
     fun init(projectId: Int) {
         if (_projectId == null || projectId != _projectId) {
+            _uiState.update { it.copy(isLoading = true) }
             _projectId = projectId
+
             viewModelScope.launch(Dispatchers.Default) {
-                val topics = getTopicsForProject(projectId)
                 _uiState.update {
                     it.copy(
                         inputComponents = generateInputComponents(),
                         outputComponents = generateOutputComponents(),
                         triggerComponents = generateTriggerComponents(),
-                        topics = topics,
+                        isLoading = false,
+                        isError = false
                     )
                 }
             }
         }
     }
 
+    private fun String.isNumeric(): Boolean {
+        return this.toDoubleOrNull() != null
+    }
+
+    private fun Map.Entry<SettingType, SettingData>.getWithErrors(
+        componentType: ComponentDetailedType,
+    ): InputFieldData {
+        val numericFields = listOf(SettingType.MinValue, SettingType.MaxValue, SettingType.OnClickSend)
+        val numericComponentTypes = listOf(ComponentDetailedType.Slider, ComponentDetailedType.LineGraph)
+        return if (key in numericFields && componentType in numericComponentTypes) {
+            if (value.inputFieldData.text.isNotBlank()) {
+                value.inputFieldData.copy(
+                    isError = !value.inputFieldData.text.isNumeric(),
+                    errorMessage = R.string.s69
+                )
+            } else {
+                value.inputFieldData.copy(
+                    isError = value.inputFieldData.text.isBlank(),
+                    errorMessage = R.string.s66
+                )
+            }
+        } else {
+            value.inputFieldData.copy(
+                isError = value.inputFieldData.text.isBlank(),
+                errorMessage = R.string.s66
+            )
+        }
+    }
+
+    fun checkInputFields() {
+        val chosenComponent = _uiState.value.chosenComponentType ?: run {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
+
+        _uiState.update { ui ->
+            ui.copy(
+                settings = ui.settings.map {
+                    it.key to it.value.copy(
+                        inputFieldData = it.getWithErrors(chosenComponent)
+                    )
+                }.toMap()
+            )
+        }
+    }
+
     fun navigateNext(scopeID: ScopeID) {
         when (_uiState.value.currentPage) {
-            AddComponentPage.ChooseComponent ->
-                _uiState.update { it.copy(
-                    currentPage = AddComponentPage.ChooseTopic,
-                    bottomNavData = getBottomNavData(AddComponentPage.ChooseTopic)
-                ) }
-            AddComponentPage.ChooseTopic ->
-                _uiState.update { it.copy(
-                    currentPage = AddComponentPage.Settings,
-                    bottomNavData = getBottomNavData(AddComponentPage.Settings),
-                    settings = generateSettings()
-                ) }
+            AddComponentPage.ChooseComponent -> {
+                if (uiState.value.chosenComponentType == null) {
+                    viewModelScope.launch {
+                        toast.toast("You must choose a component type.")
+                    }
+                    return
+                }
+                val locProjectId = _projectId
+                if (locProjectId == null) {
+                    _uiState.update { it.copy(isError = true) }
+                    return
+                }
+
+                viewModelScope.launch {
+                    val topics = getFilteredTopics(locProjectId)
+                    _uiState.update {
+                        it.copy(
+                            topics = topics,
+                            currentPage = AddComponentPage.ChooseTopic,
+                            bottomNavData = getBottomNavData(AddComponentPage.ChooseTopic)
+                        )
+                    }
+                }
+            }
+
+            AddComponentPage.ChooseTopic -> {
+                if (uiState.value.chosenTopic == null) {
+                    viewModelScope.launch {
+                        toast.toast("You must choose a topic.")
+                    }
+                    return
+                }
+                _uiState.update {
+                    it.copy(
+                        currentPage = AddComponentPage.Settings,
+                        bottomNavData = getBottomNavData(AddComponentPage.Settings),
+                        settings = generateSettings()
+                    )
+                }
+            }
+
             AddComponentPage.Settings -> {
+                checkInputFields()
+                if (uiState.value.settings.any { it.value.inputFieldData.isError }) {
+                    viewModelScope.launch {
+                        toast.toast("Some field is missing data.")
+                    }
+                    return
+                }
                 if (checkIfChosenComponentDiscord())
                     openDiscord()
                 else
@@ -146,27 +235,56 @@ class AddComponentViewModel(
     }
 
     fun handleUri() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             when (uiState.value.chosenComponentType) {
                 ComponentDetailedType.Discord -> {
+                    val discordChannels = generateDiscordChannels()
+                    if (discordChannels.isEmpty()) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                isError = true
+                            )
+                        }
+                        return@launch
+                    }
+
                     _uiState.update {
                         it.copy(
                             currentPage = AddComponentPage.Additional,
                             bottomNavData = getBottomNavData(AddComponentPage.Additional),
-                            discordChannels = generateDiscordChannels()
+                            discordChannels = discordChannels,
+                            isLoading = false,
+                            isError = false
                         )
                     }
                 }
 
                 else -> {
-                    // TODO: set error
                     _uiState.update {
                         it.copy(
                             currentPage = AddComponentPage.Additional,
-                            bottomNavData = getBottomNavData(AddComponentPage.Additional)
+                            bottomNavData = getBottomNavData(AddComponentPage.Additional),
+                            isLoading = false,
+                            isError = true
                         )
                     }
                 }
+            }
+        }
+    }
+
+    fun updateTopics() {
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val projectId = _projectId ?: return@launch
+            val topics = getFilteredTopics(projectId)
+            _uiState.update {
+                it.copy(
+                    topics = topics,
+                    isLoading = false
+                )
             }
         }
     }
@@ -175,38 +293,63 @@ class AddComponentViewModel(
         _uiState.value.chosenComponentType == ComponentDetailedType.Discord
 
     private fun openDiscord() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
                 val discordKey = integrationRepository.getDiscordKey() ?: kotlin.run {
-                    toast.toast("Operation failed.")
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        isError = true
+                    ) }
                     return@launch
                 }
                 _discordKey = discordKey
 
                 val discordUrl = integrationRepository.getDiscordUrl(discordKey) ?: kotlin.run {
-                    toast.toast("Operation failed.")
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        isError = true
+                    ) }
                     return@launch
                 }
 
                 _uiState.update {
-                    it.copy(discordUrl = discordUrl)
+                    it.copy(
+                        discordUrl = discordUrl,
+                        isLoading = false,
+                        isError = false
+                    )
                 }
                 event.event(DISCORD_EVENT)
             } catch (e: Exception) {
                 Log.e("Trigger", "Cannot open discord web", e)
-                toast.toast("Operation failed.")
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    isError = true
+                ) }
             }
         }
     }
 
     private fun onConfirmComponent(scopeID: ScopeID) {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.Default) {
-            val data = getComponentDtoData() ?: return@launch
+            val data = getComponentDtoData() ?: run {
+                toast.toast(FAILURE_TOAST_MESSAGE)
+                _uiState.update { it.copy(isLoading = false) }
+                return@launch
+            }
             val componentListDto = ComponentsListState.getScoped(scopeID)?.componentListDto ?: return@launch
+
+            Log.d("CompList", "componentListDto")
+            Log.d("CompList", componentListDto.toString())
 
             val newComponents = (componentListDto.components + listOf(data))
                 .mapIndexed { index, item -> item.copy(index = index) }
             val newDto = componentListDto.copy(components = newComponents)
+
+            Log.d("Comp", "newDto")
+            Log.d("Comp", newDto.toString())
 
             kotlin.runCatching {
                 componentRepository.updateComponentList(newDto)
@@ -216,8 +359,10 @@ class AddComponentViewModel(
             }.onFailure {
                 toast.toast(FAILURE_TOAST_MESSAGE)
             }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
+
 
     private fun getComponentDtoData(): ComponentDto? {
         val locUiState = _uiState.value
@@ -251,12 +396,23 @@ class AddComponentViewModel(
         )
     }
 
+    private suspend fun getFilteredTopics(projectId: Int): List<Topic> {
+        val topics = getTopicsForProject(projectId)
+        return when (_uiState.value.chosenComponentType) {
+            ComponentDetailedType.Slider, ComponentDetailedType.LineGraph ->
+                topics.filter { it.dataType in listOf(TopicDataType.FLOAT, TopicDataType.INT) }
+
+            else -> topics
+        }
+    }
+
     private suspend fun getTopicsForProject(projectId: Int): List<Topic> {
         kotlin.runCatching {
             topicRepository.getTopicsByProjectId(projectId)
         }.onSuccess { topics ->
             return topics.mapNotNull { it.toTopic() }
         }.onFailure {
+            _uiState.update { it.copy(isError = true) }
             return emptyList()
         }
         return emptyList()
@@ -284,14 +440,12 @@ class AddComponentViewModel(
         val defaultFields = mapOf(
             SettingType.Name to SettingData(
                 title = R.string.s39,
+                description = R.string.s50,
                 inputFieldData = InputFieldData(
-                    label = R.string.name
-                )
-            ),
-            SettingType.DefaultValue to SettingData(
-                title = R.string.s40,
-                inputFieldData = InputFieldData(
-                    label = R.string.s34
+                    label = R.string.name,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences
+                    )
                 )
             )
         )
@@ -301,6 +455,7 @@ class AddComponentViewModel(
             ComponentDetailedType.Button -> mapOf(
                 SettingType.OnClickSend to SettingData(
                     title = R.string.s33,
+                    description = R.string.s51,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
@@ -310,12 +465,14 @@ class AddComponentViewModel(
             ComponentDetailedType.Toggle -> mapOf(
                 SettingType.OnToggleOnSend to SettingData(
                     title = R.string.s35,
+                    description = R.string.s52,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
                 ),
                 SettingType.OnToggleOffSend to SettingData(
                     title = R.string.s36,
+                    description = R.string.s53,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     )
@@ -325,14 +482,22 @@ class AddComponentViewModel(
             ComponentDetailedType.Slider -> mapOf(
                 SettingType.MaxValue to SettingData(
                     title = R.string.s37,
+                    description = R.string.s54,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
                     )
                 ),
                 SettingType.MinValue to SettingData(
                     title = R.string.s38,
+                    description = R.string.s55,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
                     )
                 )
             )
@@ -340,6 +505,7 @@ class AddComponentViewModel(
             ComponentDetailedType.Discord -> mapOf(
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
+                    description = R.string.s71,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),
@@ -349,14 +515,16 @@ class AddComponentViewModel(
 
             ComponentDetailedType.Email -> mapOf(
                 SettingType.Title to SettingData(
-                    title = R.string.s54,
+                    title = R.string.a_s54,
+                    description = R.string.s70,
                     inputFieldData = InputFieldData(
-                        label = R.string.s54
+                        label = R.string.a_s54
                     ),
                     isDescription = true
                 ),
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
+                    description = R.string.s71,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),
@@ -375,7 +543,6 @@ class AddComponentViewModel(
         try {
             val discordKey = _discordKey ?: return emptyList()
             val guildId = integrationRepository.getGuildId(discordKey) ?: kotlin.run {
-                toast.toast("Operation failed.")
                 return emptyList()
             }
             val channels = integrationRepository.getDiscordChannels(guildId)
@@ -383,7 +550,6 @@ class AddComponentViewModel(
                 it.toDiscordChannel()
             }
         } catch (e: Exception) {
-            toast.toast("Operation failed.")
             return emptyList()
         }
     }
@@ -413,7 +579,7 @@ class AddComponentViewModel(
 
     private fun generateOutputComponents() = listOf(
         ComponentChoiceData(
-            titleId = R.string.s55,
+            titleId = R.string.a_s55,
             iconRes = R.drawable.ic_graph_time,
             type = ComponentDetailedType.LineGraph
         ),
@@ -426,7 +592,7 @@ class AddComponentViewModel(
             type = ComponentDetailedType.Discord
         ),
         ComponentChoiceData(
-            titleId = R.string.s53,
+            titleId = R.string.a_s53,
             iconRes = R.drawable.ic_mail,
             type = ComponentDetailedType.Email
         ),
@@ -445,6 +611,7 @@ class AddComponentViewModel(
 
     data class SettingData(
         @StringRes val title: Int,
+        @StringRes val description: Int? = null,
         val inputFieldData: InputFieldData,
         val isDescription: Boolean = false
     )
@@ -457,7 +624,6 @@ class AddComponentViewModel(
 
     enum class SettingType {
         Name,
-        DefaultValue,
         OnClickSend,
         OnToggleOnSend,
         OnToggleOffSend,

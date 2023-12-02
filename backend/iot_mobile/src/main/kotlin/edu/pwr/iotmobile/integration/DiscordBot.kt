@@ -4,6 +4,7 @@ import edu.pwr.iotmobile.dto.DiscordChannelDTO
 import jakarta.annotation.PostConstruct
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
@@ -28,7 +29,9 @@ class DiscordBot {
     fun getAllChannels(guildId: String) : List<DiscordChannelDTO> {
         val channels = jda?.getGuildById(guildId)?.channels
 
-        return channels?.map { DiscordChannelDTO(it.name, it.id) } ?: emptyList()
+        return channels
+            ?.filter { it.type == ChannelType.TEXT }
+            ?.map { DiscordChannelDTO(it.name, it.id) } ?: emptyList()
     }
 
 }

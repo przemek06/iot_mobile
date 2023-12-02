@@ -11,6 +11,7 @@ import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
 import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.TopicMessagesDto
 import edu.pwr.iotmobile.androidimcs.data.entity.DashboardEntity
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
@@ -47,8 +48,8 @@ class DashboardViewModel(
 
     private var _dashboardId: Int? = null
     private var _projectId: Int? = null
-    private var userProjectRole: UserProjectRole? = UserProjectRole.EDITOR
-    private var componentListDto: ComponentListDto? = null
+    private var _userProjectRole: UserProjectRole? = null
+    private var _componentListDto: ComponentListDto? = null
     private var _lastMessages: List<TopicMessagesDto> = emptyList()
 
     private var componentsListener: ComponentChangeWebSocketListener? = null
@@ -61,9 +62,12 @@ class DashboardViewModel(
 
     fun init(dashboardId: Int, projectId: Int?, dashboardName: String) {
         if (dashboardId == _dashboardId) return
+
+        // Set private variables
         _projectId = projectId
         _dashboardId = dashboardId
 
+        // Save dashboard to last accessed
         projectId?.let {
             viewModelScope.launch(Dispatchers.IO) {
                 val entity = DashboardEntity(
@@ -79,6 +83,7 @@ class DashboardViewModel(
             }
         }
 
+        // Begin listening on component changes
         componentsListener?.closeWebSocket()
         componentsListener = ComponentChangeWebSocketListener(
             client = client,
@@ -86,13 +91,46 @@ class DashboardViewModel(
             onComponentChangeMessage = { s -> onComponentChangeMessage(s) }
         )
 
+        _uiState.update { it.copy(isLoading = true) }
+
         viewModelScope.launch {
-            val components = componentRepository.getComponentList(dashboardId).sortedBy { it.index }
-            componentListDto = ComponentListDto(
+            // Get user project role
+            projectId ?: run {
+                _uiState.update { it.copy(isError = true, isLoading = false) }
+                return@launch
+            }
+            val projectUserInfo = projectRepository
+                .getUserProjectRole(projectId)
+                ?: run {
+                    _uiState.update { it.copy(isError = true, isLoading = false) }
+                    return@launch
+                }
+
+            val projectRole = projectUserInfo.toUserProjectRole() ?: run {
+                _uiState.update { it.copy(isError = true, isLoading = false) }
+                return@launch
+            }
+            _userProjectRole = projectRole
+
+            // Get components
+            val components = try {
+                componentRepository.getComponentList(dashboardId).sortedBy { it.index }
+            } catch (e: Exception) {
+                Log.e("Dashboard", "Error getting component", e)
+                _uiState.update {
+                    it.copy(
+                        isError = true,
+                        isLoading = false
+                    )
+                }
+                return@launch
+            }
+            _componentListDto = ComponentListDto(
                 dashboardId = dashboardId,
                 components = components
             )
 
+            // Start listening on topics for new messages
             val topics = components.mapNotNull { it.topic?.uniqueName }
             messageReceivedListener?.closeWebSocket()
 
@@ -104,6 +142,7 @@ class DashboardViewModel(
                 )
             }
 
+            // Get last messages for all topics for components
             val lastMessages = getLastMessages()
             _lastMessages = lastMessages
 
@@ -115,8 +154,10 @@ class DashboardViewModel(
                             item.toComponentData(lastMessage)
                         } ?: item.toComponentData(null)
                     },
-                    menuOptionsList = generateMenuOptions(userProjectRole),
-                    userProjectRole = userProjectRole,
+                    menuOptionsList = generateMenuOptions(_userProjectRole),
+                    userProjectRole = _userProjectRole,
+                    isError = false,
+                    isLoading = false
                 )
             }
         }
@@ -128,6 +169,9 @@ class DashboardViewModel(
     private fun onComponentChangeMessage(data: ComponentListDto) {
         Log.d("Web", "onComponentChangeMessage called")
         Log.d("Web", data.toString())
+        _componentListDto = _componentListDto?.copy(
+            components = data.components.sortedBy { it.index }
+        )
         _uiState.update { ui ->
             ui.copy(
                 components = data.components
@@ -179,7 +223,7 @@ class DashboardViewModel(
 
     /////////////////////
 
-    fun getComponentListDto(): ComponentListDto? = componentListDto
+    fun getComponentListDto(): ComponentListDto? = _componentListDto
 
     fun setAbsolutePosition(offset: Offset, index: Int) {
         _uiState.update {
@@ -273,12 +317,18 @@ class DashboardViewModel(
         }
     }
 
+    fun toggleDeleteDashboardDialog() {
+        _uiState.update {
+            it.copy(isDeleteDashboardDialogVisible = !it.isDeleteDashboardDialogVisible)
+        }
+    }
+
     fun onPlaceDraggedComponent(
         visibleItems: List<LazyStaggeredGridItemInfo>,
         windowWidth: Float
     ) {
         viewModelScope.launch {
-            val locComponentListDto = componentListDto
+            val locComponentListDto = _componentListDto
             val currentUiState = uiState.value
             val draggedComponentId = currentUiState.draggedComponentId ?: return@launch
 
@@ -310,7 +360,9 @@ class DashboardViewModel(
                 components = newList.map { it.toDto() }.toList()
             )
             dto?.let {
-                componentRepository.updateComponentList(dto)
+                kotlin.runCatching {
+                    componentRepository.updateComponentList(dto)
+                }
             }
         }
     }
@@ -336,8 +388,11 @@ class DashboardViewModel(
         val draggedComponent = components.firstOrNull { it.id == draggedComponentId } ?: return null
         val itemIndex = components.indexOf(draggedComponent)
 
-        for (it in visibleItems.subList(1, visibleItems.size)) {
-            val currentItemIndex = it.index-1
+        // Needed to account for "Add component" button
+        val toSubtract = if (_userProjectRole == UserProjectRole.VIEWER) 0 else 1
+
+        for (it in visibleItems.subList(toSubtract, visibleItems.size - 1)) {
+            val currentItemIndex = it.index-toSubtract
             // Do not consider the original position of the currently dragged item.
             if (currentItemIndex == itemIndex) continue
 
@@ -375,13 +430,19 @@ class DashboardViewModel(
 
     private suspend fun getConnectionKey(): String? {
         _projectId?.let {
-            val project = projectRepository.getProjectById(it)
-            return project?.connectionKey
+            try {
+                val project = projectRepository.getProjectById(it)
+                return project?.connectionKey
+            } catch (e: Exception) {
+                Log.e("Dashboard", "Error getting conneciton key", e)
+                return null
+            }
         }
         return null
     }
 
-    private fun deleteDashboard() {
+    fun deleteDashboard() {
+        _uiState.update { it.copy(isDialogLoading = true) }
         viewModelScope.launch(Dispatchers.Default) {
             val dashboardId = _dashboardId ?: return@launch
             kotlin.runCatching {
@@ -392,6 +453,7 @@ class DashboardViewModel(
             }.onFailure {
                 Log.d(TAG, "Delete dashboard error")
             }
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
 
@@ -403,7 +465,7 @@ class DashboardViewModel(
             ),
             MenuOption(
                 titleId = R.string.s21,
-                onClick = { deleteDashboard() }
+                onClick = { toggleDeleteDashboardDialog() }
             )
         )
         else -> emptyList()

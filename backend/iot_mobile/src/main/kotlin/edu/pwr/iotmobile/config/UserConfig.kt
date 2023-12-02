@@ -13,10 +13,14 @@ class UserConfig(
 
     @PostConstruct
     fun init() {
-        val admin = UserDTO("admin@gmail.com", "testtest", "Jon Doe")
-        val user = UserDTO("user@gmail.com", "testtest", "James Doe")
-        userService.createUser(admin, ERole.ADMIN_ROLE)
-        userService.createUser(user, ERole.USER_ROLE)
+        try {
+            val admin = UserDTO("admin@gmail.com", "testtest", "Jon Doe")
+            val user = UserDTO("user@gmail.com", "testtest", "James Doe")
+            userService.createUser(admin, ERole.ADMIN_ROLE)
+            userService.createUser(user, ERole.USER_ROLE)
+        } catch (e: Exception) {
+            // do nothing
+        }
     }
 
 }

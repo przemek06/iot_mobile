@@ -14,7 +14,7 @@ interface UserRepository {
     suspend fun login(email: String, password: String): LoginUserResult
     suspend fun logout(): Result<Unit>
     suspend fun register(userDto: UserDto): RegisterUserResult
-    // TODO: suspend fun sendActivateCodeEmail(email: String): Result<Unit>
+    suspend fun resendVerificationCode(email: String): Result<Unit>
     /**
      * Returns User if logged in, null otherwise.
      */

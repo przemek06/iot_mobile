@@ -8,17 +8,22 @@ import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 data class SearchUiState (
     val searchInputFieldData: String,
     val users: List<User>,
+    val excludedUsers: List<User>,
     val searchedUsers: List<User>,
     val selectedUser: User?,
     val data: SearchViewModel.ScreenData,
     val isDialogVisible: Boolean,
     val userRoles: List<ProjectRoleDto>,
-    val selectedRole: UserProjectRole
+    val selectedRole: UserProjectRole,
+    val isLoading: Boolean = false,
+    val isDialogLoading: Boolean = false,
+    val isError: Boolean = false,
 ) {
      companion object {
          fun default(
              searchInputFieldData: String = "",
              users: List<User> = emptyList(),
+             excludedUsers: List<User> = emptyList(),
              searchedUsers: List<User> = emptyList(),
              selectedUser: User? = null,
              data: SearchViewModel.ScreenData = SearchViewModel.ScreenData(
@@ -31,6 +36,7 @@ data class SearchUiState (
          ) = SearchUiState (
              searchInputFieldData = searchInputFieldData,
              users = users,
+             excludedUsers = excludedUsers,
              searchedUsers = searchedUsers,
              selectedUser = selectedUser,
              data = data,

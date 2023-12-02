@@ -2,6 +2,8 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.extensions.asEnum
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
@@ -24,6 +26,14 @@ class MainScreenViewModel(
     init {
         viewModelScope.launch(Dispatchers.Default) {
             kotlin.runCatching {
+
+                val role = userRepository
+                    .getActiveUserInfo()
+                    .getOrNull()
+                    ?.role
+                    ?.asEnum<UserRole>()
+                    ?: UserRole.USER_ROLE
+
                 val invitations = projectRepository.findAllPendingInvitationsForActiveUser()
                 val isInvitation = invitations.isNotEmpty()
 
@@ -40,10 +50,22 @@ class MainScreenViewModel(
                 _uiState.update { it.copy(
                     isInvitation = isInvitation,
                     user = user,
+                    role = role,
                     isLoading = false,
                     isError = false,
                     dashboards = dashboards
                 ) }
+            }
+        }
+    }
+
+    fun updateLastAccessed() {
+        viewModelScope.launch(Dispatchers.Default) {
+            kotlin.runCatching {
+                val dashboards = dashboardRepository.getLastAccessedDashboards().take(5).reversed()
+                _uiState.update {
+                    it.copy(dashboards = dashboards)
+                }
             }
         }
     }

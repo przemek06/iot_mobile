@@ -9,6 +9,8 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchMode
 
 interface ProjectDetailsNavigation {
     val projectId: Int?
+    val startOnTopic: Boolean
+    val isTopicSuccess: Boolean
 
     fun openDashboardScreen(dashboardId: Int, dashboardName: String)
     fun openAddTopic()
@@ -25,6 +27,10 @@ interface ProjectDetailsNavigation {
         ) = object : ProjectDetailsNavigation {
             override val projectId: Int?
                 get() = navBackStackEntry.getArguments().getOrNull(0)?.toInt()
+            override val startOnTopic: Boolean
+                get() = navBackStackEntry.getArguments().getOrNull(1)?.toBoolean() ?: false
+            override val isTopicSuccess: Boolean
+                get() = navBackStackEntry.savedStateHandle.getLiveData<Boolean>("resultStatus").value ?: false
 
             override fun openDashboardScreen(dashboardId: Int, dashboardName: String) {
                 projectId?.let {
@@ -58,7 +64,7 @@ interface ProjectDetailsNavigation {
 
             override fun openSearchAddAdmin() {
                 projectId?.let {
-                    navController.navigate(Screen.Search.path.appendArguments(SearchMode.ADD_ADMIN, it))
+                    navController.navigate(Screen.Search.path.appendArguments(SearchMode.ADD_PROJECT_ADMIN, it))
                 }
             }
 

@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
 import edu.pwr.iotmobile.androidimcs.ui.components.Label
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
@@ -32,8 +33,7 @@ private const val MAX_USERS_IN_LIST = 2
 
 @Composable
 fun GroupScreenContent(
-    uiState: ProjectDetailsUiState,
-    uiInteraction: ProjectDetailsUiInteraction
+    uiState: ProjectDetailsUiState
 ) {
     var isUserListExpanded by remember { mutableStateOf(false) }
 
@@ -44,6 +44,10 @@ fun GroupScreenContent(
     val bottomText = if (isUserListExpanded) R.string.hide else R.string.expand
 
     LazyColumn {
+        item {
+            Dimensions.space22.HeightSpacer()
+        }
+
         item {
             Role(uiState = uiState)
             Dimensions.space40.HeightSpacer()
@@ -61,7 +65,10 @@ fun GroupScreenContent(
         itemsIndexed(memberList) { index, user ->
             Member(
                 user = user,
-                role = uiState.userProjectRole
+                role = uiState.roles
+                    .find { it.user == user }
+                    ?.toUserProjectRole()
+                    ?: UserProjectRole.VIEWER
             )
             if (index < memberList.lastIndex)
                 Dimensions.space10.HeightSpacer()
@@ -137,10 +144,11 @@ private fun LazyItemScope.Member(
     user: UserInfoDto,
     role: UserProjectRole,
 ) {
-    if (role == UserProjectRole.ADMIN)
-        AdminMember(user = user)
-    else
-        UserNameText(user = user)
+    when(role) {
+        UserProjectRole.ADMIN -> AdminMember(user = user)
+        UserProjectRole.EDITOR -> EditorMember(user = user)
+        else -> UserNameText(user = user)
+    }
 }
 
 @Composable
@@ -151,6 +159,17 @@ private fun AdminMember(user: UserInfoDto) {
         UserNameText(user)
         Dimensions.space10.WidthSpacer()
         Label(text = stringResource(id = R.string.admin))
+    }
+}
+
+@Composable
+private fun EditorMember(user: UserInfoDto) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        UserNameText(user)
+        Dimensions.space10.WidthSpacer()
+        Label(text = stringResource(id = R.string.editor))
     }
 }
 

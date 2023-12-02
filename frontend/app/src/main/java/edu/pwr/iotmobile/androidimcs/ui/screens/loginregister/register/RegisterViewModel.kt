@@ -2,6 +2,9 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register
 
 import android.util.Log
 import android.util.Patterns
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
@@ -64,6 +67,7 @@ class RegisterViewModel(
         checkData()
         if (_uiState.value.inputFields.any { it.value.isError }) return
 
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val userDto = _uiState.value.inputFields.toDto() ?: return@launch
             val result = userRepository.register(userDto)
@@ -73,6 +77,7 @@ class RegisterViewModel(
                 RegisterUserResult.AccountExists -> toast.toast("Account with this email already exists.")
                 RegisterUserResult.Failure -> toast.toast("Error - could not register.")
             }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -87,10 +92,16 @@ class RegisterViewModel(
     private fun generateInputFields() = mapOf(
         InputFieldType.Email to InputFieldData(
             label = R.string.email,
-            errorMessage = R.string.s11
+            errorMessage = R.string.s11,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email
+            )
         ),
         InputFieldType.DisplayName to InputFieldData(
             label = R.string.display_name,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences
+            )
         ),
         InputFieldType.Password to InputFieldData(
             label = R.string.password,

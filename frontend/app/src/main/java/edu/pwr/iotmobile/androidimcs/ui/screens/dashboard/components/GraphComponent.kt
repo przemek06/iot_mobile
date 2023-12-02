@@ -20,9 +20,12 @@ import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.res.ResourcesCompat
+import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
@@ -76,11 +79,14 @@ fun LazyStaggeredGridItemScope.GraphComponent(
         }
         val density = LocalDensity.current
 
+        val context = LocalContext.current
+        val font = ResourcesCompat.getFont(context, R.font.readexpro_medium)
         val textPaint = remember(density) {
             Paint().apply {
                 color = android.graphics.Color.WHITE
                 textAlign = Paint.Align.CENTER
                 textSize = density.run { 12.sp.toPx() }
+                typeface = font
             }
         }
         val textFontSize = with(density) { 16.dp.toPx() }

@@ -20,6 +20,7 @@
         <activity
             android:name=".ui.screens.app.MainActivity"
             android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:label="@string/app_name"
             android:theme="@style/Theme.AndroidIMCS"
             android:launchMode="singleTask">
