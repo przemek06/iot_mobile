@@ -21,6 +21,7 @@ data class ProjectDetailsUiState(
     val topics: List<Topic>,
     val members: List<UserInfoDto>,
     val isDialogVisible: Boolean,
+    val isAddDialogVisible: Boolean = false,
     val isDeleteProjectDialogVisible: Boolean = false,
     val inputFieldDashboard: InputFieldData,
     val projectData: ProjectData,

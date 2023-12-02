@@ -30,6 +30,7 @@ class ComponentService(
         if (!projectService.isEditor(userId, projectId)) {
             throw NotAllowedException()
         }
+
         val existingComponents = componentRepository
             .findAllByDashboardId(componentListDTO.dashboardId)
 

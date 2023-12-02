@@ -8,7 +8,6 @@ import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDeletedDto
-import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData.Companion.toProjectData
@@ -146,6 +145,10 @@ class ProjectDetailsViewModel(
         }
     }
 
+    fun toggleAddDashboardDialog() {
+        _uiState.update { it.copy(isAddDialogVisible = !it.isAddDialogVisible) }
+    }
+
     fun addDashboard(name: String) {
         val localProjectId = _projectId ?: run {
             viewModelScope.launch { toast.toast("Operation failed.") }
@@ -173,7 +176,14 @@ class ProjectDetailsViewModel(
                 dashboardRepository.createDashboard(dashboardDto)
             }.onSuccess { result ->
                 when (result) {
-                    CreateResult.Success -> updateDashboards()
+                    CreateResult.Success -> {
+                        updateDashboards()
+                        _uiState.update { it.copy(
+                            isDialogLoading = false,
+                            isAddDialogVisible = false
+                        ) }
+                        return@launch
+                    }
                     CreateResult.AlreadyExists ->
                         _uiState.update {
                             it.copy(

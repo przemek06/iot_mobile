@@ -10,4 +10,5 @@ enum class ComponentDetailedType(
     Discord(ComponentType.TRIGGER, 1),
     Email(ComponentType.TRIGGER, 1),
     LineGraph(ComponentType.OUTPUT, 2),
+    SpeedGraph(ComponentType.OUTPUT, 2),
 }

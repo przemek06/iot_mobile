@@ -50,6 +50,8 @@ data class ComponentDTO(
     private fun toOutputComponentEntity(): OutputComponent {
         val outputComponent = OutputComponent()
         outputComponent.topic = topic?.toEntity() ?: throw InvalidDataException()
+        outputComponent.minValue = minValue
+        outputComponent.maxValue = maxValue
 
         return outputComponent
     }
