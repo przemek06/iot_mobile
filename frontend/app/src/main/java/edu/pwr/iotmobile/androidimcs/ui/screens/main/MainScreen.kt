@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.main
 
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -20,11 +21,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
+import edu.pwr.iotmobile.androidimcs.data.dto.NotificationDto
+import edu.pwr.iotmobile.androidimcs.data.dto.TopicDto
+import edu.pwr.iotmobile.androidimcs.service.NotificationService
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
@@ -38,10 +45,14 @@ import org.koin.androidx.compose.koinViewModel
 fun MainScreen(navigation: MainScreenNavigation) {
     val viewModel: MainScreenViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(navigation.isDashboardDeleted) {
         viewModel.updateLastAccessed()
     }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        PermissionRequest()
 
     ErrorBox(isVisible = uiState.isError)
     LoadingBox(isVisible = uiState.isLoading)
