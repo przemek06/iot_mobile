@@ -186,7 +186,7 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
 ) {
-    when (item.type) {
+    when (item.detailedType) {
 
         ComponentDetailedType.Toggle -> ToggleComponent(
             item = item,
@@ -366,11 +366,22 @@ fun LazyStaggeredGridItemScope.ComponentWrapper(
                             )
                         }
                     }
+                    AnimatedVisibility(visible = !uiState.isEditMode) {
+                        IconButton(
+                            onClick = { uiInteraction.onInfoComponentClick(item.id) }
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_info),
+                                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onBackground),
+                                contentDescription = "Delete component",
+                            )
+                        }
+                    }
                 }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(Dimensions.space10),
+                        .padding(horizontal = Dimensions.space10, vertical = Dimensions.space12),
                 ) {
                     content()
                 }

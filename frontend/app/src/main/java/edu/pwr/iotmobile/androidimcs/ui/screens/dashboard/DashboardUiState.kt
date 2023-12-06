@@ -24,6 +24,7 @@ data class DashboardUiState(
     val userProjectRole: UserProjectRole? = null,
     val isDeleteDashboardDialogVisible: Boolean = false,
     val deleteComponentId: Int? = null,
+    val infoComponentId: Int? = null,
     val isLoading: Boolean = true,
     val isDialogLoading: Boolean = false,
     val isError: Boolean = false,
@@ -38,12 +39,13 @@ data class ComponentData(
     val size: Int,
 
     val currentValue: String?,
+    val currentValueReceivedAt: String?,
     val graphData: List<Pair<LocalDateTime, Float>> = emptyList(),
 
     val absolutePosition: Offset = Offset.Zero,
 
     val componentType: ComponentType,
-    val type: ComponentDetailedType,
+    val detailedType: ComponentDetailedType,
 
     val topic: Topic? = null,
 
@@ -57,7 +59,7 @@ data class ComponentData(
 ) {
     companion object {
         fun ComponentDto.toComponentData(
-            currentValue: String? = null,
+            currentValue: MessageDto? = null,
             graphData: List<Pair<LocalDateTime, Float>> = emptyList()
         ): ComponentData? {
             val componentDetailedType = type.asEnum<ComponentDetailedType>() ?: return null
@@ -69,10 +71,11 @@ data class ComponentData(
                 index = index,
                 size = size,
                 height = if (componentDetailedType == ComponentDetailedType.SpeedGraph || componentDetailedType == ComponentDetailedType.LineGraph) 240.dp else 140.dp,// if (componentType == ComponentType.OUTPUT) 240.dp else 140.dp,
-                currentValue = currentValue,
+                currentValue = currentValue?.message,
+                currentValueReceivedAt = currentValue?.tsSent,
                 graphData = graphData,
                 componentType = componentType,
-                type = componentDetailedType,
+                detailedType = componentDetailedType,
                 topic = topic?.toTopic(),
                 onSendValue = onSendValue,
                 onSendAlternativeValue = onSendAlternative,
@@ -90,7 +93,7 @@ data class ComponentData(
                 index = index,
                 size = size,
                 componentType = componentType.name,
-                type = type.name,
+                type = detailedType.name,
                 topic = topic?.toDto(),
                 onSendValue = onSendValue.toString(),
                 onSendAlternative = onSendAlternativeValue.toString(),

@@ -217,7 +217,7 @@ class DashboardViewModel(
                 item.topic?.id?.let {
                     val lastMessage = takeLastMessage(it)
                     item.copy(
-                        currentValue = lastMessage,
+                        currentValue = lastMessage?.message,
                         graphData = takeGraphData(it)
                     )
                 } ?: item.copy(
@@ -251,7 +251,7 @@ class DashboardViewModel(
 
     fun onComponentClick(item: ComponentData, value: Any?) {
         viewModelScope.launch(Dispatchers.Default) {
-            val message = when (item.type) {
+            val message = when (item.detailedType) {
 
                 ComponentDetailedType.Button -> {
                     item.onSendValue
@@ -307,7 +307,7 @@ class DashboardViewModel(
     }
 
     fun onLocalComponentValueChange(item: ComponentData, value: Any?) {
-        when (item.type) {
+        when (item.detailedType) {
 
             ComponentDetailedType.Slider -> {
                 val newItems = uiState.value.components.map {
@@ -434,7 +434,6 @@ class DashboardViewModel(
     private fun takeLastMessage(topicId: Int) = _lastMessages
         .firstOrNull { it.topicId == topicId }
         ?.messages?.lastOrNull()
-        ?.message
 
     private fun takeGraphData(topicId: Int) = _lastMessages
         .firstOrNull { it.topicId == topicId }
@@ -543,6 +542,18 @@ class DashboardViewModel(
     fun closeDeleteComponentDialog() {
         _uiState.update {
             it.copy(deleteComponentId = null)
+        }
+    }
+
+    fun onInfoComponentClick(id: Int) {
+        _uiState.update {
+            it.copy(infoComponentId = id)
+        }
+    }
+
+    fun closeInfoComponentDialog() {
+        _uiState.update {
+            it.copy(infoComponentId = null)
         }
     }
 
