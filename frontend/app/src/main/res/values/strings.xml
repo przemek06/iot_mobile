@@ -235,4 +235,25 @@
     <string name="s89">Received at</string>
     <string name="s90">Component</string>
     <string name="s91">Photo</string>
+    <string name="s92">Welcome to IMCS app!</string>
+    <string name="s93">Get to know out app and connect to any IoT device you wish!</string>
+    <string name="s94">App layout</string>
+    <string name="s95">Project</string>
+    <string name="s96">Projects allow you and your team to share a common space for your resources.\nInvite your friends and coworkers using the Group tab!</string>
+    <string name="s97">Dashboard</string>
+    <string name="s98">Dashboard keeps your components in order. Reorganize them in any way you want!</string>
+    <string name="s99">Topic</string>
+    <string name="s100">Topics are communication links between your app and IoT device. Select a unique name, data type, and it’s done!\nUse your topics when creating components - 1 component needs 1 topic to send messages to.</string>
+    <string name="s101">Component</string>
+    <string name="s102">Components are the main interface of communication with your IoT device!\nSelect from a variety of types, assign a topic to transmit your messages, and fill out some settings to create an easy to use communication link!</string>
+    <string name="s103">First steps</string>
+    <string name="s104">Now that you know the whole layout, create your first component!</string>
+    <string name="s105">1. Create a new Project</string>
+    <string name="s106">2. Inside, create a new Dashboard</string>
+    <string name="s107">3. Enter and add a new component</string>
+    <string name="s108">After filling out the necessary fields, you should now have a new component on your dashboard!</string>
+    <string name="s109">4. Authorize with Connection key on IoT device and receive messages!</string>
+    <string name="s110">You can find the Connection key in Project details, under Show Access button.\nUse it in the code of your IoT device to start listening and sending messages through topics.</string>
+    <string name="s111">You can now interact with the component on your mobile app, and observe how messages sent affect your IoT device and vice versa!</string>
+    <string name="s112">Create your first project now!</string>
 </resources>
