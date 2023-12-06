@@ -441,7 +441,9 @@ class AddComponentViewModel(
             onSendAlternative = locUiState.settings[SettingType.OnSendAlternative]?.inputFieldData?.text,
             maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,
             minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text,
-            actionDestinationDTO = locUiState.discordChannels.toActionDestinationDTO() ?: getEmailActionDestinationDto(),
+            actionDestinationDTO = locUiState.settings[SettingType.ActionDestination]?.inputFieldData?.text?.let {
+                ActionDestinationDTO(type = EActionDestinationType.NOTIFICATION, token = it)
+            } ?: locUiState.discordChannels.toActionDestinationDTO() ?: getEmailActionDestinationDto(),
             pattern = locUiState.settings[SettingType.Description]?.inputFieldData?.text
         )
     }
@@ -640,7 +642,32 @@ class AddComponentViewModel(
                     isDescription = true
                 )
             )
-
+            ComponentDetailedType.Notification -> mapOf(
+                SettingType.Name to SettingData(
+                    title = R.string.name,
+                    description = R.string.s422,
+                    inputFieldData = InputFieldData(
+                        label = R.string.name
+                    ),
+                    isDescription = true
+                ),
+                SettingType.ActionDestination to SettingData(
+                    title = R.string.a_s54,
+                    description = R.string.s420,
+                    inputFieldData = InputFieldData(
+                        label = R.string.a_s54
+                    ),
+                    isDescription = true
+                ),
+                SettingType.Description to SettingData( //pattern
+                    title = R.string.a_s52,
+                    description = R.string.s421,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
             ComponentDetailedType.SpeedGraph -> mapOf(
                 SettingType.MaxValue to SettingData(
                     title = R.string.s37,
@@ -663,7 +690,6 @@ class AddComponentViewModel(
                     )
                 )
             )
-
             else -> emptyMap()
 
         }
@@ -739,6 +765,10 @@ class AddComponentViewModel(
             type = ComponentDetailedType.Email
         ),
         ComponentChoiceData(
+            titleId = R.string.a_s56,
+            iconRes = R.drawable.ic_notification,
+            type = ComponentDetailedType.Notification
+        ),
             titleId = R.string.s91,
             iconRes = R.drawable.ic_camera,
             type = ComponentDetailedType.Photo
@@ -776,7 +806,8 @@ class AddComponentViewModel(
         MaxValue,
         MinValue,
         Description,
-        Title
+        Title,
+        ActionDestination
     }
 
     companion object {

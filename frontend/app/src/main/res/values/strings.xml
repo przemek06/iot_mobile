@@ -190,6 +190,8 @@
     <string name="a_s52">Description</string>
     <string name="a_s53">Email</string>
     <string name="a_s54">Title</string>
+    <string name="a_s541">Title of notification</string>
+    <string name="a_s56">Notification</string>
     <string name="a_s55">Line graph</string>
     <string name="s56">Operation failed.</string>
     <string name="s57">Something went wrong</string>
@@ -214,6 +216,9 @@
     <string name="s68">The password is incorrect</string>
     <string name="s69">The value must be a number</string>
     <string name="s70">The title of the email</string>
+    <string name="s420">The title of the notification</string>
+    <string name="s422">The name of this component</string>
+    <string name="s421">The description of the notification</string>
     <string name="s71">The message to be sent. If you wish to include the message from topic, use "%s" in place of the actual value.</string>
     <string name="s72">No data</string>
     <string name="s73">The maximum value of the graph.</string>

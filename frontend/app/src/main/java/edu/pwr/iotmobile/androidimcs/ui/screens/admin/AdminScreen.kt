@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
@@ -48,6 +49,7 @@ fun AdminScreenContent(
 
     val isLogOutDialogVisible = remember { mutableStateOf(false) }
     val isDeleteAccountDialogVisible = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (isLogOutDialogVisible.value) {
         SimpleDialog(
@@ -56,7 +58,7 @@ fun AdminScreenContent(
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isLogOutDialogVisible.value = false },
             onConfirm = {
-                uiInteraction.logout()
+                uiInteraction.logout(context)
                 isLogOutDialogVisible.value = false
             }
         )
