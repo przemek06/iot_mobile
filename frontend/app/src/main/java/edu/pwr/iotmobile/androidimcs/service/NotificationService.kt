@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.service
 
+import android.app.ActivityManager
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationManager
@@ -30,7 +31,7 @@ class NotificationService : Service() {
     private val client: OkHttpClient by inject()
     private val notificationListener: NotificationWebSocketListener = NotificationWebSocketListener(
         client = client,
-        onNotificationReceived = {  data -> showExpandableNotification(data) }
+        onNotificationReceived = {  data -> showBasicNotification(data) }
     )
     private var notificationManager: NotificationManager? = null
 
@@ -89,4 +90,14 @@ class NotificationService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
+}
+
+private fun isServiceRunning(serviceClass: Class<*>, context: Context): Boolean {
+    val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+        if (serviceClass.name == service.service.className) {
+            return true
+        }
+    }
+    return false
 }

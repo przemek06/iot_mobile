@@ -15,7 +15,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import edu.pwr.iotmobile.androidimcs.service.serviceStarter
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent.AddComponentNavigation
@@ -53,10 +52,6 @@ fun NavGraph(
     innerPadding: PaddingValues = PaddingValues(10.dp),
     startDestination: String = Screen.Invitations.path
 ) {
-    val context = LocalContext.current
-    LaunchedEffect(Unit) {
-        serviceStarter(context)
-    }
     NavHost(
         navController = navController,
         startDestination = startDestination,

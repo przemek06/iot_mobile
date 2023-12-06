@@ -39,7 +39,7 @@ fun LazyStaggeredGridItemScope.NotificationComponent(
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 modifier = Modifier.align(Alignment.Center),
-                painter = painterResource(id = R.drawable.ic_discord),
+                painter = painterResource(id = R.drawable.ic_notification),
                 colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary),
                 contentDescription = null,
             )

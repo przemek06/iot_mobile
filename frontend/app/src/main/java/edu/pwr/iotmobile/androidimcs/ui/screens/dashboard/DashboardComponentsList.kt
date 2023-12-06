@@ -53,6 +53,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ButtonCompo
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.DiscordComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.EmailComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.GraphComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.NotificationComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SliderComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.Speedometer
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ToggleComponent
@@ -201,6 +202,12 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
             coroutineScope = coroutineScope
         )
 
+        ComponentDetailedType.Notification -> NotificationComponent(
+            item = item,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
     }
 }
 

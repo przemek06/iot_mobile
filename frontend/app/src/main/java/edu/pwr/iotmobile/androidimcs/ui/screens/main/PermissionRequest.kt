@@ -82,7 +82,7 @@ fun PermissionRequest() {
 }
 
 @Composable
-fun PermissionDialog(
+private fun PermissionDialog(
     isPermanentlyDeclined: Boolean,
     onDismiss: () -> Unit,
     onOkClick: () -> Unit,
