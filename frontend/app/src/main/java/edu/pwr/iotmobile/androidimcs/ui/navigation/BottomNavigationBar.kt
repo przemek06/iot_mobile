@@ -40,7 +40,8 @@ private val SCREENS_WITHOUT_BOTTOM_BAR = listOf(
     Screen.AddComponent.path,
     Screen.AddTopic.path,
     Screen.Dashboard.path,
-    Screen.Admin.path
+    Screen.Admin.path,
+    Screen.Learn.path
 )
 @Composable
 fun BottomNavigationBar(
