@@ -84,6 +84,7 @@ class ComponentServiceTest {
         // given
         val newComponents = getNewComponents()
         every { userService.getActiveUserId() } returns null
+
         // throws
         assertThrows<NoAuthenticationException> { componentService.updateAll(newComponents) }
     }
