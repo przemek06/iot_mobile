@@ -101,7 +101,10 @@ fun TopBar(
                                     color = MaterialTheme.colorScheme.onSecondary
                                 )
                             },
-                            onClick = it.onClick
+                            onClick = {
+                                it.onClick()
+                                expanded = false
+                            }
                         )
                     }
                 }
