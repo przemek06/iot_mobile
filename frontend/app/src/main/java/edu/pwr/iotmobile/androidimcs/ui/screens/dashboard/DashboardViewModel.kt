@@ -250,31 +250,32 @@ class DashboardViewModel(
     }
 
     fun onComponentClick(item: ComponentData, value: Any?) {
-        val message = when (item.type) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val message = when (item.type) {
 
-            ComponentDetailedType.Button -> { item.onSendValue }
+                ComponentDetailedType.Button -> {
+                    item.onSendValue
+                }
 
-            ComponentDetailedType.Toggle -> {
-                val lastValue = value as String
-                val isChecked = lastValue == item.onSendValue
-                val newValue = if (isChecked) item.onSendAlternativeValue else item.onSendValue
-                val newItems = uiState.value.components.map {
-                    if (it.id == item.id) {
-                        item.copy(currentValue = newValue)
+                ComponentDetailedType.Toggle -> {
+                    val lastValue = value as String
+                    val isChecked = lastValue == item.onSendValue
+                    val newValue = if (isChecked) item.onSendAlternativeValue else item.onSendValue
+                    val newItems = uiState.value.components.map {
+                        if (it.id == item.id) {
+                            item.copy(currentValue = newValue)
+                        } else it
                     }
-                    else it
+                    _uiState.update {
+                        it.copy(components = newItems)
+                    }
+                    newValue
                 }
-                _uiState.update {
-                    it.copy(components = newItems)
-                }
-                newValue
+
+                else -> value
+
             }
 
-            else -> value
-
-        }
-
-        viewModelScope.launch(Dispatchers.Default) {
             if (message == null) {
                 toast.toast("Error while sending message.")
                 return@launch

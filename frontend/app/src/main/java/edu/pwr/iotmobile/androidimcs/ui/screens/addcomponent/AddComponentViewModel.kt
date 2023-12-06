@@ -520,6 +520,23 @@ class AddComponentViewModel(
                 )
             )
 
+            ComponentDetailedType.ReleaseButton -> mapOf(
+                SettingType.OnClickSend to SettingData(
+                    title = R.string.s33,
+                    description = R.string.s51,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                ),
+                SettingType.OnToggleOffSend to SettingData(
+                    title = R.string.s78,
+                    description = R.string.s79,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                )
+            )
+
             ComponentDetailedType.Toggle -> mapOf(
                 SettingType.OnToggleOnSend to SettingData(
                     title = R.string.s35,
@@ -645,6 +662,11 @@ class AddComponentViewModel(
             titleId = R.string.s41,
             iconRes = R.drawable.ic_button,
             type = ComponentDetailedType.Button
+        ),
+        ComponentChoiceData(
+            titleId = R.string.s80,
+            iconRes = R.drawable.ic_spiral,
+            type = ComponentDetailedType.ReleaseButton
         ),
         ComponentChoiceData(
             titleId = R.string.s42,

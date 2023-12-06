@@ -53,6 +53,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ButtonCompo
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.DiscordComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.EmailComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.GraphComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ReleaseButtonComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SliderComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.Speedometer
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ToggleComponent
@@ -166,6 +167,13 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
             coroutineScope = coroutineScope
         )
 
+        ComponentDetailedType.ReleaseButton -> ReleaseButtonComponent(
+            item = item,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+
         ComponentDetailedType.Slider -> SliderComponent(
             item = item,
             uiInteraction = uiInteraction,
@@ -251,6 +259,8 @@ fun LazyStaggeredGridItemScope.ComponentWrapper(
         .height(item.height)
         .offset { IntOffset(offset.x.roundToInt(), offset.y.roundToInt()) }
         .pointerInput(Unit) {
+            // TODO: change to edit mode
+            if (true) return@pointerInput
             var interaction: DragInteraction.Start? = null
             detectDragGesturesAfterLongPress(
                 onDragStart = {

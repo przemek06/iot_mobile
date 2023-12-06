@@ -221,4 +221,7 @@
     <string name="s75">Speed graph</string>
     <string name="s76">The maximum value cannot be smaller than the minimum value</string>
     <string name="s77">The maximum and minimum values cannot be equal</string>
+    <string name="s78">On release send</string>
+    <string name="s79">The value which will be sent on button release</string>
+    <string name="s80">Release button</string>
 </resources>
