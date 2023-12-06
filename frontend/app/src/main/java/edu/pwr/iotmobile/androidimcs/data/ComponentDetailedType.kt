@@ -5,6 +5,7 @@ enum class ComponentDetailedType(
     val size: Int
 ) {
     Button(ComponentType.INPUT, 1),
+    ReleaseButton(ComponentType.INPUT, 1),
     Toggle(ComponentType.INPUT, 1),
     Slider(ComponentType.INPUT, 2),
     Discord(ComponentType.TRIGGER, 1),

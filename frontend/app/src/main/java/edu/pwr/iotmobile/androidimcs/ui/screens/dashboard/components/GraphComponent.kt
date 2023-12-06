@@ -33,6 +33,7 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiState
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import kotlinx.coroutines.CoroutineScope
@@ -45,6 +46,7 @@ import kotlin.math.roundToInt
 @Composable
 fun LazyStaggeredGridItemScope.GraphComponent(
     item: ComponentData,
+    uiState: DashboardUiState,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
@@ -54,6 +56,7 @@ fun LazyStaggeredGridItemScope.GraphComponent(
 ) {
     ComponentWrapper(
         item = item,
+        uiState = uiState,
         uiInteraction = uiInteraction,
         onPlaceItem = onPlaceItem,
         coroutineScope = coroutineScope

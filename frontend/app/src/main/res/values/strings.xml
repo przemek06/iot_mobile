@@ -221,4 +221,17 @@
     <string name="s75">Speed graph</string>
     <string name="s76">The maximum value cannot be smaller than the minimum value</string>
     <string name="s77">The maximum and minimum values cannot be equal</string>
+    <string name="s78">On release send</string>
+    <string name="s79">The value which will be sent on button release</string>
+    <string name="s80">Release button</string>
+    <string name="s81">Are you sure you want to delete this component (%s)?</string>
+    <string name="s82">You are in Edit mode</string>
+    <string name="s83">Return to normal mode</string>
+    <string name="s84">Type</string>
+    <string name="s85">Detailed type</string>
+    <string name="s86">Connected topic</string>
+    <string name="s87">Message type</string>
+    <string name="s88">Last message</string>
+    <string name="s89">Received at</string>
+    <string name="s90">Component</string>
 </resources>
