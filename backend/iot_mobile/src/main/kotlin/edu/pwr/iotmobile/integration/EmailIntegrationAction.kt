@@ -22,7 +22,7 @@ class EmailIntegrationAction(
                 .findAllUsersByProjectIdNoSecurity(projectId)
 
             users.forEach {
-                val message = pattern.format(data.message, it.name)
+                val message = pattern.format(data.message)
                 mailService.sendHtmlMail(subject, it.email, message)
             }
         } catch (e: java.lang.Exception) {

@@ -16,11 +16,23 @@ class OutputComponent(
     @JoinColumn(name = "topic_id", nullable = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     var topic: Topic,
+    var minValue: String?,
+    var maxValue: String?
 ) : Component() {
-    constructor() : this(Topic()) {
+    constructor() : this(Topic(), "", "") {
     }
 
     fun toDTO(): ComponentDTO {
-        return ComponentDTO(id, name, EComponentType.OUTPUT, type, size, index, topic.toDTO())
+        return ComponentDTO(
+                id,
+                name,
+                EComponentType.OUTPUT,
+                type,
+                size,
+                index,
+                topic.toDTO(),
+                minValue = minValue,
+                maxValue = maxValue
+        )
     }
 }

@@ -13,17 +13,20 @@ import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentWrapper
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiInteraction
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardUiState
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun LazyStaggeredGridItemScope.ButtonComponent(
     item: ComponentData,
+    uiState: DashboardUiState,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
 ) {
     ComponentWrapper(
         item = item,
+        uiState = uiState,
         uiInteraction = uiInteraction,
         onPlaceItem = onPlaceItem,
         coroutineScope = coroutineScope
