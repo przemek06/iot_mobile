@@ -23,9 +23,11 @@ data class DashboardUiState(
     val menuOptionsList: List<MenuOption> = emptyList(),
     val userProjectRole: UserProjectRole? = null,
     val isDeleteDashboardDialogVisible: Boolean = false,
+    val deleteComponentId: Int? = null,
     val isLoading: Boolean = true,
     val isDialogLoading: Boolean = false,
     val isError: Boolean = false,
+    val isEditMode: Boolean = false,
 )
 
 data class ComponentData(

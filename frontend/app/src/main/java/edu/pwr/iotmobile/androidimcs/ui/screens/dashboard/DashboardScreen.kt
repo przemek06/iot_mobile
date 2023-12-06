@@ -70,6 +70,11 @@ private fun DashboardScreenContent(
         uiInteraction = uiInteraction,
         navigation = navigation
     )
+    DeleteComponentDialog(
+        uiState = uiState,
+        uiInteraction = uiInteraction
+    )
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -106,6 +111,31 @@ private fun DeleteDashboardDialog(
                 color = MaterialTheme.colorScheme.onBackground
             )
             Dimensions.space10
+            Text(
+                text = stringResource(id = R.string.delete_account_desc2) + ".",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeleteComponentDialog(
+    uiState: DashboardUiState,
+    uiInteraction: DashboardUiInteraction,
+) {
+    val component = uiState.components.firstOrNull { it.id == uiState.deleteComponentId }
+
+    if (uiState.deleteComponentId != null) {
+        SimpleDialog(
+            title = stringResource(id = R.string.s81, component?.name ?: ""),
+            confirmButtonText = stringResource(id = R.string.yes),
+            closeButtonText = stringResource(id = R.string.no),
+            onCloseDialog = { uiInteraction.closeDeleteComponentDialog() },
+            isLoading = uiState.isDialogLoading,
+            onConfirm = { uiInteraction.deleteComponent(uiState.deleteComponentId) }
+        ) {
             Text(
                 text = stringResource(id = R.string.delete_account_desc2) + ".",
                 style = MaterialTheme.typography.bodyLarge,

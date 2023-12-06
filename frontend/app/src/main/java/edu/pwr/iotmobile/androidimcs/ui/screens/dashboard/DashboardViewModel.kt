@@ -468,16 +468,87 @@ class DashboardViewModel(
     fun deleteDashboard() {
         _uiState.update { it.copy(isDialogLoading = true) }
         viewModelScope.launch(Dispatchers.Default) {
-            val dashboardId = _dashboardId ?: return@launch
+            val dashboardId = _dashboardId ?: run {
+                toast.toast("Could not delete dashboard.")
+                _uiState.update { it.copy(isDialogLoading = false) }
+                return@launch
+            }
             kotlin.runCatching {
                 dashboardRepository.deleteDashboard(dashboardId)
             }.onSuccess {
                 toast.toast("Successfully deleted dashboard!")
                 event.event(DASHBOARD_DELETED_EVENT)
             }.onFailure {
+                toast.toast("Could not delete dashboard.")
                 Log.d(TAG, "Delete dashboard error")
             }
             _uiState.update { it.copy(isDialogLoading = false) }
+        }
+    }
+
+    fun deleteComponent(id: Int) {
+        _uiState.update { it.copy(isDialogLoading = true) }
+        viewModelScope.launch(Dispatchers.Default) {
+            val currentUiState = _uiState.value
+            val component = currentUiState.components.firstOrNull { it.id == id } ?: run {
+                toast.toast("Could not delete component.")
+                _uiState.update { it.copy(isDialogLoading = false) }
+                return@launch
+            }
+
+            val newOrderedList = currentUiState.components.toMutableList()
+            newOrderedList.remove(component)
+            val newList = newOrderedList.mapIndexed { index, data ->
+                data.copy(index = index)
+            }
+
+            _uiState.update {
+                it.copy(
+                    draggedComponentId = null,
+                    components = newList
+                )
+            }
+
+            // Map new list to dto
+            val locComponentListDto = _componentListDto
+            val dto = locComponentListDto?.copy(
+                components = newList.map { it.toDto() }.toList()
+            ) ?: run {
+                toast.toast("Could not delete component.")
+                _uiState.update { it.copy(isDialogLoading = false) }
+                return@launch
+            }
+
+            // Update component list
+            kotlin.runCatching {
+                componentRepository.updateComponentList(dto)
+            }.onSuccess {
+                toast.toast("Successfully deleted component!")
+                closeDeleteComponentDialog()
+            }.onFailure {
+                toast.toast("Could not delete component.")
+                Log.e(TAG, "Delete component error", it)
+            }
+
+            _uiState.update { it.copy(isDialogLoading = false) }
+        }
+    }
+
+    fun onDeleteComponentClick(id: Int) {
+        _uiState.update {
+            it.copy(deleteComponentId = id)
+        }
+    }
+
+    fun closeDeleteComponentDialog() {
+        _uiState.update {
+            it.copy(deleteComponentId = null)
+        }
+    }
+
+    fun toggleEditMode() {
+        _uiState.update {
+            it.copy(isEditMode = !uiState.value.isEditMode)
         }
     }
 
@@ -485,7 +556,7 @@ class DashboardViewModel(
         UserProjectRole.ADMIN, UserProjectRole.EDITOR -> listOf(
             MenuOption(
                 titleId = R.string.s20,
-                onClick = {/*TODO*/}
+                onClick = { toggleEditMode() }
             ),
             MenuOption(
                 titleId = R.string.s21,
