@@ -535,25 +535,17 @@ class AddComponentViewModel(
             )
 
             ComponentDetailedType.Notification -> mapOf(
-                SettingType.Title to SettingData(
-                    title = R.string.a_s54,
-                    description = R.string.s72,
-                    inputFieldData = InputFieldData(
-                        label = R.string.a_s54
-                    ),
-                    isDescription = true
-                ),
                 SettingType.Name to SettingData(
                     title = R.string.name,
-                    description = R.string.s72,
+                    description = R.string.s422,
                     inputFieldData = InputFieldData(
-                        label = R.string.a_s54
+                        label = R.string.name
                     ),
                     isDescription = true
                 ),
                 SettingType.ActionDestination to SettingData(
-                    title = R.string.a_s541,
-                    description = R.string.s72,
+                    title = R.string.a_s54,
+                    description = R.string.s420,
                     inputFieldData = InputFieldData(
                         label = R.string.a_s54
                     ),
@@ -561,7 +553,7 @@ class AddComponentViewModel(
                 ),
                 SettingType.Description to SettingData( //pattern
                     title = R.string.a_s52,
-                    description = R.string.s73,
+                    description = R.string.s421,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),
@@ -633,7 +625,7 @@ class AddComponentViewModel(
             type = ComponentDetailedType.Email
         ),
         ComponentChoiceData(
-            titleId = R.string.a_s54,
+            titleId = R.string.a_s56,
             iconRes = R.drawable.ic_notification,
             type = ComponentDetailedType.Notification
         )
