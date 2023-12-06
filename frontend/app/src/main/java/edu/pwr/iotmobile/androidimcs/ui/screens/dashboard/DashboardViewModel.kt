@@ -173,6 +173,20 @@ class DashboardViewModel(
         _componentListDto = _componentListDto?.copy(
             components = data.components.sortedBy { it.index }
         )
+
+        val topics = _componentListDto?.components?.mapNotNull { it.topic?.uniqueName }
+        topics?.let {
+            messageReceivedListener?.closeWebSocket()
+
+            if (it.isNotEmpty()) {
+                messageReceivedListener = MessageReceivedWebSocketListener(
+                    client = client,
+                    topicNames = it,
+                    onMessageReceived = { m -> onMessageReceived(m) }
+                )
+            }
+        }
+
         _uiState.update { ui ->
             ui.copy(
                 components = data.components
