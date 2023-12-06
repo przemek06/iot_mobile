@@ -62,6 +62,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.DiscordComp
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.EmailComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.GraphComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.NotificationComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.PhotoComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ReleaseButtonComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SliderComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.Speedometer
@@ -85,7 +86,6 @@ fun ComponentsList(
 
     val itm = uiState.components.firstOrNull { it.id == uiState.draggedComponentId }
 
-    // TODO: fix autoscroll
     LaunchedEffect(key1 = itm) {
         coroutineScope.launch {
             if (itm == null) return@launch
@@ -214,6 +214,14 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
         )
 
         ComponentDetailedType.Slider -> SliderComponent(
+            item = item,
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+
+        ComponentDetailedType.Photo -> PhotoComponent(
             item = item,
             uiState = uiState,
             uiInteraction = uiInteraction,

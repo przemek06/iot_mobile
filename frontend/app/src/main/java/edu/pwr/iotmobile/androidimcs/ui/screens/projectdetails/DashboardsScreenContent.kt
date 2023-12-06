@@ -37,6 +37,7 @@ fun DashboardsScreenContent(
     AddNewDashboardDialog(
         uiState = uiState,
         uiInteraction = uiInteraction,
+        closeKeyboard = { keyboardFocus.clear() },
         onCloseDialog = {
             keyboardFocus.clear()
             uiInteraction.toggleAddDashboardDialog()
@@ -71,6 +72,7 @@ fun DashboardsScreenContent(
 private fun AddNewDashboardDialog(
     uiState: ProjectDetailsUiState,
     uiInteraction: ProjectDetailsUiInteraction,
+    closeKeyboard: () -> Unit,
     onCloseDialog: () -> Unit
 ) {
     if (uiState.isAddDialogVisible) {
@@ -80,6 +82,7 @@ private fun AddNewDashboardDialog(
             onCloseDialog = { onCloseDialog() },
             onConfirm = {
                 uiInteraction.addNewDashboard(uiState.inputFieldDashboard.text)
+                closeKeyboard()
             }
         ) {
             Text(

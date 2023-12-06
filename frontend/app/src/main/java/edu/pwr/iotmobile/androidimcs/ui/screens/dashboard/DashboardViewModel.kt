@@ -1,5 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import android.graphics.Bitmap
+import android.util.Base64
 import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo
 import androidx.compose.ui.geometry.Offset
@@ -8,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
+import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
 import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
@@ -31,6 +34,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 
 private const val TAG = "DashboardViewModel"
@@ -55,6 +59,8 @@ class DashboardViewModel(
 
     private var componentsListener: ComponentChangeWebSocketListener? = null
     private var messageReceivedListener: MessageReceivedWebSocketListener? = null
+
+    private var photoComponent: ComponentData? = null
 
     override fun onCleared() {
         componentsListener?.closeWebSocket()
@@ -173,6 +179,20 @@ class DashboardViewModel(
         _componentListDto = _componentListDto?.copy(
             components = data.components.sortedBy { it.index }
         )
+
+        val topics = _componentListDto?.components?.mapNotNull { it.topic?.uniqueName }
+        topics?.let {
+            messageReceivedListener?.closeWebSocket()
+
+            if (it.isNotEmpty()) {
+                messageReceivedListener = MessageReceivedWebSocketListener(
+                    client = client,
+                    topicNames = it,
+                    onMessageReceived = { m -> onMessageReceived(m) }
+                )
+            }
+        }
+
         _uiState.update { ui ->
             ui.copy(
                 components = data.components
@@ -270,6 +290,12 @@ class DashboardViewModel(
                         it.copy(components = newItems)
                     }
                     newValue
+                }
+
+                ComponentDetailedType.Photo -> {
+                    photoComponent = item
+                    event.event(TAKE_PICTURE)
+                    return@launch
                 }
 
                 else -> value
@@ -442,6 +468,7 @@ class DashboardViewModel(
         ?: emptyList()
 
     private fun MessageDto.toGraphData(): Pair<LocalDateTime, Float>? {
+        if (topic.valueType == TopicDataType.IMAGE) return null
         return try {
             val dateTime = LocalDateTime.parse(tsSent)
             dateTime to message.toFloat()
@@ -563,6 +590,51 @@ class DashboardViewModel(
         }
     }
 
+    fun onTakePhoto(bitmap: Bitmap?) {
+        viewModelScope.launch {
+            if (bitmap == null) {
+                toast.toast("Could not send photo.")
+                photoComponent = null
+                return@launch
+            }
+
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
+            val image = stream.toByteArray()
+            val message = Base64.encodeToString(image, Base64.DEFAULT)
+
+            val photoSize = image.size/1024.0/1024.0
+            Log.d("Photo", "Photo size: $photoSize")
+            Log.d("Photo", "Message size: ${message.length}")
+            Log.d("Photo", "Byte array size: ${image.size}")
+
+            val connectionKey = getConnectionKey()
+            val messageDto = photoComponent?.toMessageDto(
+                value = message,
+                connectionKey = connectionKey,
+            )
+            if (messageDto == null) {
+                toast.toast("Could not send message.")
+                photoComponent = null
+                return@launch
+            }
+
+            Log.d("Message", "messageDto")
+            Log.d("Message", messageDto.toString())
+
+            kotlin.runCatching {
+                messageRepository.sendMessage(messageDto)
+            }.onSuccess {
+                if (!it.isSuccess) {
+                    toast.toast("Could not send message.")
+                }
+            }.onFailure {
+                toast.toast("Error while sending message.")
+            }
+            photoComponent = null
+        }
+    }
+
     private fun generateMenuOptions(role: UserProjectRole?) = when (role) {
         UserProjectRole.ADMIN, UserProjectRole.EDITOR -> listOf(
             MenuOption(
@@ -579,5 +651,6 @@ class DashboardViewModel(
 
     companion object {
         const val DASHBOARD_DELETED_EVENT = "dashboardDeleted"
+        const val TAKE_PICTURE = "takePicture"
     }
 }
