@@ -467,6 +467,9 @@ class AddComponentViewModel(
             ComponentDetailedType.Slider, ComponentDetailedType.LineGraph, ComponentDetailedType.SpeedGraph ->
                 topics.filter { it.dataType in listOf(TopicDataType.FLOAT, TopicDataType.INT) }
 
+            ComponentDetailedType.Photo ->
+                topics.filter { it.dataType == TopicDataType.IMAGE }
+
             else -> topics
         }
     }
@@ -734,6 +737,11 @@ class AddComponentViewModel(
             titleId = R.string.a_s53,
             iconRes = R.drawable.ic_mail,
             type = ComponentDetailedType.Email
+        ),
+        ComponentChoiceData(
+            titleId = R.string.s91,
+            iconRes = R.drawable.ic_camera,
+            type = ComponentDetailedType.Photo
         ),
     )
 

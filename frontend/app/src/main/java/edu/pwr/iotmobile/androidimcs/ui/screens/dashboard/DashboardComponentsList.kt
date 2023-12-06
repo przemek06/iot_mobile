@@ -61,6 +61,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ButtonCompo
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.DiscordComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.EmailComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.GraphComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.PhotoComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ReleaseButtonComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SliderComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.Speedometer
@@ -213,6 +214,14 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
         )
 
         ComponentDetailedType.Slider -> SliderComponent(
+            item = item,
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+
+        ComponentDetailedType.Photo -> PhotoComponent(
             item = item,
             uiState = uiState,
             uiInteraction = uiInteraction,

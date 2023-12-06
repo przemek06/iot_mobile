@@ -82,12 +82,12 @@ fun ProjectsScreenContent(
             title = stringResource(R.string.add_new_project_dialog),
             isLoading = uiState.isDialogLoading,
             onCloseDialog = {
-                uiInteraction.setDialogInvisible()
                 keyboardFocus.clear()
+                uiInteraction.setDialogInvisible()
             },
             onConfirm = {
-                uiInteraction.addNewProject(uiState.inputFiled.text)
                 keyboardFocus.clear()
+                uiInteraction.addNewProject(uiState.inputFiled.text)
             }
         ) {
             Text(
