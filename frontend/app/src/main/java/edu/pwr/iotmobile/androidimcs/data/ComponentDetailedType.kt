@@ -8,6 +8,7 @@ enum class ComponentDetailedType(
     ReleaseButton(ComponentType.INPUT, 1),
     Toggle(ComponentType.INPUT, 1),
     Slider(ComponentType.INPUT, 2),
+    Photo(ComponentType.INPUT, 1),
     Discord(ComponentType.TRIGGER, 1),
     Email(ComponentType.TRIGGER, 1),
     LineGraph(ComponentType.OUTPUT, 2),

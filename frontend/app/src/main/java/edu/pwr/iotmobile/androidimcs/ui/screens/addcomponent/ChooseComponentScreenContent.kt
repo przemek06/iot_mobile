@@ -95,6 +95,10 @@ fun ChooseComponentScreenContent(
                 uiInteraction = uiInteraction
             )
         }
+
+        item(span = { GridItemSpan(2) }) {
+            Dimensions.space30.HeightSpacer()
+        }
     }
 }
 

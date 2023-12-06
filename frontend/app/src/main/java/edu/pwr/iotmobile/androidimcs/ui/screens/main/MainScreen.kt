@@ -119,11 +119,6 @@ private fun MainScreenContent(
         }
 
         item {
-            NewToApp(navigation)
-            Dimensions.space30.HeightSpacer()
-        }
-
-        item {
             if (uiState.dashboards.isNotEmpty()) {
                 Text(
                     text = stringResource(id = R.string.main_screen_2),
@@ -140,6 +135,13 @@ private fun MainScreenContent(
                 onClick = { navigation.openDashboardScreen(it.projectId, it.dashboardId, it.dashboardName) }
             )
             Dimensions.space14.HeightSpacer()
+        }
+
+        item {
+            if (uiState.dashboards.isNotEmpty())
+                Dimensions.space14.HeightSpacer()
+            NewToApp(navigation)
+            Dimensions.space30.HeightSpacer()
         }
 
         item {

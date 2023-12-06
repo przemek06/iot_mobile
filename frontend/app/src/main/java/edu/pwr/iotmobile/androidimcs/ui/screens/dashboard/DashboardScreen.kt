@@ -1,5 +1,8 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -16,12 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.extensions.firstUppercaseRestLowercase
 import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
 import edu.pwr.iotmobile.androidimcs.ui.components.InfoDialog
 import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardViewModel.Companion.DASHBOARD_DELETED_EVENT
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardViewModel.Companion.TAKE_PICTURE
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import org.koin.androidx.compose.koinViewModel
 
@@ -38,8 +44,20 @@ fun DashboardScreen(navigation: DashboardNavigation) {
     }
 
     val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        viewModel.onTakePhoto(bitmap)
+    }
+
     viewModel.event.CollectEvent(context) {
-        navigation.onReturn(isDashboardDeleted = true)
+        when (it) {
+            DASHBOARD_DELETED_EVENT -> navigation.onReturn(isDashboardDeleted = true)
+
+            TAKE_PICTURE -> launcher.launch()
+
+            else -> { /*Nothing*/ }
+        }
     }
     viewModel.toast.CollectToast(context)
 
@@ -182,10 +200,12 @@ private fun InfoComponentDialog(
                 value = component?.topic?.dataType?.name?.firstUppercaseRestLowercase(),
                 description = R.string.s87
             )
-            ComponentInfoRow(
-                value = component?.currentValue,
-                description = R.string.s88
-            )
+            if (component?.detailedType != ComponentDetailedType.Photo) {
+                ComponentInfoRow(
+                    value = component?.currentValue,
+                    description = R.string.s88
+                )
+            }
             ComponentInfoRow(
                 value = component?.currentValueReceivedAt,
                 description = R.string.s89

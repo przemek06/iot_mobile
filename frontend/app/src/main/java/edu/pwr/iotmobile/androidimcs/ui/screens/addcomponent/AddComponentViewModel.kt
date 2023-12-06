@@ -131,11 +131,15 @@ class AddComponentViewModel(
 
     private fun Map.Entry<SettingType, SettingData>.getWithErrors(
         componentType: ComponentDetailedType,
+        chosenTopic: Topic
     ): InputFieldData {
-        val numericFields = listOf(SettingType.MinValue, SettingType.MaxValue, SettingType.OnClickSend)
+        val numericFields = listOf(SettingType.MinValue, SettingType.MaxValue, SettingType.OnSendValue, SettingType.OnSendAlternative)
         val numericComponentTypes = listOf(ComponentDetailedType.Slider, ComponentDetailedType.LineGraph, ComponentDetailedType.SpeedGraph)
 
-        return if (key in numericFields && componentType in numericComponentTypes) {
+        val numericComponentRequired = componentType in numericComponentTypes
+        val numericTopicRequired = chosenTopic.dataType.isNumeric
+
+        return if (key in numericFields && (numericComponentRequired || numericTopicRequired)) {
             if (value.inputFieldData.text.isNotBlank()) {
                 value.inputFieldData.copy(
                     isError = !value.inputFieldData.text.isNumeric(),
@@ -160,12 +164,16 @@ class AddComponentViewModel(
             _uiState.update { it.copy(isError = true) }
             return
         }
+        val chosenTopic = _uiState.value.chosenTopic ?: run {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
 
         _uiState.update { ui ->
             ui.copy(
                 settings = ui.settings.map {
                     it.key to it.value.copy(
-                        inputFieldData = it.getWithErrors(chosenComponent)
+                        inputFieldData = it.getWithErrors(chosenComponent, chosenTopic)
                     )
                 }.toMap()
             )
@@ -423,15 +431,14 @@ class AddComponentViewModel(
 
     private fun getComponentDtoData(): ComponentDto? {
         val locUiState = _uiState.value
-        Log.d("UI", "maxValue: ${locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text}")
         return ComponentDto(
             componentType = locUiState.chosenComponentType?.belongsTo?.name ?: return null,
             type = locUiState.chosenComponentType.name,
             size = locUiState.chosenComponentType.size,
             topic = locUiState.chosenTopic?.toDto(),
             name = locUiState.settings[SettingType.Name]?.inputFieldData?.text,
-            onSendValue = locUiState.settings[SettingType.OnClickSend]?.inputFieldData?.text ?: locUiState.settings[SettingType.OnToggleOnSend]?.inputFieldData?.text,
-            onSendAlternative = locUiState.settings[SettingType.OnToggleOffSend]?.inputFieldData?.text,
+            onSendValue = locUiState.settings[SettingType.OnSendValue]?.inputFieldData?.text,
+            onSendAlternative = locUiState.settings[SettingType.OnSendAlternative]?.inputFieldData?.text,
             maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,
             minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text,
             actionDestinationDTO = locUiState.settings[SettingType.ActionDestination]?.inputFieldData?.text?.let {
@@ -461,6 +468,9 @@ class AddComponentViewModel(
         return when (_uiState.value.chosenComponentType) {
             ComponentDetailedType.Slider, ComponentDetailedType.LineGraph, ComponentDetailedType.SpeedGraph ->
                 topics.filter { it.dataType in listOf(TopicDataType.FLOAT, TopicDataType.INT) }
+
+            ComponentDetailedType.Photo ->
+                topics.filter { it.dataType == TopicDataType.IMAGE }
 
             else -> topics
         }
@@ -497,6 +507,11 @@ class AddComponentViewModel(
     }
 
     private fun generateSettings(): Map<SettingType, SettingData> {
+        val chosenTopic = _uiState.value.chosenTopic ?: run {
+            _uiState.update { it.copy(isError = true) }
+            return emptyMap()
+        }
+
         val defaultFields = mapOf(
             SettingType.Name to SettingData(
                 title = R.string.s39,
@@ -510,48 +525,67 @@ class AddComponentViewModel(
             )
         )
 
+        val keyboardType = if (chosenTopic.dataType.isNumeric)
+            KeyboardType.Number
+        else KeyboardType.Text
+
         val specificFields = when (uiState.value.chosenComponentType) {
 
             ComponentDetailedType.Button -> mapOf(
-                SettingType.OnClickSend to SettingData(
+                SettingType.OnSendValue to SettingData(
                     title = R.string.s33,
                     description = R.string.s51,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = keyboardType
+                        )
                     )
                 )
             )
 
             ComponentDetailedType.ReleaseButton -> mapOf(
-                SettingType.OnClickSend to SettingData(
+                SettingType.OnSendValue to SettingData(
                     title = R.string.s33,
                     description = R.string.s51,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = keyboardType
+                        )
                     )
                 ),
-                SettingType.OnToggleOffSend to SettingData(
+                SettingType.OnSendAlternative to SettingData(
                     title = R.string.s78,
                     description = R.string.s79,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = keyboardType
+                        )
                     )
                 )
             )
 
             ComponentDetailedType.Toggle -> mapOf(
-                SettingType.OnToggleOnSend to SettingData(
+                SettingType.OnSendValue to SettingData(
                     title = R.string.s35,
                     description = R.string.s52,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = keyboardType
+                        )
                     )
                 ),
-                SettingType.OnToggleOffSend to SettingData(
+                SettingType.OnSendAlternative to SettingData(
                     title = R.string.s36,
                     description = R.string.s53,
                     inputFieldData = InputFieldData(
-                        label = R.string.s34
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = keyboardType
+                        )
                     )
                 )
             )
@@ -734,7 +768,11 @@ class AddComponentViewModel(
             titleId = R.string.a_s56,
             iconRes = R.drawable.ic_notification,
             type = ComponentDetailedType.Notification
-        )
+        ),
+            titleId = R.string.s91,
+            iconRes = R.drawable.ic_camera,
+            type = ComponentDetailedType.Photo
+        ),
     )
 
     data class BottomNavData(
@@ -763,9 +801,8 @@ class AddComponentViewModel(
 
     enum class SettingType {
         Name,
-        OnClickSend,
-        OnToggleOnSend,
-        OnToggleOffSend,
+        OnSendValue,
+        OnSendAlternative,
         MaxValue,
         MinValue,
         Description,

@@ -9,6 +9,7 @@ class Message(
     @ManyToOne
     @JoinColumn(name = "topic_id")
     var topic: Topic,
+    @Column(length = 20000)
     var message: String,
     var tsSent: String,
     @Id
