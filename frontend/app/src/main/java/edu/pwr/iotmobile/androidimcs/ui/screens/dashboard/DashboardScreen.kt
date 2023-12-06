@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -15,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.extensions.firstUppercaseRestLowercase
 import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
+import edu.pwr.iotmobile.androidimcs.ui.components.InfoDialog
 import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
@@ -70,6 +73,15 @@ private fun DashboardScreenContent(
         uiInteraction = uiInteraction,
         navigation = navigation
     )
+    DeleteComponentDialog(
+        uiState = uiState,
+        uiInteraction = uiInteraction
+    )
+    InfoComponentDialog(
+        uiState = uiState,
+        uiInteraction = uiInteraction
+    )
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -113,4 +125,83 @@ private fun DeleteDashboardDialog(
             )
         }
     }
+}
+
+@Composable
+private fun DeleteComponentDialog(
+    uiState: DashboardUiState,
+    uiInteraction: DashboardUiInteraction,
+) {
+    if (uiState.deleteComponentId != null) {
+        val component = uiState.components.firstOrNull { it.id == uiState.deleteComponentId }
+        SimpleDialog(
+            title = stringResource(id = R.string.s81, component?.name ?: ""),
+            confirmButtonText = stringResource(id = R.string.yes),
+            closeButtonText = stringResource(id = R.string.no),
+            onCloseDialog = { uiInteraction.closeDeleteComponentDialog() },
+            isLoading = uiState.isDialogLoading,
+            onConfirm = { uiInteraction.deleteComponent(uiState.deleteComponentId) }
+        ) {
+            Text(
+                text = stringResource(id = R.string.delete_account_desc2) + ".",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+}
+
+@Composable
+private fun InfoComponentDialog(
+    uiState: DashboardUiState,
+    uiInteraction: DashboardUiInteraction,
+) {
+    if (uiState.infoComponentId != null) {
+        val component = uiState.components.firstOrNull { it.id == uiState.infoComponentId }
+        InfoDialog(
+            title = stringResource(id = R.string.s90),
+            onCloseDialog = { uiInteraction.closeInfoComponentDialog() },
+        ) {
+            ComponentInfoRow(
+                value = component?.name,
+                description = R.string.name
+            )
+            ComponentInfoRow(
+                value = component?.componentType?.name?.firstUppercaseRestLowercase(),
+                description = R.string.s84
+            )
+            ComponentInfoRow(
+                value = component?.detailedType?.name?.firstUppercaseRestLowercase(),
+                description = R.string.s85
+            )
+            ComponentInfoRow(
+                value = component?.topic?.name,
+                description = R.string.s86
+            )
+            ComponentInfoRow(
+                value = component?.topic?.dataType?.name?.firstUppercaseRestLowercase(),
+                description = R.string.s87
+            )
+            ComponentInfoRow(
+                value = component?.currentValue,
+                description = R.string.s88
+            )
+            ComponentInfoRow(
+                value = component?.currentValueReceivedAt,
+                description = R.string.s89
+            )
+        }
+    }
+}
+
+@Composable
+private fun ComponentInfoRow(
+    value: String?,
+    @StringRes description: Int
+) {
+    Text(
+        text = stringResource(id = description) + ": $value",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onBackground
+    )
 }

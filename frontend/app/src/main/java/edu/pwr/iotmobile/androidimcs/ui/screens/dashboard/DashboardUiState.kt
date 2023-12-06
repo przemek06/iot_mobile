@@ -23,9 +23,12 @@ data class DashboardUiState(
     val menuOptionsList: List<MenuOption> = emptyList(),
     val userProjectRole: UserProjectRole? = null,
     val isDeleteDashboardDialogVisible: Boolean = false,
+    val deleteComponentId: Int? = null,
+    val infoComponentId: Int? = null,
     val isLoading: Boolean = true,
     val isDialogLoading: Boolean = false,
     val isError: Boolean = false,
+    val isEditMode: Boolean = false,
 )
 
 data class ComponentData(
@@ -36,11 +39,13 @@ data class ComponentData(
     val size: Int,
 
     val currentValue: String?,
+    val currentValueReceivedAt: String?,
+    val graphData: List<Pair<LocalDateTime, Float>> = emptyList(),
 
     val absolutePosition: Offset = Offset.Zero,
 
     val componentType: ComponentType,
-    val type: ComponentDetailedType,
+    val detailedType: ComponentDetailedType,
 
     val topic: Topic? = null,
 
@@ -53,17 +58,24 @@ data class ComponentData(
     val pattern: String? = null
 ) {
     companion object {
-        fun ComponentDto.toComponentData(currentValue: String?): ComponentData? {
+        fun ComponentDto.toComponentData(
+            currentValue: MessageDto? = null,
+            graphData: List<Pair<LocalDateTime, Float>> = emptyList()
+        ): ComponentData? {
             val componentDetailedType = type.asEnum<ComponentDetailedType>() ?: return null
+            val componentType = componentType.asEnum<ComponentType>() ?: return null
+
             return ComponentData(
                 id = id ?: return null,
                 name = name ?: "",
                 index = index,
                 size = size,
-                height = if (componentDetailedType == ComponentDetailedType.LineGraph) 200.dp else 140.dp,
-                currentValue = currentValue,
-                componentType = componentType.asEnum<ComponentType>() ?: return null,
-                type = componentDetailedType,
+                height = if (componentDetailedType == ComponentDetailedType.SpeedGraph || componentDetailedType == ComponentDetailedType.LineGraph) 240.dp else 140.dp,// if (componentType == ComponentType.OUTPUT) 240.dp else 140.dp,
+                currentValue = currentValue?.message,
+                currentValueReceivedAt = currentValue?.tsSent,
+                graphData = graphData,
+                componentType = componentType,
+                detailedType = componentDetailedType,
                 topic = topic?.toTopic(),
                 onSendValue = onSendValue,
                 onSendAlternativeValue = onSendAlternative,
@@ -81,7 +93,7 @@ data class ComponentData(
                 index = index,
                 size = size,
                 componentType = componentType.name,
-                type = type.name,
+                type = detailedType.name,
                 topic = topic?.toDto(),
                 onSendValue = onSendValue.toString(),
                 onSendAlternative = onSendAlternativeValue.toString(),

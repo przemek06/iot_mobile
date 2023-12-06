@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import java.time.LocalDateTime
 
 private const val TAG = "DashboardViewModel"
 
@@ -150,9 +151,9 @@ class DashboardViewModel(
                 ui.copy(
                     components = components.mapNotNull { item ->
                         item.topic?.id?.let {
-                            val lastMessage = getLastMessage(it)
-                            item.toComponentData(lastMessage)
-                        } ?: item.toComponentData(null)
+                            val lastMessage = takeLastMessage(it)
+                            item.toComponentData(lastMessage, takeGraphData(it))
+                        } ?: item.toComponentData(null, emptyList())
                     },
                     menuOptionsList = generateMenuOptions(_userProjectRole),
                     userProjectRole = _userProjectRole,
@@ -178,9 +179,9 @@ class DashboardViewModel(
                     .sortedBy { it.index }
                     .mapNotNull { item ->
                         item.topic?.id?.let {
-                            val lastMessage = getLastMessage(it)
-                            item.toComponentData(lastMessage)
-                        } ?: item.toComponentData(null)
+                            val lastMessage = takeLastMessage(it)
+                            item.toComponentData(lastMessage, takeGraphData(it))
+                        } ?: item.toComponentData()
                     }
             )
         }
@@ -214,9 +215,15 @@ class DashboardViewModel(
         _uiState.update { ui ->
             ui.copy(components = ui.components.map { item ->
                 item.topic?.id?.let {
-                    val lastMessage = getLastMessage(it)
-                    item.copy(currentValue = lastMessage)
-                } ?: item.copy(currentValue = null)
+                    val lastMessage = takeLastMessage(it)
+                    item.copy(
+                        currentValue = lastMessage?.message,
+                        graphData = takeGraphData(it)
+                    )
+                } ?: item.copy(
+                    currentValue = null,
+                    graphData = emptyList()
+                )
             })
         }
     }
@@ -243,31 +250,32 @@ class DashboardViewModel(
     }
 
     fun onComponentClick(item: ComponentData, value: Any?) {
-        val message = when (item.type) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val message = when (item.detailedType) {
 
-            ComponentDetailedType.Button -> { item.onSendValue }
+                ComponentDetailedType.Button -> {
+                    item.onSendValue
+                }
 
-            ComponentDetailedType.Toggle -> {
-                val lastValue = value as String
-                val isChecked = lastValue == item.onSendValue
-                val newValue = if (isChecked) item.onSendAlternativeValue else item.onSendValue
-                val newItems = uiState.value.components.map {
-                    if (it.id == item.id) {
-                        item.copy(currentValue = newValue)
+                ComponentDetailedType.Toggle -> {
+                    val lastValue = value as String
+                    val isChecked = lastValue == item.onSendValue
+                    val newValue = if (isChecked) item.onSendAlternativeValue else item.onSendValue
+                    val newItems = uiState.value.components.map {
+                        if (it.id == item.id) {
+                            item.copy(currentValue = newValue)
+                        } else it
                     }
-                    else it
+                    _uiState.update {
+                        it.copy(components = newItems)
+                    }
+                    newValue
                 }
-                _uiState.update {
-                    it.copy(components = newItems)
-                }
-                newValue
+
+                else -> value
+
             }
 
-            else -> value
-
-        }
-
-        viewModelScope.launch(Dispatchers.Default) {
             if (message == null) {
                 toast.toast("Error while sending message.")
                 return@launch
@@ -299,7 +307,7 @@ class DashboardViewModel(
     }
 
     fun onLocalComponentValueChange(item: ComponentData, value: Any?) {
-        when (item.type) {
+        when (item.detailedType) {
 
             ComponentDetailedType.Slider -> {
                 val newItems = uiState.value.components.map {
@@ -423,10 +431,25 @@ class DashboardViewModel(
         }
     }
 
-    private fun getLastMessage(topicId: Int) = _lastMessages
+    private fun takeLastMessage(topicId: Int) = _lastMessages
         .firstOrNull { it.topicId == topicId }
         ?.messages?.lastOrNull()
-        ?.message
+
+    private fun takeGraphData(topicId: Int) = _lastMessages
+        .firstOrNull { it.topicId == topicId }
+        ?.messages?.takeLast(10)
+        ?.mapNotNull { it.toGraphData() }
+        ?: emptyList()
+
+    private fun MessageDto.toGraphData(): Pair<LocalDateTime, Float>? {
+        return try {
+            val dateTime = LocalDateTime.parse(tsSent)
+            dateTime to message.toFloat()
+        } catch(e: Exception) {
+            Log.e("GraphData", "Error while converting to graph data", e)
+            null
+        }
+    }
 
     private suspend fun getConnectionKey(): String? {
         _projectId?.let {
@@ -444,16 +467,99 @@ class DashboardViewModel(
     fun deleteDashboard() {
         _uiState.update { it.copy(isDialogLoading = true) }
         viewModelScope.launch(Dispatchers.Default) {
-            val dashboardId = _dashboardId ?: return@launch
+            val dashboardId = _dashboardId ?: run {
+                toast.toast("Could not delete dashboard.")
+                _uiState.update { it.copy(isDialogLoading = false) }
+                return@launch
+            }
             kotlin.runCatching {
                 dashboardRepository.deleteDashboard(dashboardId)
             }.onSuccess {
                 toast.toast("Successfully deleted dashboard!")
                 event.event(DASHBOARD_DELETED_EVENT)
             }.onFailure {
+                toast.toast("Could not delete dashboard.")
                 Log.d(TAG, "Delete dashboard error")
             }
             _uiState.update { it.copy(isDialogLoading = false) }
+        }
+    }
+
+    fun deleteComponent(id: Int) {
+        _uiState.update { it.copy(isDialogLoading = true) }
+        viewModelScope.launch(Dispatchers.Default) {
+            val currentUiState = _uiState.value
+            val component = currentUiState.components.firstOrNull { it.id == id } ?: run {
+                toast.toast("Could not delete component.")
+                _uiState.update { it.copy(isDialogLoading = false) }
+                return@launch
+            }
+
+            val newOrderedList = currentUiState.components.toMutableList()
+            newOrderedList.remove(component)
+            val newList = newOrderedList.mapIndexed { index, data ->
+                data.copy(index = index)
+            }
+
+            _uiState.update {
+                it.copy(
+                    draggedComponentId = null,
+                    components = newList
+                )
+            }
+
+            // Map new list to dto
+            val locComponentListDto = _componentListDto
+            val dto = locComponentListDto?.copy(
+                components = newList.map { it.toDto() }.toList()
+            ) ?: run {
+                toast.toast("Could not delete component.")
+                _uiState.update { it.copy(isDialogLoading = false) }
+                return@launch
+            }
+
+            // Update component list
+            kotlin.runCatching {
+                componentRepository.updateComponentList(dto)
+            }.onSuccess {
+                toast.toast("Successfully deleted component!")
+                closeDeleteComponentDialog()
+            }.onFailure {
+                toast.toast("Could not delete component.")
+                Log.e(TAG, "Delete component error", it)
+            }
+
+            _uiState.update { it.copy(isDialogLoading = false) }
+        }
+    }
+
+    fun onDeleteComponentClick(id: Int) {
+        _uiState.update {
+            it.copy(deleteComponentId = id)
+        }
+    }
+
+    fun closeDeleteComponentDialog() {
+        _uiState.update {
+            it.copy(deleteComponentId = null)
+        }
+    }
+
+    fun onInfoComponentClick(id: Int) {
+        _uiState.update {
+            it.copy(infoComponentId = id)
+        }
+    }
+
+    fun closeInfoComponentDialog() {
+        _uiState.update {
+            it.copy(infoComponentId = null)
+        }
+    }
+
+    fun toggleEditMode() {
+        _uiState.update {
+            it.copy(isEditMode = !uiState.value.isEditMode)
         }
     }
 
@@ -461,7 +567,7 @@ class DashboardViewModel(
         UserProjectRole.ADMIN, UserProjectRole.EDITOR -> listOf(
             MenuOption(
                 titleId = R.string.s20,
-                onClick = {/*TODO*/}
+                onClick = { toggleEditMode() }
             ),
             MenuOption(
                 titleId = R.string.s21,

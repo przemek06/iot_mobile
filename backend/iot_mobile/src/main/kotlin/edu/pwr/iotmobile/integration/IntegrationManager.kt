@@ -9,6 +9,7 @@ import edu.pwr.iotmobile.service.MailService
 import edu.pwr.iotmobile.service.NotificationService
 import edu.pwr.iotmobile.service.ProjectService
 import jakarta.annotation.PostConstruct
+import jakarta.annotation.PreDestroy
 import org.springframework.stereotype.Component
 import reactor.core.Disposable
 import java.util.concurrent.ConcurrentHashMap
@@ -37,6 +38,15 @@ class IntegrationManager(
         val triggerComponents = componentService.findAllTriggerComponents()
 
         triggerComponents.forEach { addIntegrationAction(it, it.topic.project.connectionKey) }
+    }
+
+    @PreDestroy
+    fun clearIntegrations() {
+        integrationActionMap.values
+            .forEach {
+                it.subscription.dispose()
+                rabbitListener.cancelConsumer(it.consumerTag)
+            }
     }
 
     fun addIntegrationAction(component: TriggerComponent, connectionKey: String) {

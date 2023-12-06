@@ -13,6 +13,12 @@ interface DashboardUiInteraction {
     fun onAddNewComponent()
     fun toggleDeleteDashboardDialog()
     fun deleteDashboard()
+    fun deleteComponent(id: Int)
+    fun closeDeleteComponentDialog()
+    fun onDeleteComponentClick(id: Int)
+    fun closeInfoComponentDialog()
+    fun onInfoComponentClick(id: Int)
+    fun toggleEditMode()
 
     companion object {
         fun default(
@@ -50,6 +56,30 @@ interface DashboardUiInteraction {
 
             override fun deleteDashboard() {
                 viewModel.deleteDashboard()
+            }
+
+            override fun deleteComponent(id: Int) {
+                viewModel.deleteComponent(id)
+            }
+
+            override fun closeDeleteComponentDialog() {
+                viewModel.closeDeleteComponentDialog()
+            }
+
+            override fun onDeleteComponentClick(id: Int) {
+                viewModel.onDeleteComponentClick(id)
+            }
+
+            override fun closeInfoComponentDialog() {
+                viewModel.closeInfoComponentDialog()
+            }
+
+            override fun onInfoComponentClick(id: Int) {
+                viewModel.onInfoComponentClick(id)
+            }
+
+            override fun toggleEditMode() {
+                viewModel.toggleEditMode()
             }
 
         }
