@@ -73,9 +73,7 @@ fun BottomNavigationBar(
                 enter = slideInVertically(initialOffsetY = { s -> s } ),
                 exit = slideOutVertically(targetOffsetY = { t -> t } )
             ) {
-                NavigationBar(
-//                    modifier = Modifier.height(Dimensions.space60)
-                ) {
+                NavigationBar {
                     bottomNavItems.forEach { screen ->
                         val iconSize =
                             if (screen.path == Screen.Projects.path) Dimensions.space30

@@ -85,7 +85,6 @@ fun ComponentsList(
 
     val itm = uiState.components.firstOrNull { it.id == uiState.draggedComponentId }
 
-    // TODO: fix autoscroll
     LaunchedEffect(key1 = itm) {
         coroutineScope.launch {
             if (itm == null) return@launch
