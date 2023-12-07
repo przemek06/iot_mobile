@@ -218,6 +218,7 @@ class SearchViewModel(
                 if (result.isSuccess) {
                     toast.toast("Successfully added admin")
                     _uiState.update { it.copy(isDialogLoading = false) }
+                    updateList()
                     setDialogInvisible()
                     return@launch
                 }
@@ -299,6 +300,7 @@ class SearchViewModel(
                 if (result.isSuccess) {
                     toast.toast("Successfully revoked access")
                     _uiState.update { it.copy(isDialogLoading = false) }
+                    updateList()
                     setDialogInvisible()
                     return@launch
                 }
