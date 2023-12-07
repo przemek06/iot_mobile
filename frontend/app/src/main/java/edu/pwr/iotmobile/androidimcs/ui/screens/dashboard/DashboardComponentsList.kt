@@ -263,6 +263,7 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
 
         ComponentDetailedType.Notification -> NotificationComponent(
             item = item,
+            uiState = uiState,
             uiInteraction = uiInteraction,
             onPlaceItem = onPlaceItem,
             coroutineScope = coroutineScope

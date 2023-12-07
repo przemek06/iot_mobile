@@ -613,6 +613,30 @@ class AddComponentViewModel(
                 )
             )
 
+
+            ComponentDetailedType.SpeedGraph -> mapOf(
+                SettingType.MaxValue to SettingData(
+                    title = R.string.s37,
+                    description = R.string.s73,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
+                ),
+                SettingType.MinValue to SettingData(
+                    title = R.string.s38,
+                    description = R.string.s74,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
+                )
+            )
+
             ComponentDetailedType.Discord -> mapOf(
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
@@ -642,24 +666,16 @@ class AddComponentViewModel(
                     isDescription = true
                 )
             )
+
             ComponentDetailedType.Notification -> mapOf(
-                SettingType.Name to SettingData(
-                    title = R.string.name,
-                    description = R.string.s422,
-                    inputFieldData = InputFieldData(
-                        label = R.string.name
-                    ),
-                    isDescription = true
-                ),
                 SettingType.ActionDestination to SettingData(
                     title = R.string.a_s54,
                     description = R.string.s420,
                     inputFieldData = InputFieldData(
                         label = R.string.a_s54
-                    ),
-                    isDescription = true
+                    )
                 ),
-                SettingType.Description to SettingData( //pattern
+                SettingType.Description to SettingData(
                     title = R.string.a_s52,
                     description = R.string.s421,
                     inputFieldData = InputFieldData(
@@ -668,28 +684,7 @@ class AddComponentViewModel(
                     isDescription = true
                 )
             )
-            ComponentDetailedType.SpeedGraph -> mapOf(
-                SettingType.MaxValue to SettingData(
-                    title = R.string.s37,
-                    description = R.string.s73,
-                    inputFieldData = InputFieldData(
-                        label = R.string.s34,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number
-                        )
-                    )
-                ),
-                SettingType.MinValue to SettingData(
-                    title = R.string.s38,
-                    description = R.string.s74,
-                    inputFieldData = InputFieldData(
-                        label = R.string.s34,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number
-                        )
-                    )
-                )
-            )
+
             else -> emptyMap()
 
         }
@@ -769,6 +764,7 @@ class AddComponentViewModel(
             iconRes = R.drawable.ic_notification,
             type = ComponentDetailedType.Notification
         ),
+        ComponentChoiceData(
             titleId = R.string.s91,
             iconRes = R.drawable.ic_camera,
             type = ComponentDetailedType.Photo
