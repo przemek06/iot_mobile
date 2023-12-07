@@ -460,6 +460,10 @@ class AddComponentViewModel(
 
             ComponentDetailedType.Telegram -> getTelegramActionDestinationDto()
 
+            ComponentDetailedType.Notification -> _uiState.value.settings[SettingType.ActionDestination]?.inputFieldData?.text?.let {
+                ActionDestinationDTO(type = EActionDestinationType.NOTIFICATION, token = it)
+            }
+
             else -> null
         }
     }
