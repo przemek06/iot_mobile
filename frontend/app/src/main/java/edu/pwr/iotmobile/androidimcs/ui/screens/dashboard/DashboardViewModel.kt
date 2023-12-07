@@ -1,5 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.dashboard
 
+import android.graphics.Bitmap
+import android.util.Base64
 import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo
 import androidx.compose.ui.geometry.Offset
@@ -8,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.ComponentDetailedType
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
+import edu.pwr.iotmobile.androidimcs.data.TopicDataType
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
 import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
@@ -31,6 +34,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import java.io.ByteArrayOutputStream
+import java.time.LocalDateTime
 
 private const val TAG = "DashboardViewModel"
 
@@ -54,6 +59,8 @@ class DashboardViewModel(
 
     private var componentsListener: ComponentChangeWebSocketListener? = null
     private var messageReceivedListener: MessageReceivedWebSocketListener? = null
+
+    private var photoComponent: ComponentData? = null
 
     override fun onCleared() {
         componentsListener?.closeWebSocket()
@@ -150,9 +157,9 @@ class DashboardViewModel(
                 ui.copy(
                     components = components.mapNotNull { item ->
                         item.topic?.id?.let {
-                            val lastMessage = getLastMessage(it)
-                            item.toComponentData(lastMessage)
-                        } ?: item.toComponentData(null)
+                            val lastMessage = takeLastMessage(it)
+                            item.toComponentData(lastMessage, takeGraphData(it))
+                        } ?: item.toComponentData(null, emptyList())
                     },
                     menuOptionsList = generateMenuOptions(_userProjectRole),
                     userProjectRole = _userProjectRole,
@@ -172,15 +179,29 @@ class DashboardViewModel(
         _componentListDto = _componentListDto?.copy(
             components = data.components.sortedBy { it.index }
         )
+
+        val topics = _componentListDto?.components?.mapNotNull { it.topic?.uniqueName }
+        topics?.let {
+            messageReceivedListener?.closeWebSocket()
+
+            if (it.isNotEmpty()) {
+                messageReceivedListener = MessageReceivedWebSocketListener(
+                    client = client,
+                    topicNames = it,
+                    onMessageReceived = { m -> onMessageReceived(m) }
+                )
+            }
+        }
+
         _uiState.update { ui ->
             ui.copy(
                 components = data.components
                     .sortedBy { it.index }
                     .mapNotNull { item ->
                         item.topic?.id?.let {
-                            val lastMessage = getLastMessage(it)
-                            item.toComponentData(lastMessage)
-                        } ?: item.toComponentData(null)
+                            val lastMessage = takeLastMessage(it)
+                            item.toComponentData(lastMessage, takeGraphData(it))
+                        } ?: item.toComponentData()
                     }
             )
         }
@@ -214,9 +235,15 @@ class DashboardViewModel(
         _uiState.update { ui ->
             ui.copy(components = ui.components.map { item ->
                 item.topic?.id?.let {
-                    val lastMessage = getLastMessage(it)
-                    item.copy(currentValue = lastMessage)
-                } ?: item.copy(currentValue = null)
+                    val lastMessage = takeLastMessage(it)
+                    item.copy(
+                        currentValue = lastMessage?.message,
+                        graphData = takeGraphData(it)
+                    )
+                } ?: item.copy(
+                    currentValue = null,
+                    graphData = emptyList()
+                )
             })
         }
     }
@@ -243,31 +270,38 @@ class DashboardViewModel(
     }
 
     fun onComponentClick(item: ComponentData, value: Any?) {
-        val message = when (item.type) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val message = when (item.detailedType) {
 
-            ComponentDetailedType.Button -> { item.onSendValue }
+                ComponentDetailedType.Button -> {
+                    item.onSendValue
+                }
 
-            ComponentDetailedType.Toggle -> {
-                val lastValue = value as String
-                val isChecked = lastValue == item.onSendValue
-                val newValue = if (isChecked) item.onSendAlternativeValue else item.onSendValue
-                val newItems = uiState.value.components.map {
-                    if (it.id == item.id) {
-                        item.copy(currentValue = newValue)
+                ComponentDetailedType.Toggle -> {
+                    val lastValue = value as String
+                    val isChecked = lastValue == item.onSendValue
+                    val newValue = if (isChecked) item.onSendAlternativeValue else item.onSendValue
+                    val newItems = uiState.value.components.map {
+                        if (it.id == item.id) {
+                            item.copy(currentValue = newValue)
+                        } else it
                     }
-                    else it
+                    _uiState.update {
+                        it.copy(components = newItems)
+                    }
+                    newValue
                 }
-                _uiState.update {
-                    it.copy(components = newItems)
+
+                ComponentDetailedType.Photo -> {
+                    photoComponent = item
+                    event.event(TAKE_PICTURE)
+                    return@launch
                 }
-                newValue
+
+                else -> value
+
             }
 
-            else -> value
-
-        }
-
-        viewModelScope.launch(Dispatchers.Default) {
             if (message == null) {
                 toast.toast("Error while sending message.")
                 return@launch
@@ -299,7 +333,7 @@ class DashboardViewModel(
     }
 
     fun onLocalComponentValueChange(item: ComponentData, value: Any?) {
-        when (item.type) {
+        when (item.detailedType) {
 
             ComponentDetailedType.Slider -> {
                 val newItems = uiState.value.components.map {
@@ -391,7 +425,7 @@ class DashboardViewModel(
         // Needed to account for "Add component" button
         val toSubtract = if (_userProjectRole == UserProjectRole.VIEWER) 0 else 1
 
-        for (it in visibleItems.subList(toSubtract, visibleItems.size)) {
+        for (it in visibleItems.subList(toSubtract, visibleItems.size - 1)) {
             val currentItemIndex = it.index-toSubtract
             // Do not consider the original position of the currently dragged item.
             if (currentItemIndex == itemIndex) continue
@@ -423,10 +457,26 @@ class DashboardViewModel(
         }
     }
 
-    private fun getLastMessage(topicId: Int) = _lastMessages
+    private fun takeLastMessage(topicId: Int) = _lastMessages
         .firstOrNull { it.topicId == topicId }
         ?.messages?.lastOrNull()
-        ?.message
+
+    private fun takeGraphData(topicId: Int) = _lastMessages
+        .firstOrNull { it.topicId == topicId }
+        ?.messages?.takeLast(10)
+        ?.mapNotNull { it.toGraphData() }
+        ?: emptyList()
+
+    private fun MessageDto.toGraphData(): Pair<LocalDateTime, Float>? {
+        if (topic.valueType == TopicDataType.IMAGE) return null
+        return try {
+            val dateTime = LocalDateTime.parse(tsSent)
+            dateTime to message.toFloat()
+        } catch(e: Exception) {
+            Log.e("GraphData", "Error while converting to graph data", e)
+            null
+        }
+    }
 
     private suspend fun getConnectionKey(): String? {
         _projectId?.let {
@@ -444,16 +494,144 @@ class DashboardViewModel(
     fun deleteDashboard() {
         _uiState.update { it.copy(isDialogLoading = true) }
         viewModelScope.launch(Dispatchers.Default) {
-            val dashboardId = _dashboardId ?: return@launch
+            val dashboardId = _dashboardId ?: run {
+                toast.toast("Could not delete dashboard.")
+                _uiState.update { it.copy(isDialogLoading = false) }
+                return@launch
+            }
             kotlin.runCatching {
                 dashboardRepository.deleteDashboard(dashboardId)
             }.onSuccess {
                 toast.toast("Successfully deleted dashboard!")
                 event.event(DASHBOARD_DELETED_EVENT)
             }.onFailure {
+                toast.toast("Could not delete dashboard.")
                 Log.d(TAG, "Delete dashboard error")
             }
             _uiState.update { it.copy(isDialogLoading = false) }
+        }
+    }
+
+    fun deleteComponent(id: Int) {
+        _uiState.update { it.copy(isDialogLoading = true) }
+        viewModelScope.launch(Dispatchers.Default) {
+            val currentUiState = _uiState.value
+            val component = currentUiState.components.firstOrNull { it.id == id } ?: run {
+                toast.toast("Could not delete component.")
+                _uiState.update { it.copy(isDialogLoading = false) }
+                return@launch
+            }
+
+            val newOrderedList = currentUiState.components.toMutableList()
+            newOrderedList.remove(component)
+            val newList = newOrderedList.mapIndexed { index, data ->
+                data.copy(index = index)
+            }
+
+            _uiState.update {
+                it.copy(
+                    draggedComponentId = null,
+                    components = newList
+                )
+            }
+
+            // Map new list to dto
+            val locComponentListDto = _componentListDto
+            val dto = locComponentListDto?.copy(
+                components = newList.map { it.toDto() }.toList()
+            ) ?: run {
+                toast.toast("Could not delete component.")
+                _uiState.update { it.copy(isDialogLoading = false) }
+                return@launch
+            }
+
+            // Update component list
+            kotlin.runCatching {
+                componentRepository.updateComponentList(dto)
+            }.onSuccess {
+                toast.toast("Successfully deleted component!")
+                closeDeleteComponentDialog()
+            }.onFailure {
+                toast.toast("Could not delete component.")
+                Log.e(TAG, "Delete component error", it)
+            }
+
+            _uiState.update { it.copy(isDialogLoading = false) }
+        }
+    }
+
+    fun onDeleteComponentClick(id: Int) {
+        _uiState.update {
+            it.copy(deleteComponentId = id)
+        }
+    }
+
+    fun closeDeleteComponentDialog() {
+        _uiState.update {
+            it.copy(deleteComponentId = null)
+        }
+    }
+
+    fun onInfoComponentClick(id: Int) {
+        _uiState.update {
+            it.copy(infoComponentId = id)
+        }
+    }
+
+    fun closeInfoComponentDialog() {
+        _uiState.update {
+            it.copy(infoComponentId = null)
+        }
+    }
+
+    fun toggleEditMode() {
+        _uiState.update {
+            it.copy(isEditMode = !uiState.value.isEditMode)
+        }
+    }
+
+    fun onTakePhoto(bitmap: Bitmap?) {
+        viewModelScope.launch {
+            if (bitmap == null) {
+                toast.toast("Could not send photo.")
+                photoComponent = null
+                return@launch
+            }
+
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
+            val image = stream.toByteArray()
+            val message = Base64.encodeToString(image, Base64.DEFAULT)
+
+            val photoSize = image.size/1024.0/1024.0
+            Log.d("Photo", "Photo size: $photoSize")
+            Log.d("Photo", "Message size: ${message.length}")
+            Log.d("Photo", "Byte array size: ${image.size}")
+
+            val connectionKey = getConnectionKey()
+            val messageDto = photoComponent?.toMessageDto(
+                value = message,
+                connectionKey = connectionKey,
+            )
+            if (messageDto == null) {
+                toast.toast("Could not send message.")
+                photoComponent = null
+                return@launch
+            }
+
+            Log.d("Message", "messageDto")
+            Log.d("Message", messageDto.toString())
+
+            kotlin.runCatching {
+                messageRepository.sendMessage(messageDto)
+            }.onSuccess {
+                if (!it.isSuccess) {
+                    toast.toast("Could not send message.")
+                }
+            }.onFailure {
+                toast.toast("Error while sending message.")
+            }
+            photoComponent = null
         }
     }
 
@@ -461,7 +639,7 @@ class DashboardViewModel(
         UserProjectRole.ADMIN, UserProjectRole.EDITOR -> listOf(
             MenuOption(
                 titleId = R.string.s20,
-                onClick = {/*TODO*/}
+                onClick = { toggleEditMode() }
             ),
             MenuOption(
                 titleId = R.string.s21,
@@ -473,5 +651,6 @@ class DashboardViewModel(
 
     companion object {
         const val DASHBOARD_DELETED_EVENT = "dashboardDeleted"
+        const val TAKE_PICTURE = "takePicture"
     }
 }

@@ -4,7 +4,7 @@ data class ComponentDto(
     val id: Int? = null,
     val componentType: String,
     val type: String,
-    val size: Int, // 1 or 2
+    val size: Int,
     val index: Int = 0,
     val topic: TopicDto? = null,
     val name: String? = null,
@@ -19,9 +19,9 @@ data class ComponentDto(
 data class ActionDestinationDTO(
     val id: Int? = null,
     val type: EActionDestinationType,
-    val token: String,
+    val token: String
 )
 
 enum class EActionDestinationType {
-    DISCORD, EMAIL, TELEGRAM, SLACK
+    DISCORD, EMAIL, TELEGRAM, SLACK, NOTIFICATION
 }

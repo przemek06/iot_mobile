@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package edu.pwr.iotmobile.androidimcs.ui.screens.projects
 
 import androidx.compose.animation.AnimatedVisibility
@@ -14,10 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
@@ -65,13 +71,22 @@ fun ProjectsScreenContent(
     uiInteraction: ProjectsUiInteraction,
     navigation: ProjectsNavigation
 ) {
+    val focusManager = LocalFocusManager.current
+    val keyboardFocus = KeyboardFocusController(
+        keyboardController = LocalSoftwareKeyboardController.current,
+        focusManager = focusManager
+    )
 
     if (uiState.isDialogVisible) {
         SimpleDialog(
             title = stringResource(R.string.add_new_project_dialog),
             isLoading = uiState.isDialogLoading,
-            onCloseDialog = { uiInteraction.setDialogInvisible() },
+            onCloseDialog = {
+                keyboardFocus.clear()
+                uiInteraction.setDialogInvisible()
+            },
             onConfirm = {
+                keyboardFocus.clear()
                 uiInteraction.addNewProject(uiState.inputFiled.text)
             }
         ) {

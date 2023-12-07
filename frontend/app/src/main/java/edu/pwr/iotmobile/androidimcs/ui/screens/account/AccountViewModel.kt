@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.account
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
+import edu.pwr.iotmobile.androidimcs.service.ServiceManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -142,7 +144,10 @@ class AccountViewModel(
         }
     }
 
-    fun logout(navigation: AccountNavigation) {
+    fun logout(
+        navigation: AccountNavigation,
+        context: Context
+    ) {
         updateLoading(true)
         viewModelScope.launch {
             try {
@@ -160,6 +165,7 @@ class AccountViewModel(
                 updateLoading(false)
             }
         }
+        ServiceManager.serviceStop(context)
     }
 
     private fun updateLoading(value: Boolean) {

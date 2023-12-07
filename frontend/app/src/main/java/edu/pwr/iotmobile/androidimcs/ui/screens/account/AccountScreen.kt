@@ -76,6 +76,7 @@ private fun AccountScreenContent(
     val isDisplayNameDialogVisible = remember { mutableStateOf(false) }
     val isLogOutDialogVisible = remember { mutableStateOf(false) }
     val isDeleteAccountDialogVisible = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (isDisplayNameDialogVisible.value) {
         SimpleDialog(
@@ -95,7 +96,7 @@ private fun AccountScreenContent(
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isLogOutDialogVisible.value = false },
             onConfirm = {
-                uiInteraction.logout(navigation)
+                uiInteraction.logout(navigation, context)
                 isLogOutDialogVisible.value = false
             }
         )

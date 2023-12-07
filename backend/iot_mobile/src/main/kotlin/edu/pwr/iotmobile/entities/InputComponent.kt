@@ -28,7 +28,7 @@ class InputComponent(
         return ComponentDTO(
             id,
             name,
-            EComponentType.OUTPUT,
+            EComponentType.INPUT,
             type,
             size,
             index,

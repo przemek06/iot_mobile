@@ -6,7 +6,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
@@ -27,6 +29,8 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.invitations.InvitationsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.invitations.InvitationsScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.learn.LearnScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.learn.LearnScreenNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
@@ -152,14 +156,16 @@ fun NavGraph(
                 )
             )
         }
+
         slidingComposable(Screen.Invitations.path) {
             InvitationsScreen(
                 navigation = InvitationsNavigation.default(navController)
             )
         }
-        slidingComposable(Screen.Invitations.path) {
-            InvitationsScreen(
-                navigation = InvitationsNavigation.default(navController)
+
+        slidingComposable(Screen.Learn.path) {
+            LearnScreen(
+                navigation = LearnScreenNavigation.default(navController)
             )
         }
     }
