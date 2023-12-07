@@ -46,7 +46,6 @@ class MainScreenViewModel(
                     ) }
                     return@launch
                 }
-                event.event("LoggedIn")
 
                 val dashboards = dashboardRepository.getLastAccessedDashboards().take(5).reversed()
 
