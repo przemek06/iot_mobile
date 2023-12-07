@@ -214,4 +214,12 @@
     <string name="s68">The password is incorrect</string>
     <string name="a_s69">Slack</string>
     <string name="a_s70">Telegram</string>
+    <string name="a_s71">Slack webhook</string>
+    <string name="a_s72">Use the following instruction to get your webhook.</string>
+    <string name="a_s73">Create a webhook</string>
+    <string name="a_s74">Chat ID</string>
+    <string name="a_s75">Enter the Chat ID of your channel</string>
+    <string name="a_s76">Bot ID</string>
+    <string name="a_s77">Enter the ID of Bot in your channel</string>
+    <string name="a_s78">How to get your Bot ID</string>
 </resources>
