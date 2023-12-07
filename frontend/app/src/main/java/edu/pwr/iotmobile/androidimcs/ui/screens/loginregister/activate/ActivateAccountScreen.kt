@@ -133,7 +133,10 @@ private fun ActivateAccountScreenContent(
             ButtonCommon(
                 text = stringResource(id = R.string.activate),
                 width = Dimensions.buttonWidth,
-                onClick = { uiInteraction.onActivate() }
+                onClick = {
+                    keyboardFocus.clear()
+                    uiInteraction.onActivate()
+                }
             )
             Dimensions.space30.HeightSpacer()
             OrDivider()

@@ -732,7 +732,12 @@ class AddComponentViewModel(
             titleId = R.string.s43,
             iconRes = R.drawable.ic_slider,
             type = ComponentDetailedType.Slider
-        )
+        ),
+        ComponentChoiceData(
+            titleId = R.string.s91,
+            iconRes = R.drawable.ic_camera,
+            type = ComponentDetailedType.Photo
+        ),
     )
 
     private fun generateOutputComponents() = listOf(
@@ -763,11 +768,6 @@ class AddComponentViewModel(
             titleId = R.string.a_s56,
             iconRes = R.drawable.ic_notification,
             type = ComponentDetailedType.Notification
-        ),
-        ComponentChoiceData(
-            titleId = R.string.s91,
-            iconRes = R.drawable.ic_camera,
-            type = ComponentDetailedType.Photo
         ),
     )
 

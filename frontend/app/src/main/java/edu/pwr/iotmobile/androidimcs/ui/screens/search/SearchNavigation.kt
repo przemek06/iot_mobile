@@ -24,6 +24,10 @@ interface SearchNavigation {
 
             override fun goBack() {
                 navController.popBackStack()
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    "userResultStatus",
+                    true
+                )
             }
         }
     }

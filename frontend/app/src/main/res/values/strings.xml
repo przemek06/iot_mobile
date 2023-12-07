@@ -263,4 +263,5 @@
     <string name="s112">Create your first project now!</string>
     <string name="s113">Are you sure you want to leave this project (%s)?</string>
     <string name="s114">You will lose access to all of the resources in this project.</string>
+    <string name="s115">An account with this email already exists.</string>
 </resources>

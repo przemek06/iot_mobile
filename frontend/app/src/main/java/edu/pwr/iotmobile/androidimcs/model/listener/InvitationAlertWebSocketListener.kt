@@ -17,7 +17,7 @@ class InvitationAlertWebSocketListener(
     onNewInvitation: (data: Boolean) -> Unit
 ) {
     private val request = Request.Builder()
-        .url("ws://${BuildConfig.APP_NETWORK}:8080/invitations") // Replace with your server URL and WebSocket endpoint
+        .url("ws://${BuildConfig.APP_NETWORK}/invitations") // Replace with your server URL and WebSocket endpoint
         .build()
 
     private val webSocket = client.newWebSocket(request, object : WebSocketListener() {

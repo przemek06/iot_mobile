@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
+import edu.pwr.iotmobile.androidimcs.extensions.firstUppercaseRestLowercase
 import edu.pwr.iotmobile.androidimcs.ui.components.ActionOption
 import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
 import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
@@ -100,7 +101,7 @@ private fun SearchScreenContent(
                 LazyColumn {
                     items(UserProjectRole.values()) {
                         RadioButtonWithText(
-                            text = it.name,
+                            text = it.name.firstUppercaseRestLowercase(),
                             isSelected = it == uiState.selectedRole
                         ) { uiInteraction.selectRole(it) }
                     }

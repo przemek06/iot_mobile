@@ -11,6 +11,7 @@ interface ProjectDetailsNavigation {
     val projectId: Int?
     val startOnTopic: Boolean
     val isTopicSuccess: Boolean
+    val isUserListSuccess: Boolean
 
     fun openDashboardScreen(dashboardId: Int, dashboardName: String)
     fun openAddTopic()
@@ -31,6 +32,8 @@ interface ProjectDetailsNavigation {
                 get() = navBackStackEntry.getArguments().getOrNull(1)?.toBoolean() ?: false
             override val isTopicSuccess: Boolean
                 get() = navBackStackEntry.savedStateHandle.getLiveData<Boolean>("resultStatus").value ?: false
+            override val isUserListSuccess: Boolean
+                get() = navBackStackEntry.savedStateHandle.getLiveData<Boolean>("userResultStatus").value ?: false
 
             override fun openDashboardScreen(dashboardId: Int, dashboardName: String) {
                 projectId?.let {

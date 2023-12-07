@@ -7,7 +7,6 @@ import edu.pwr.iotmobile.androidimcs.data.result.ActivateAccountResult
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -43,15 +42,14 @@ class ActivateAccountViewModel(
             val code = _uiState.value.inputField
             when (repository.verifyUser(code.text)) {
                 ActivateAccountResult.Success -> {
+                    event.event(ACTIVATE_ACCOUNT_SUCCESS_EVENT)
+                    toast.toast("Successfully activated account!")
                     _uiState.update {
                         it.copy(
                             isAccountActivated = true,
                             isLoading = false
                         )
                     }
-                    delay(3000)
-                    event.event(ACTIVATE_ACCOUNT_SUCCESS_EVENT)
-                    toast.toast("Successfully activated account!")
                 }
                 ActivateAccountResult.IncorrectCode -> _uiState.update {
                     val updatedInputField = code.copy(isError = true)

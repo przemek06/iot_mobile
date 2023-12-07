@@ -11,7 +11,7 @@ enum class ComponentDetailedType(
     Photo(ComponentType.INPUT, 1),
     Discord(ComponentType.TRIGGER, 1),
     Email(ComponentType.TRIGGER, 1),
-    LineGraph(ComponentType.OUTPUT, 2),
     Notification(ComponentType.TRIGGER, 1),
+    LineGraph(ComponentType.OUTPUT, 2),
     SpeedGraph(ComponentType.OUTPUT, 2)
 }

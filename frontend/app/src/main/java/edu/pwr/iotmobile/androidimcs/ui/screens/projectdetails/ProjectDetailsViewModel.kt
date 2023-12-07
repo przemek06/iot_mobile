@@ -333,7 +333,7 @@ class ProjectDetailsViewModel(
         }
     }
 
-    private fun updateUsers() {
+    fun updateUsers() {
         val localProjectId = _projectId ?: run {
             _uiState.update { it.copy(isError = true) }
             return

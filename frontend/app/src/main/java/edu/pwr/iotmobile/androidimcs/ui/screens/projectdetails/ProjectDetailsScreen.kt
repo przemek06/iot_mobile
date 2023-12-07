@@ -60,6 +60,9 @@ fun ProjectDetailsScreen(
     LaunchedEffect(navigation.isTopicSuccess) {
         viewModel.updateTopics()
     }
+    LaunchedEffect(navigation.isUserListSuccess) {
+        viewModel.updateUsers()
+    }
 
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {

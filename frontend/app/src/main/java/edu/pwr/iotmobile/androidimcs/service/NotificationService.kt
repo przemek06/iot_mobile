@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import edu.pwr.iotmobile.androidimcs.R
@@ -24,16 +25,18 @@ class NotificationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        Log.d("NotifService", "NotificationService onCreate called.")
         this.context = applicationContext
         this.notificationManager = applicationContext.getSystemService(NotificationManager::class.java)
         notificationListener = NotificationWebSocketListener(
             client = client,
-            onNotificationReceived = {  data -> showBasicNotification(data) }
+            onNotificationReceived = { data -> showBasicNotification(data) }
         )
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("NotifService", "NotificationService onDestroy called.")
         notificationListener?.closeWebSocket()
     }
 

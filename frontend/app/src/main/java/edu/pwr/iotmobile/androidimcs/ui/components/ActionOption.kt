@@ -1,6 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
@@ -27,15 +28,16 @@ fun ActionOption(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (userProjectRole == UserProjectRole.ADMIN) {
-            AdminMember(user = user)
-        } else {
-            UserNameText(user = user)
-            ButtonCommon(
-                text = buttonText,
-                type = ButtonCommonType.Alternative
-            ) { onClick() }
+        EmailWrapper(user) {
+            if (userProjectRole == UserProjectRole.ADMIN)
+                AdminMember(user = user)
+            else
+                UserNameText(user = user)
         }
+        ButtonCommon(
+            text = buttonText,
+            type = ButtonCommonType.Alternative
+        ) { onClick() }
     }
 }
 
@@ -57,4 +59,19 @@ private fun UserNameText(user: User) {
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onBackground
     )
+}
+
+@Composable
+private fun EmailWrapper(
+    user: User,
+    content: @Composable () -> Unit
+) {
+    Column {
+        content()
+        Text(
+            text = user.email,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
 }
