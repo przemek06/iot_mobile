@@ -8,7 +8,9 @@ interface ProjectDetailsUiInteraction {
     fun deleteTopic(id: Int)
     fun deleteProject()
     fun toggleDeleteProjectDialog()
+    fun toggleLeaveProjectDialog()
     fun regenerateConnectionKey()
+    fun leaveGroup()
 
     companion object {
         fun default(
@@ -42,8 +44,16 @@ interface ProjectDetailsUiInteraction {
                 viewModel.toggleDeleteProjectDialog()
             }
 
+            override fun toggleLeaveProjectDialog() {
+                viewModel.toggleLeaveProjectDialog()
+            }
+
             override fun regenerateConnectionKey() {
                 viewModel.regenerateConnectionKey()
+            }
+
+            override fun leaveGroup() {
+                viewModel.leaveGroup()
             }
         }
     }

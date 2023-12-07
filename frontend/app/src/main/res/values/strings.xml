@@ -261,4 +261,6 @@
     <string name="s110">You can find the Connection key in Project details, under Show Access button.\nUse it in the code of your IoT device to start listening and sending messages through topics.</string>
     <string name="s111">You can now interact with the component on your mobile app, and observe how messages sent affect your IoT device and vice versa!</string>
     <string name="s112">Create your first project now!</string>
+    <string name="s113">Are you sure you want to leave this project (%s)?</string>
+    <string name="s114">You will lose access to all of the resources in this project.</string>
 </resources>

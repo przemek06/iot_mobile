@@ -57,49 +57,50 @@ private fun ChangePasswordScreenContent(
     uiState: ChangePasswordUiState,
     uiInteraction: ChangePasswordUiInteraction
 ) {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Dimensions.space22),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
         TopBar(text = stringResource(id = R.string.change_password)) {
             navigation.goBack()
         }
         Column(
-            modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = Dimensions.space22),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(id = R.string.change_password_1),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
-            )
-            Dimensions.space10.HeightSpacer()
-            InputField(
-                text = uiState.inputFieldPassword.text,
-                label = stringResource(id = uiState.inputFieldPassword.label),
-                onValueChange = { uiInteraction.onTextChangePassword(it) }
-            )
-            Dimensions.space40.HeightSpacer()
-            Text(
-                text = stringResource(id = R.string.change_password_2),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
-            )
-            Dimensions.space10.HeightSpacer()
-            InputField(
-                text = uiState.inputFieldPasswordNew.text,
-                label = stringResource(id = uiState.inputFieldPasswordNew.label),
-                onValueChange = { uiInteraction.onTextChangePasswordNew(it) }
-            )
-            Dimensions.space40.HeightSpacer()
-            ButtonCommon(text = stringResource(id = R.string.confirm)) {
-                uiInteraction.onConfirm(navigation = navigation)
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(id = R.string.change_password_1),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center
+                )
+                Dimensions.space10.HeightSpacer()
+                InputField(
+                    text = uiState.inputFieldPassword.text,
+                    label = stringResource(id = uiState.inputFieldPassword.label),
+                    onValueChange = { uiInteraction.onTextChangePassword(it) }
+                )
+                Dimensions.space40.HeightSpacer()
+                Text(
+                    text = stringResource(id = R.string.change_password_2),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center
+                )
+                Dimensions.space10.HeightSpacer()
+                InputField(
+                    text = uiState.inputFieldPasswordNew.text,
+                    label = stringResource(id = uiState.inputFieldPasswordNew.label),
+                    onValueChange = { uiInteraction.onTextChangePasswordNew(it) }
+                )
+                Dimensions.space40.HeightSpacer()
+                ButtonCommon(text = stringResource(id = R.string.confirm)) {
+                    uiInteraction.onConfirm(navigation = navigation)
+                }
             }
         }
     }

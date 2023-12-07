@@ -104,6 +104,10 @@ private fun ProjectDetailsScreenContent(
         uiState = uiState,
         uiInteraction = uiInteraction
     )
+    LeaveProjectDialog(
+        uiState = uiState,
+        uiInteraction = uiInteraction
+    )
 
     Column {
         TopBar(
@@ -210,6 +214,29 @@ private fun DeleteProjectDialog(
             Dimensions.space10
             Text(
                 text = stringResource(id = R.string.delete_account_desc2) + ".",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+}
+
+@Composable
+private fun LeaveProjectDialog(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction,
+) {
+    if (uiState.isLeaveProjectDialogVisible) {
+        SimpleDialog(
+            title = stringResource(id = R.string.s113, uiState.projectData.name),
+            confirmButtonText = stringResource(id = R.string.yes),
+            closeButtonText = stringResource(id = R.string.no),
+            onCloseDialog = { uiInteraction.toggleLeaveProjectDialog() },
+            isLoading = uiState.isDialogLoading,
+            onConfirm = { uiInteraction.leaveGroup() }
+        ) {
+            Text(
+                text = stringResource(id = R.string.s114),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )

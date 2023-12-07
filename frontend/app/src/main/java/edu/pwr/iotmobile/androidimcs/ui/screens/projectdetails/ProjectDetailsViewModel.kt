@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
+import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDeletedDto
@@ -69,13 +70,26 @@ class ProjectDetailsViewModel(
             )
 
             viewModelScope.launch {
-
                 try {
                     val projectUserInfo = projectRepository
                         .getUserProjectRole(localProjectId)
                         ?: return@launch
 
-                    val projectRole = projectUserInfo.toUserProjectRole() ?: return@launch
+                    val user = userRepository.getLoggedInUser().firstOrNull() ?: run {
+                        _uiState.update { it.copy(
+                            isError = true,
+                            isLoading = false
+                        ) }
+                        return@launch
+                    }
+
+                    val projectRole = projectUserInfo.toUserProjectRole() ?: run {
+                        _uiState.update { it.copy(
+                            isError = true,
+                            isLoading = false
+                        ) }
+                        return@launch
+                    }
                     _userProjectRole = projectRole
 
                     val roles = projectRepository
@@ -105,7 +119,11 @@ class ProjectDetailsViewModel(
                             userRoleDescriptionId = getUserRoleDescription(projectRole),
                             userProjectRole = projectRole,
                             roles = roles,
-                            userOptionsList = generateUserOptions(projectRole, navigation),
+                            userOptionsList = generateUserOptions(projectRole,
+                                user,
+                                projectData.createdBy,
+                                navigation
+                            ).filterNotNull(),
                             menuOptionsList = generateMenuOptions(projectRole),
                             dashboards = getDashboards(),
                             projectData = projectData,
@@ -370,67 +388,13 @@ class ProjectDetailsViewModel(
         }
     }
 
-    private fun getUserRoleDescription(role: UserProjectRole) = when (role) {
-        UserProjectRole.ADMIN -> R.string.admin_desc
-        UserProjectRole.EDITOR -> R.string.modify_desc
-        UserProjectRole.VIEWER -> R.string.view_desc
+    fun toggleLeaveProjectDialog() {
+        _uiState.update {
+            it.copy(isLeaveProjectDialogVisible = !it.isLeaveProjectDialogVisible)
+        }
     }
 
-    private fun generateUserOptions(
-        role: UserProjectRole,
-        navigation: ProjectDetailsNavigation
-    ) = when (role) {
-        UserProjectRole.ADMIN -> listOf(
-            MenuOption(
-                titleId = R.string.invite_users,
-                isBold = true,
-                onClick = { navigation.openSearchInviteUsers() }
-            ),
-            MenuOption(
-                titleId = R.string.edit_roles,
-                onClick = { navigation.openSearchEditRoles() }
-            ),
-            MenuOption(
-                titleId = R.string.revoke_access,
-                onClick = { navigation.openSearchRevokeAccess() }
-            ),
-            MenuOption(
-                titleId = R.string.add_admin,
-                onClick = { navigation.openSearchAddAdmin() }
-            ),
-            MenuOption(
-                titleId = R.string.leave_group,
-                isBold = true,
-                onClick = { leaveGroup() }
-            )
-        )
-        UserProjectRole.EDITOR -> listOf(
-            MenuOption(
-                titleId = R.string.leave_group,
-                isBold = true,
-                onClick = { leaveGroup() }
-            )
-        )
-        UserProjectRole.VIEWER -> listOf(
-            MenuOption(
-                titleId = R.string.leave_group,
-                isBold = true,
-                onClick = { leaveGroup() }
-            )
-        )
-    }
-
-    private fun generateMenuOptions(role: UserProjectRole) = when (role) {
-        UserProjectRole.ADMIN -> listOf(
-            MenuOption(
-                titleId = R.string.delete_project,
-                onClick = { toggleDeleteProjectDialog() }
-            )
-        )
-        else -> emptyList()
-    }
-
-    private fun leaveGroup() {
+    fun leaveGroup() {
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
@@ -475,6 +439,71 @@ class ProjectDetailsViewModel(
                 ) }
             }
         }
+    }
+
+    private fun getUserRoleDescription(role: UserProjectRole) = when (role) {
+        UserProjectRole.ADMIN -> R.string.admin_desc
+        UserProjectRole.EDITOR -> R.string.modify_desc
+        UserProjectRole.VIEWER -> R.string.view_desc
+    }
+
+    private fun generateUserOptions(
+        role: UserProjectRole,
+        user: User,
+        createdBy: Int,
+        navigation: ProjectDetailsNavigation
+    ) = when (role) {
+        UserProjectRole.ADMIN -> listOf(
+            MenuOption(
+                titleId = R.string.invite_users,
+                isBold = true,
+                onClick = { navigation.openSearchInviteUsers() }
+            ),
+            MenuOption(
+                titleId = R.string.edit_roles,
+                onClick = { navigation.openSearchEditRoles() }
+            ),
+            MenuOption(
+                titleId = R.string.revoke_access,
+                onClick = { navigation.openSearchRevokeAccess() }
+            ),
+            MenuOption(
+                titleId = R.string.add_admin,
+                onClick = { navigation.openSearchAddAdmin() }
+            ),
+            if (user.id == createdBy)
+                null
+            else
+                MenuOption(
+                    titleId = R.string.leave_group,
+                    isBold = true,
+                    onClick = { toggleLeaveProjectDialog() }
+                )
+        )
+        UserProjectRole.EDITOR -> listOf(
+            MenuOption(
+                titleId = R.string.leave_group,
+                isBold = true,
+                onClick = { toggleLeaveProjectDialog() }
+            )
+        )
+        UserProjectRole.VIEWER -> listOf(
+            MenuOption(
+                titleId = R.string.leave_group,
+                isBold = true,
+                onClick = { toggleLeaveProjectDialog() }
+            )
+        )
+    }
+
+    private fun generateMenuOptions(role: UserProjectRole) = when (role) {
+        UserProjectRole.ADMIN -> listOf(
+            MenuOption(
+                titleId = R.string.delete_project,
+                onClick = { toggleDeleteProjectDialog() }
+            )
+        )
+        else -> emptyList()
     }
 
     enum class ProjectTab(val labelId: Int, val index: Int) {
