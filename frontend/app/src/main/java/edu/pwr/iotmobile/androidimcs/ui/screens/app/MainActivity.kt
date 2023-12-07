@@ -1,10 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.app
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -25,12 +22,10 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.model.listener.InvitationAlertWebSocketListener
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
-import edu.pwr.iotmobile.androidimcs.service.ServiceManager
 import edu.pwr.iotmobile.androidimcs.ui.navigation.BottomNavigationBar
 import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
 import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme
@@ -62,18 +57,6 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
-        }
-
-        // Start notification service if permission is granted
-        val permissionStatus = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            true
-        }
-        if (!ServiceManager.isServiceRunning(this) &&
-            permissionStatus == PackageManager.PERMISSION_GRANTED
-        ) {
-            ServiceManager.serviceStart(this)
         }
 
         setContent {

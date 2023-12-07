@@ -154,6 +154,7 @@ class AccountViewModel(
                 val result = userRepository.logout()
                 result.onSuccess {
                     toast.toast("Successfully logged out")
+                    ServiceManager.serviceStop(context)
                     navigation.openLogin()
                 }
                 result.onFailure {
@@ -165,7 +166,6 @@ class AccountViewModel(
                 updateLoading(false)
             }
         }
-        ServiceManager.serviceStop(context)
     }
 
     private fun updateLoading(value: Boolean) {

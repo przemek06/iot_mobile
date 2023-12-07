@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.extensions.asEnum
+import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
@@ -17,7 +18,8 @@ import kotlinx.coroutines.launch
 class MainScreenViewModel(
     private val projectRepository: ProjectRepository,
     private val userRepository: UserRepository,
-    private val dashboardRepository: DashboardRepository
+    private val dashboardRepository: DashboardRepository,
+    val event: Event
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainScreenUiState())
@@ -44,6 +46,7 @@ class MainScreenViewModel(
                     ) }
                     return@launch
                 }
+                event.event("LoggedIn")
 
                 val dashboards = dashboardRepository.getLastAccessedDashboards().take(5).reversed()
 
