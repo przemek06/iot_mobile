@@ -94,7 +94,7 @@ class MessageServiceTest {
         every { topicService.findTopic(any()) } returns topic
         every { projectService.isInProject(any(), any()) } returns true
         every { messageRepository.save(any()) } returns message
-        every { queueService.sendMessage(any(), any()) } returns Unit
+        every { queueService.sendMessage(any(), any(), any()) } returns Unit
 
         // when
         val actual = messageService.sendMessage(messageDTO)
@@ -122,7 +122,7 @@ class MessageServiceTest {
         every { topicService.findTopic(any()) } returns topic
         every { projectService.isInProject(any(), any()) } returns true
         every { messageRepository.save(any()) } returns message
-        every { queueService.sendMessage(any(), any()) } throws QueueException()
+        every { queueService.sendMessage(any(), any(), any()) } throws QueueException()
 
         // throws
         assertThrows<QueueException> { messageService.sendMessage(message.toDTO()) }
@@ -149,7 +149,7 @@ class MessageServiceTest {
         val messageDTO = getMessageDto()
         every { topicService.findTopic(any()) } returns topic
         every { messageRepository.save(any()) } returns message
-        every { queueService.sendMessage(any(), any()) } returns Unit
+        every { queueService.sendMessage(any(), any(), any()) } returns Unit
 
         // when
         val actual = messageService.sendMessageFromDevice(messageDTO)
@@ -188,7 +188,7 @@ class MessageServiceTest {
         val messageDTO = getMessageDto()
         every { topicService.findTopic(any()) } returns topic
         every { messageRepository.save(any()) } returns message
-        every { queueService.sendMessage(any(), any()) } throws QueueException()
+        every { queueService.sendMessage(any(), any(), any()) } throws QueueException()
 
         // throws
         assertThrows<QueueException> { messageService.sendMessageFromDevice(messageDTO) }
