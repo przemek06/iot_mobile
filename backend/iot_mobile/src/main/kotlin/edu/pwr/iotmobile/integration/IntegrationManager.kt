@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import edu.pwr.iotmobile.entities.TriggerComponent
 import edu.pwr.iotmobile.enums.EActionDestinationType
 import edu.pwr.iotmobile.error.exception.InvalidStateException
+import edu.pwr.iotmobile.error.exception.TelegramException
 import edu.pwr.iotmobile.rabbit.RabbitListener
 import edu.pwr.iotmobile.service.ComponentService
 import edu.pwr.iotmobile.service.MailService
@@ -115,18 +116,14 @@ class IntegrationManager(
     }
 
     private fun createTelegramIntegrationAction(component: TriggerComponent): TelegramIntegrationAction {
-        if(getTelegramChatId(component).isBlank()){
-            component.actionDestination.token = updateTelegramToken(component)
-        }
-        return TelegramIntegrationAction(component.actionDestination.token, telegramBot, component.pattern)
+        val chatIds = requestChatIds(component)
+        return TelegramIntegrationAction(component.actionDestination.token, telegramBot, component.pattern, chatIds)
     }
 
-    fun updateTelegramToken(component: TriggerComponent): String{
-        return "${requestChatId(component)};${getTelegramBotToken(component)}"
-    }
 
-    fun requestChatId(component: TriggerComponent): String{
-        val botToken = getTelegramBotToken(component)
+    fun requestChatIds(component: TriggerComponent): List<String>{
+        val chatIds = mutableListOf<String>()
+        val botToken = component.actionDestination.token
         val uri = "https://api.telegram.org/bot$botToken/getUpdates"
         val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()
@@ -134,16 +131,18 @@ class IntegrationManager(
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        if (response.statusCode() != 200) {
+            throw TelegramException(response.body())
+        }
+
         val chatInfo = objectMapper.readTree(response.body())
-        val chatId = chatInfo.get("result")[0]["my_chat_member"]["chat"]["id"]
-        return chatId.asText()
+        for (update in chatInfo.get("result")){
+            if (update.has("my_chat_member")) {
+                chatIds.add(update["my_chat_member"]["chat"]["id"].asText())
+            }
+        }
+        return chatIds
     }
 
-    fun getTelegramChatId(component: TriggerComponent): String{
-        return component.actionDestination.token.split(";")[0]
-    }
-
-    fun getTelegramBotToken(component: TriggerComponent): String{
-        return component.actionDestination.token.split(";")[1]
-    }
 }
