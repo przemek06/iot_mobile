@@ -1,8 +1,10 @@
 package edu.pwr.iotmobile.integration
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import edu.pwr.iotmobile.entities.TriggerComponent
 import edu.pwr.iotmobile.enums.EActionDestinationType
 import edu.pwr.iotmobile.error.exception.InvalidStateException
+import edu.pwr.iotmobile.error.exception.TelegramException
 import edu.pwr.iotmobile.rabbit.RabbitListener
 import edu.pwr.iotmobile.service.ComponentService
 import edu.pwr.iotmobile.service.MailService
@@ -12,6 +14,10 @@ import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy
 import org.springframework.stereotype.Component
 import reactor.core.Disposable
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
@@ -32,6 +38,7 @@ class IntegrationManager(
     )
 
     val integrationActionMap: MutableMap<Int, IntegrationWrapper> = ConcurrentHashMap()
+    val objectMapper = ObjectMapper()
 
     @PostConstruct
     fun loadIntegrations() {
@@ -63,7 +70,7 @@ class IntegrationManager(
             val integrationAction = createSlackIntegrationAction(component)
             addIntegrationAction(component, integrationAction, connectionKey)
         } else if (component.actionDestination.type == EActionDestinationType.TELEGRAM) {
-            val integrationAction = createTelegramIntegrationFunction(component)
+            val integrationAction = createTelegramIntegrationAction(component)
             addIntegrationAction(component, integrationAction, connectionKey)
         }
     }
@@ -108,7 +115,34 @@ class IntegrationManager(
         return SlackIntegrationAction(component.actionDestination.token, slackBot)
     }
 
-    private fun createTelegramIntegrationFunction(component: TriggerComponent): TelegramIntegrationAction {
-        return TelegramIntegrationAction(component.actionDestination.token, telegramBot)
+    private fun createTelegramIntegrationAction(component: TriggerComponent): TelegramIntegrationAction {
+        val chatIds = requestChatIds(component)
+        return TelegramIntegrationAction(component.actionDestination.token, telegramBot, component.pattern, chatIds)
     }
+
+
+    fun requestChatIds(component: TriggerComponent): List<String>{
+        val chatIds = mutableListOf<String>()
+        val botToken = component.actionDestination.token
+        val uri = "https://api.telegram.org/bot$botToken/getUpdates"
+        val client = HttpClient.newBuilder().build()
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create(uri))
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        if (response.statusCode() != 200) {
+            throw TelegramException(response.body())
+        }
+
+        val chatInfo = objectMapper.readTree(response.body())
+        for (update in chatInfo.get("result")){
+            if (update.has("my_chat_member")) {
+                chatIds.add(update["my_chat_member"]["chat"]["id"].asText())
+            }
+        }
+        return chatIds
+    }
+
 }
