@@ -93,9 +93,7 @@ class ProjectDetailsViewModel(
                     _userProjectRole = projectRole
 
                     val roles = projectRepository
-                        .findAllProjectRolesByProjectId(localProjectId)
-                        .getOrNull()
-                        ?: emptyList()
+                        .getAllProjectRolesByProjectId(localProjectId)
 
                     val projectData = projectRepository
                         .getProjectById(localProjectId)

@@ -20,7 +20,7 @@ interface UserRepository {
      */
     suspend fun getLoggedInUser(): Flow<User?>
     suspend fun getUserInfoById(id: Int): Result<UserInfoDto>
-    suspend fun getAllUserInfo(): Result<List<UserInfoDto>>
+    suspend fun getAllUserInfo(): List<UserInfoDto>
     suspend fun verifyUser(code: String): ActivateAccountResult
     suspend fun sendResetPasswordEmail(email: String): Result<Unit>
     suspend fun resetPassword(email: String, code: String, passwordBody: PasswordBody): ForgotPasswordResult

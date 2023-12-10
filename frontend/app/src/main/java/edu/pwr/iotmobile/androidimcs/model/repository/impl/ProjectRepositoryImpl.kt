@@ -123,13 +123,13 @@ class ProjectRepositoryImpl(
             Result.failure(Exception("Editing project role failed"))
     }
 
-    override suspend fun findAllProjectRolesByProjectId(projectId: Int): Result<List<ProjectRoleDto>> {
+    override suspend fun getAllProjectRolesByProjectId(projectId: Int): List<ProjectRoleDto> {
         val result = remoteDataSource.findAllProjectRolesByProjectId(projectId)
         val body = result.body()
         return if (result.isSuccessful && body != null)
-            Result.success(body)
+            body
         else
-            Result.failure(Exception("Getting roles failed"))
+            emptyList()
     }
 
     override suspend fun revokeAccess(projectId: Int, userId: Int): Result<Unit> {

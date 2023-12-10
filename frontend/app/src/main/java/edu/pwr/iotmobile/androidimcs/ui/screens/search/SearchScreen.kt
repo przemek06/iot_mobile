@@ -86,14 +86,8 @@ private fun SearchScreenContent(
             isLoading = uiState.isDialogLoading,
             onCloseDialog = { uiInteraction.setDialogInvisible() },
             onConfirm = {
-                if (!alternative) {
-                    uiState.selectedUser?.let {
-                        uiState.data.dialogButton2Function(it)
-                    }
-                } else {
-                    uiState.selectedUser?.let {
-                        uiState.data.dialogButton2FunctionAlternative(it)
-                    }
+                uiState.selectedUser?.let {
+                    uiState.data.dialogButtonFunction(it)
                 }
             }
         ) {

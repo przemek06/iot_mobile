@@ -1,7 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.search
 
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
@@ -13,6 +12,7 @@ import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Locale.filter
 
 
 class SearchViewModel(
@@ -32,114 +33,60 @@ class SearchViewModel(
     private val _uiState = MutableStateFlow(SearchUiState.default())
     val uiState = _uiState.asStateFlow()
 
+    private var _projectId: Int? = null
+    private var _searchMode: SearchMode? = null
+
     fun init(
-        navigation: SearchNavigation
+        searchMode: SearchMode?,
+        projectId: Int?
     ) {
-        val data = when(navigation.mode) {
-            SearchMode.ADD_ADMIN -> ScreenData(
-                topBarText = R.string.add_admin,
-                buttonText = R.string.add_admin,
-                dialogTitle = R.string.search_admin_1,
-                dialogButton2Function = {
-                    addAdmin(it)
-                    setDialogInvisible()
-                },
-                getUsersFunction = { getAllUsers() },
-                excludeUsersFunction = { excludeAdmins() }
-            )
-            SearchMode.ADD_PROJECT_ADMIN -> ScreenData(
-                topBarText = R.string.add_admin,
-                buttonText = R.string.add_admin,
-                dialogTitle = R.string.search_admin_1,
-                dialogButton2Function = {
-                    addProjectAdmin(
-                        userId = it.id,
-                        projectId = navigation.projectId
-                    )
-                    setDialogInvisible()
-                },
-                getUsersFunction = { getProjectUsers(navigation.projectId) },
-                excludeUsersFunction = { excludeProjectsAdmins(navigation.projectId) }
-            )
-            SearchMode.BLOCK_USERS -> ScreenData(
-                topBarText = R.string.block_users,
-                buttonText = R.string.block,
-                buttonTextAlternative = R.string.unblock,
-                dialogTitle = R.string.search_block_1,
-                dialogTitleAlternative = R.string.search_block_2,
-                dialogButton2Function = {
-                    toggleBlockUser(it)
-                    setDialogInvisible()
-                },
-                dialogButton2FunctionAlternative = {
-                    toggleBlockUser(it)
-                    setDialogInvisible()
-                },
-                alternative = {
-                    it.isBlocked
-                },
-                getUsersFunction = { getAllUsers() }
-            )
-            SearchMode.INVITE_USERS -> ScreenData(
-                topBarText = R.string.invite_users,
-                buttonText = R.string.invite,
-                dialogTitle = R.string.sure_invite,
-                buttonFunction = {
-                    inviteUser(
-                        userId = it.id,
-                        projectId = navigation.projectId
-                    )
-                },
-                getUsersFunction = { getAllUsers() },
-                excludeUsersFunction = { excludeProjectUsers(navigation.projectId) }
-            )
-            SearchMode.REVOKE_ACCESS -> ScreenData(
-                topBarText = R.string.revoke_access,
-                buttonText = R.string.remove,
-                dialogTitle = R.string.u_sure_revoke_access,
-                dialogButton2Function = {
-                    revokeAccess(
-                        userId = it.id,
-                        projectId = navigation.projectId
-                    )
-                    setDialogInvisible()
-                },
-                getUsersFunction = { getProjectUsers(navigation.projectId) },
-                excludeUsersFunction = { excludeProjectsAdmins(navigation.projectId) }
-            )
-            SearchMode.EDIT_ROLES -> ScreenData(
-                topBarText = R.string.edit_roles,
-                buttonText = R.string.edit,
-                buttonFunction = {
-                    _uiState.value.selectedUser?.let { selectedUser ->
-                        selectRole(_uiState.value.userRoles.firstOrNull { dto ->
-                            dto.user.name == selectedUser.displayName
-                        }?.toUserProjectRole() ?: UserProjectRole.VIEWER)
+        if (searchMode == null || projectId == null) {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
+
+        if (searchMode != _searchMode || projectId != _projectId) {
+            _projectId = projectId
+
+            viewModelScope.launch {
+                try {
+                    val screenData = generateScreenData(
+                        searchMode = searchMode,
+                        projectId = projectId
+                    ) ?: kotlin.run {
+                        _uiState.update { it.copy(isError = true) }
+                        return@launch
                     }
-                    null
-                },
-                dialogTitle = R.string.edit_role_dialog,
-                dialogButton2Function = {
-                    editRole(
-                        user = it,
-                        projectId = navigation.projectId
-                    )
-                    setDialogInvisible()
-                },
-                getUsersFunction = {
-                    getProjectUsers(navigation.projectId)
-                    getRoles(navigation.projectId)
+
+                    val projectRoles = projectRepository.getAllProjectRolesByProjectId(projectId)
+                    val users = getUsers(searchMode, projectId)
+                    val filteredUsers = users.filter { user ->
+                        user.exclude(
+                            searchMode = searchMode,
+                            projectRole = projectRoles.find { user.id == it.user.id }
+                                ?.toUserProjectRole(),
+                            usersInProject = users.map { it.id }
+                        )
+                    }
+                    _uiState.update { ui ->
+                        ui.copy(
+                            data = screenData,
+                            users = filteredUsers.mapNotNull { it.toUser() },
+                            isLoading = false,
+                            isError = false
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e("Search", "Failed to initialize", e)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isError = true
+                        )
+                    }
                 }
-            )
-            else -> ScreenData(
-                topBarText = R.string.nothing,
-                buttonText = R.string.nothing
-            )
+            }
         }
-        _uiState.update {
-            it.copy(data = data)
-        }
-        updateList()
     }
     private fun updateList() {
         val data = uiState.value.data
@@ -352,7 +299,7 @@ class SearchViewModel(
         }
         viewModelScope.launch {
             try {
-                val result = projectRepository.findAllProjectRolesByProjectId(projectId)
+                val result = projectRepository.getAllProjectRolesByProjectId(projectId)
                 result.onSuccess { list ->
                     _uiState.update {
                         it.copy(
@@ -369,32 +316,43 @@ class SearchViewModel(
         }
     }
 
-    private fun getAllUsers() {
-        _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            val result = userRepository.getAllUserInfo()
-            result.onSuccess { list ->
-                val users = list.mapNotNull { it.toUser() }
-                _uiState.update { state ->
-                    state.copy(
-                        users = users,
-                        searchedUsers = users.filter { !state.excludedUsers.contains(it) },
-                        isError = false,
-                        isLoading = false
-                    )
-                }
-            }
-            result.onFailure {
-                toast.toast("Cannot list users")
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isError = true
-                    )
-                }
-            }
-        }
+    private suspend fun getAllUsers() {
+        val result = userRepository.getAllUserInfo()
     }
+
+//    private fun getAllUsers() {
+//        _uiState.update { it.copy(isLoading = true) }
+//        viewModelScope.launch {
+//            try {
+//                val result = userRepository.getAllUserInfo()
+//                result.onSuccess { list ->
+//                    val users = list.mapNotNull { it.toUser() }
+//                    _uiState.update { state ->
+//                        state.copy(
+//                            users = users,
+//                            searchedUsers = users.filter { !state.excludedUsers.contains(it) },
+//                            isError = false,
+//                            isLoading = false
+//                        )
+//                    }
+//                }
+//                result.onFailure {
+//                    _uiState.update {
+//                        it.copy(
+//                            isLoading = false,
+//                            isError = true
+//                        )
+//                    }
+//                }
+//            } catch (e: Exception) {
+//                Log.e("Search", "Cannot get all users", e)
+//                _uiState.update { it.copy(
+//                    isLoading = false,
+//                    isError = true
+//                ) }
+//            }
+//        }
+//    }
     private fun getProjectUsers(projectId: Int?) {
         if (projectId == null) {
             _uiState.update { it.copy(isError = true) }
@@ -446,7 +404,7 @@ class SearchViewModel(
         projectId?.let {
             viewModelScope.launch {
                 kotlin.runCatching {
-                    val roles = projectRepository.findAllProjectRolesByProjectId(it).getOrNull() ?: return@launch
+                    val roles = projectRepository.getAllProjectRolesByProjectId(it).getOrNull() ?: return@launch
                     val users = projectRepository.getUsersByProjectId(projectId)
                     users.filter { user ->
                         roles.find { it.user == user }?.role == UserProjectRole.ADMIN.name
@@ -483,6 +441,136 @@ class SearchViewModel(
         }
     }
 
+    private suspend fun getUsers(
+        searchMode: SearchMode,
+        projectId: Int
+    ): List<UserInfoDto> {
+        return when (searchMode) {
+            SearchMode.ADD_ADMIN -> userRepository.getAllUserInfo()
+            SearchMode.ADD_PROJECT_ADMIN -> projectRepository.getUsersByProjectId(projectId)
+            SearchMode.BLOCK_USERS -> userRepository.getAllUserInfo()
+            SearchMode.INVITE_USERS -> userRepository.getAllUserInfo()
+            SearchMode.EDIT_ROLES -> projectRepository.getUsersByProjectId(projectId)
+            SearchMode.REVOKE_ACCESS -> projectRepository.getUsersByProjectId(projectId)
+        }
+    }
+
+    private fun UserInfoDto.exclude(
+        searchMode: SearchMode,
+        projectRole: UserProjectRole?,
+        usersInProject: List<Int>
+    ): Boolean {
+        if (projectRole == null) return false
+        return when (searchMode) {
+            SearchMode.ADD_ADMIN -> this.role == UserRole.ADMIN_ROLE.name
+            SearchMode.ADD_PROJECT_ADMIN -> projectRole == UserProjectRole.ADMIN
+            SearchMode.BLOCK_USERS -> false
+            SearchMode.INVITE_USERS -> this.id in usersInProject
+            SearchMode.EDIT_ROLES -> false
+            SearchMode.REVOKE_ACCESS -> projectRole == UserProjectRole.ADMIN
+        }
+    }
+
+    private fun generateScreenData(
+        searchMode: SearchMode?,
+        projectId: Int?
+    ): ScreenData? {
+        if (searchMode == null || projectId == null) return null
+        return when (searchMode) {
+            SearchMode.ADD_ADMIN -> ScreenData(
+                topBarText = R.string.add_admin,
+                buttonText = R.string.add_admin,
+                dialogTitle = R.string.search_admin_1,
+                dialogButtonFunction = {
+                    addAdmin(it)
+                    setDialogInvisible()
+                },
+                getUsersFunction = { getAllUsers() },
+                excludeUsersFunction = { excludeAdmins() }
+            )
+            SearchMode.ADD_PROJECT_ADMIN -> ScreenData(
+                topBarText = R.string.add_admin,
+                buttonText = R.string.add_admin,
+                dialogTitle = R.string.search_admin_1,
+                dialogButtonFunction = {
+                    addProjectAdmin(
+                        userId = it.id,
+                        projectId = projectId
+                    )
+                    setDialogInvisible()
+                },
+                getUsersFunction = { getProjectUsers(projectId) },
+                excludeUsersFunction = { excludeProjectsAdmins(projectId) }
+            )
+            SearchMode.BLOCK_USERS -> ScreenData(
+                topBarText = R.string.block_users,
+                buttonText = R.string.block,
+                buttonTextAlternative = R.string.unblock,
+                dialogTitle = R.string.search_block_1,
+                dialogTitleAlternative = R.string.search_block_2,
+                dialogButtonFunction = {
+                    toggleBlockUser(it)
+                    setDialogInvisible()
+                },
+                alternative = {
+                    it.isBlocked
+                },
+                getUsersFunction = { getAllUsers() }
+            )
+            SearchMode.INVITE_USERS -> ScreenData(
+                topBarText = R.string.invite_users,
+                buttonText = R.string.invite,
+                dialogTitle = R.string.sure_invite,
+                buttonFunction = {
+                    inviteUser(
+                        userId = it.id,
+                        projectId = projectId
+                    )
+                },
+                getUsersFunction = { getAllUsers() },
+                excludeUsersFunction = { excludeProjectUsers(projectId) }
+            )
+            SearchMode.REVOKE_ACCESS -> ScreenData(
+                topBarText = R.string.revoke_access,
+                buttonText = R.string.remove,
+                dialogTitle = R.string.u_sure_revoke_access,
+                dialogButtonFunction = {
+                    revokeAccess(
+                        userId = it.id,
+                        projectId = projectId
+                    )
+                    setDialogInvisible()
+                },
+                getUsersFunction = { getProjectUsers(projectId) },
+                excludeUsersFunction = { excludeProjectsAdmins(projectId) }
+            )
+            SearchMode.EDIT_ROLES -> ScreenData(
+                topBarText = R.string.edit_roles,
+                buttonText = R.string.edit,
+                buttonFunction = {
+                    _uiState.value.selectedUser?.let { selectedUser ->
+                        selectRole(_uiState.value.userRoles.firstOrNull { dto ->
+                            dto.user.name == selectedUser.displayName
+                        }?.toUserProjectRole() ?: UserProjectRole.VIEWER)
+                    }
+                    null
+                },
+                dialogTitle = R.string.edit_role_dialog,
+                dialogButtonFunction = {
+                    editRole(
+                        user = it,
+                        projectId = projectId
+                    )
+                    setDialogInvisible()
+                },
+                getUsersFunction = {
+                    getProjectUsers(projectId)
+                    getRoles(projectId)
+                }
+            )
+        }
+    }
+
     data class ScreenData(
         val topBarText: Int,
         val buttonText: Int,
@@ -490,9 +578,7 @@ class SearchViewModel(
         val buttonFunction: (user: User) -> Any? = { null },
         val dialogTitle: Int = R.string.nothing,
         val dialogTitleAlternative: Int = R.string.nothing,
-        val dialogContent: @Composable () -> Unit = {},
-        val dialogButton2Function: (user: User) -> Unit = {},
-        val dialogButton2FunctionAlternative: (user: User) -> Unit = {},
+        val dialogButtonFunction: (user: User) -> Unit = {},
         val alternative: (user: User) -> Boolean = { false },
         val getUsersFunction: () -> Unit = {},
         val excludeUsersFunction: () -> Unit = {}
@@ -505,6 +591,5 @@ enum class SearchMode {
     BLOCK_USERS,
     INVITE_USERS,
     REVOKE_ACCESS,
-    EDIT_ROLES,
-    NONE
+    EDIT_ROLES
 }
