@@ -63,7 +63,11 @@ class UserRepositoryImpl(
 
                 LoginUserResult.Success
             }
+
+            401 -> LoginUserResult.UserBanned
+
             403 -> LoginUserResult.AccountInactive
+
             else -> LoginUserResult.Failure
         }
     }

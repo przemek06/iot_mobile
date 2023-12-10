@@ -43,8 +43,11 @@ class SearchViewModel(
         searchMode: SearchMode?,
         projectId: Int?
     ) {
-        if (searchMode == null || projectId == null) {
-            _uiState.update { it.copy(isError = true) }
+        if (searchMode == null) {
+            _uiState.update { it.copy(
+                isError = true,
+                isLoading = false
+            ) }
             return
         }
 
@@ -57,10 +60,7 @@ class SearchViewModel(
                     val screenData = generateScreenData(
                         searchMode = searchMode,
                         projectId = projectId
-                    ) ?: kotlin.run {
-                        _uiState.update { it.copy(isError = true) }
-                        return@launch
-                    }
+                    )
 
                     val filteredUsers = getFilteredUsers(searchMode, projectId)
                     _allUsers = filteredUsers
@@ -193,7 +193,7 @@ class SearchViewModel(
                 userRepository.toggleUserBlocked(user.id)
             }.onSuccess {
                 if (it.isSuccess) {
-                    toast.toast("Success")
+                    toast.toast("Successfully blocked user.")
                     updateUsersList()
                 } else {
                     toast.toast("Operation failed.")
@@ -315,9 +315,8 @@ class SearchViewModel(
 
     private fun updateUsersList() {
         val locSearchMode = _searchMode
-        val locProjectId = _projectId
-        if (locSearchMode == null || locProjectId == null) {
-            Log.d("Search", "locSearchMode or locProjectId null")
+        if (locSearchMode == null) {
+            Log.d("Search", "locSearchMode null")
             _uiState.update { it.copy(isError = true) }
             return
         }
@@ -325,7 +324,7 @@ class SearchViewModel(
 
         viewModelScope.launch {
             try {
-                val filteredUsers = getFilteredUsers(locSearchMode, locProjectId)
+                val filteredUsers = getFilteredUsers(locSearchMode, _projectId)
                 _allUsers = filteredUsers
 
                 val searchedText = _uiState.value.searchedText
@@ -357,11 +356,11 @@ class SearchViewModel(
 
     private suspend fun getFilteredUsers(
         searchMode: SearchMode,
-        projectId: Int
+        projectId: Int?
     ): List<User> {
-        val projectRoles = projectRepository.getAllProjectRolesByProjectId(projectId)
+        val projectRoles =  projectId?.let { projectRepository.getAllProjectRolesByProjectId(projectId) } ?: emptyList()
         _projectRoles = projectRoles
-        val usersInProject = projectRepository.getUsersByProjectId(projectId)
+        val usersInProject =  projectId?.let { projectRepository.getUsersByProjectId(projectId) } ?: emptyList()
         val users = getUsers(searchMode, projectId)
 
         return users.filterNot { user ->
@@ -376,15 +375,15 @@ class SearchViewModel(
 
     private suspend fun getUsers(
         searchMode: SearchMode,
-        projectId: Int
+        projectId: Int?
     ): List<UserInfoDto> {
         return when (searchMode) {
             SearchMode.ADD_ADMIN -> userRepository.getAllUserInfo()
-            SearchMode.ADD_PROJECT_ADMIN -> projectRepository.getUsersByProjectId(projectId)
+            SearchMode.ADD_PROJECT_ADMIN -> projectId?.let { projectRepository.getUsersByProjectId(projectId) } ?: emptyList()
             SearchMode.BLOCK_USERS -> userRepository.getAllUserInfo()
             SearchMode.INVITE_USERS -> userRepository.getAllUserInfo()
-            SearchMode.EDIT_ROLES -> projectRepository.getUsersByProjectId(projectId)
-            SearchMode.REVOKE_ACCESS -> projectRepository.getUsersByProjectId(projectId)
+            SearchMode.EDIT_ROLES -> projectId?.let { projectRepository.getUsersByProjectId(projectId) } ?: emptyList()
+            SearchMode.REVOKE_ACCESS -> projectId?.let {  projectRepository.getUsersByProjectId(projectId) } ?: emptyList()
         }
     }
 
@@ -393,7 +392,6 @@ class SearchViewModel(
         projectRole: UserProjectRole?,
         usersInProject: List<Int>
     ): Boolean {
-        if (projectRole == null) return false
         return when (searchMode) {
             SearchMode.ADD_ADMIN -> this.role == UserRole.ADMIN_ROLE.name
             SearchMode.ADD_PROJECT_ADMIN -> projectRole == UserProjectRole.ADMIN
@@ -405,10 +403,9 @@ class SearchViewModel(
     }
 
     private fun generateScreenData(
-        searchMode: SearchMode?,
+        searchMode: SearchMode,
         projectId: Int?
-    ): ScreenData? {
-        if (searchMode == null || projectId == null) return null
+    ): ScreenData {
         return when (searchMode) {
             SearchMode.ADD_ADMIN -> ScreenData(
                 topBarText = R.string.add_admin,
