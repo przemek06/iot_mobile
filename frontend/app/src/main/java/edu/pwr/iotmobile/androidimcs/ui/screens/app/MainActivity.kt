@@ -37,6 +37,7 @@ import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
@@ -71,7 +72,9 @@ class MainActivity : ComponentActivity() {
                     if (!ServiceManager.isServiceRunning(context) &&
                         permissionStatus == PackageManager.PERMISSION_GRANTED
                     ) {
-                        ServiceManager.serviceStart(context)
+                        withContext(Dispatchers.Main) {
+                            ServiceManager.serviceStart(context)
+                        }
                     }
                 }
             }
