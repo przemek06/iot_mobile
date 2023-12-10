@@ -431,8 +431,10 @@ class AddComponentViewModel(
 
     private fun getComponentDtoData(): ComponentDto? {
         val locUiState = _uiState.value
+        val componentType = locUiState.chosenComponentType ?: return null
+
         return ComponentDto(
-            componentType = locUiState.chosenComponentType?.belongsTo?.name ?: return null,
+            componentType = locUiState.chosenComponentType.belongsTo.name,
             type = locUiState.chosenComponentType.name,
             size = locUiState.chosenComponentType.size,
             topic = locUiState.chosenTopic?.toDto(),
@@ -441,11 +443,29 @@ class AddComponentViewModel(
             onSendAlternative = locUiState.settings[SettingType.OnSendAlternative]?.inputFieldData?.text,
             maxValue = locUiState.settings[SettingType.MaxValue]?.inputFieldData?.text,
             minValue = locUiState.settings[SettingType.MinValue]?.inputFieldData?.text,
-            actionDestinationDTO = locUiState.settings[SettingType.ActionDestination]?.inputFieldData?.text?.let {
-                ActionDestinationDTO(type = EActionDestinationType.NOTIFICATION, token = it)
-            } ?: locUiState.discordChannels.toActionDestinationDTO() ?: getEmailActionDestinationDto(),
+            actionDestinationDTO = getActionDestinationDto(componentType),
             pattern = locUiState.settings[SettingType.Description]?.inputFieldData?.text
         )
+    }
+
+    private fun getActionDestinationDto(
+        chosenComponentType: ComponentDetailedType
+    ): ActionDestinationDTO? {
+        return when (chosenComponentType) {
+            ComponentDetailedType.Discord -> _uiState.value.discordChannels.toActionDestinationDTO()
+
+            ComponentDetailedType.Email -> getEmailActionDestinationDto()
+
+            ComponentDetailedType.Slack -> getSlackActionDestinationDto()
+
+            ComponentDetailedType.Telegram -> getTelegramActionDestinationDto()
+
+            ComponentDetailedType.Notification -> _uiState.value.settings[SettingType.ActionDestination]?.inputFieldData?.text?.let {
+                ActionDestinationDTO(type = EActionDestinationType.NOTIFICATION, token = it)
+            }
+
+            else -> null
+        }
     }
 
     private fun List<DiscordChannel>.toActionDestinationDTO(): ActionDestinationDTO? {
@@ -460,6 +480,22 @@ class AddComponentViewModel(
         return ActionDestinationDTO(
             type = EActionDestinationType.EMAIL,
             token = uiState.value.settings[SettingType.Title]?.inputFieldData?.text ?: return null
+        )
+    }
+
+    private fun getSlackActionDestinationDto(): ActionDestinationDTO? {
+        return ActionDestinationDTO(
+            type = EActionDestinationType.SLACK,
+            token = uiState.value.settings[SettingType.Token1]?.inputFieldData?.text ?: return null
+        )
+    }
+
+    private fun getTelegramActionDestinationDto(): ActionDestinationDTO? {
+        val token1 = uiState.value.settings[SettingType.Token1]?.inputFieldData?.text ?: return null
+        val token2 = uiState.value.settings[SettingType.Token2]?.inputFieldData?.text ?: return null
+        return ActionDestinationDTO(
+            type = EActionDestinationType.TELEGRAM,
+            token = "$token1;$token2"
         )
     }
 
@@ -685,6 +721,51 @@ class AddComponentViewModel(
                 )
             )
 
+            ComponentDetailedType.Slack -> mapOf(
+                SettingType.Token1 to SettingData(
+                    title = R.string.a_s71,
+                    description = R.string.a_s72,
+                    linkText = R.string.a_s73,
+                    link = "https://api.slack.com/messaging/webhooks",
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                ),
+                SettingType.Description to SettingData(
+                    title = R.string.a_s52,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
+
+            ComponentDetailedType.Telegram -> mapOf(
+                SettingType.Token1 to SettingData(
+                    title = R.string.a_s74,
+                    description = R.string.a_s75,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                ),
+                SettingType.Token2 to SettingData(
+                    title = R.string.a_s76,
+                    description = R.string.a_s77,
+                    linkText = R.string.a_s78,
+                    link = "https://core.telegram.org/bots/features#creating-a-new-bot",
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    )
+                ),
+                SettingType.Description to SettingData(
+                    title = R.string.a_s52,
+                    inputFieldData = InputFieldData(
+                        label = R.string.s34
+                    ),
+                    isDescription = true
+                )
+            )
+
             else -> emptyMap()
 
         }
@@ -765,6 +846,16 @@ class AddComponentViewModel(
             type = ComponentDetailedType.Email
         ),
         ComponentChoiceData(
+            titleId = R.string.a_s69,
+            iconRes = R.drawable.ic_slack,
+            type = ComponentDetailedType.Slack
+        ),
+        ComponentChoiceData(
+            titleId = R.string.a_s70,
+            iconRes = R.drawable.ic_telegram,
+            type = ComponentDetailedType.Telegram
+        ),
+        ComponentChoiceData(
             titleId = R.string.a_s56,
             iconRes = R.drawable.ic_notification,
             type = ComponentDetailedType.Notification
@@ -785,6 +876,8 @@ class AddComponentViewModel(
     data class SettingData(
         @StringRes val title: Int,
         @StringRes val description: Int? = null,
+        @StringRes val linkText: Int? = null,
+        val link: String? = null,
         val inputFieldData: InputFieldData,
         val isDescription: Boolean = false
     )
@@ -803,6 +896,8 @@ class AddComponentViewModel(
         MinValue,
         Description,
         Title,
+        Token1,
+        Token2,
         ActionDestination
     }
 

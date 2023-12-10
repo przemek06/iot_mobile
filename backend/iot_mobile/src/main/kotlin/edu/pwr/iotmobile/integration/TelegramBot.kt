@@ -13,11 +13,9 @@ class TelegramBot {
 
     val uriPattern = "https://api.telegram.org/bot{token}/sendMessage"
     val objectMapper = ObjectMapper()
-    fun sendMessageToChannel(token: String, message: String) {
+    fun sendMessageToChannel(token: String, message: String, chatId: String) {
 
-        val chatId = getChatId(token)
-        val botToken = getBotToken(token)
-        val uri = createURI(botToken)
+        val uri = createURI(token)
 
         val data = mapOf("text" to message, "chat_id" to chatId)
         val payload = objectMapper.writeValueAsString(data)
@@ -36,15 +34,8 @@ class TelegramBot {
         }
     }
 
-    fun getBotToken(token: String): String {
-        return token.split(";")[1]
-    }
 
-    fun getChatId(token: String): String {
-        return token.split(";")[0]
-    }
-
-    fun createURI(botToken: String): String {
-        return uriPattern.replace("{token}", botToken)
+    fun createURI(token: String): String {
+        return uriPattern.replace("{token}", token)
     }
 }

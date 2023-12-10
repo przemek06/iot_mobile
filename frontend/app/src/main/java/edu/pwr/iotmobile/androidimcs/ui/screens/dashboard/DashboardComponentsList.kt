@@ -64,8 +64,10 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.GraphCompon
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.NotificationComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.PhotoComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ReleaseButtonComponent
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SlackComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.SliderComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.Speedometer
+import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.TelegramComponent
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.components.ToggleComponent
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -262,6 +264,22 @@ fun LazyStaggeredGridItemScope.ComponentChoice(
         )
 
         ComponentDetailedType.Notification -> NotificationComponent(
+            item = item,
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+
+        ComponentDetailedType.Slack -> SlackComponent(
+            item = item,
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            onPlaceItem = onPlaceItem,
+            coroutineScope = coroutineScope
+        )
+
+        ComponentDetailedType.Telegram -> TelegramComponent(
             item = item,
             uiState = uiState,
             uiInteraction = uiInteraction,
