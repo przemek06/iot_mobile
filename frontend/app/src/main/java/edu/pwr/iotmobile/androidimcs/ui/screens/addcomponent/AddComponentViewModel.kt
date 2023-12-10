@@ -486,16 +486,15 @@ class AddComponentViewModel(
     private fun getSlackActionDestinationDto(): ActionDestinationDTO? {
         return ActionDestinationDTO(
             type = EActionDestinationType.SLACK,
-            token = uiState.value.settings[SettingType.Token1]?.inputFieldData?.text ?: return null
+            token = uiState.value.settings[SettingType.Token]?.inputFieldData?.text ?: return null
         )
     }
 
     private fun getTelegramActionDestinationDto(): ActionDestinationDTO? {
-        val token1 = uiState.value.settings[SettingType.Token1]?.inputFieldData?.text ?: return null
-        val token2 = uiState.value.settings[SettingType.Token2]?.inputFieldData?.text ?: return null
+        val token = uiState.value.settings[SettingType.Token]?.inputFieldData?.text ?: return null
         return ActionDestinationDTO(
             type = EActionDestinationType.TELEGRAM,
-            token = "$token1;$token2"
+            token = token
         )
     }
 
@@ -722,7 +721,7 @@ class AddComponentViewModel(
             )
 
             ComponentDetailedType.Slack -> mapOf(
-                SettingType.Token1 to SettingData(
+                SettingType.Token to SettingData(
                     title = R.string.a_s71,
                     description = R.string.a_s72,
                     linkText = R.string.a_s73,
@@ -741,14 +740,7 @@ class AddComponentViewModel(
             )
 
             ComponentDetailedType.Telegram -> mapOf(
-                SettingType.Token1 to SettingData(
-                    title = R.string.a_s74,
-                    description = R.string.a_s75,
-                    inputFieldData = InputFieldData(
-                        label = R.string.s34
-                    )
-                ),
-                SettingType.Token2 to SettingData(
+                SettingType.Token to SettingData(
                     title = R.string.a_s76,
                     description = R.string.a_s77,
                     linkText = R.string.a_s78,
@@ -896,8 +888,7 @@ class AddComponentViewModel(
         MinValue,
         Description,
         Title,
-        Token1,
-        Token2,
+        Token,
         ActionDestination
     }
 
