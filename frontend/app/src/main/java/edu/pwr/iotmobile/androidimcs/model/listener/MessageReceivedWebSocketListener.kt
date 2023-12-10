@@ -17,7 +17,7 @@ class MessageReceivedWebSocketListener(
     onMessageReceived: (data: MessageDto) -> Unit
 ) {
     private val request = Request.Builder()
-        .url("ws://${BuildConfig.APP_NETWORK}:8080/messages") // Replace with your server URL and WebSocket endpoint
+        .url("ws://${BuildConfig.APP_NETWORK}/messages") // Replace with your server URL and WebSocket endpoint
         .build()
 
     private val webSocket = client.newWebSocket(request, object : WebSocketListener() {
@@ -35,8 +35,12 @@ class MessageReceivedWebSocketListener(
             // Update your UI or perform any other necessary tasks
             Log.d("WebSocket", "Message received")
             Log.d("WebSocket", text)
-            val obj = Gson().fromJson(text, MessageDto::class.java)
-            onMessageReceived(obj)
+            try {
+                val obj = Gson().fromJson(text, MessageDto::class.java)
+                onMessageReceived(obj)
+            } catch (e: Exception) {
+                Log.e("WebSocket", "Could not convert fromJson.", e)
+            }
             return
         }
 

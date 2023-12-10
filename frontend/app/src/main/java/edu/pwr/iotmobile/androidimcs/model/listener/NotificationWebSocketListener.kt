@@ -3,7 +3,6 @@ package edu.pwr.iotmobile.androidimcs.model.listener
 import android.util.Log
 import com.google.gson.Gson
 import edu.pwr.iotmobile.androidimcs.BuildConfig
-import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
 import edu.pwr.iotmobile.androidimcs.data.dto.NotificationDto
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,11 +11,11 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 
 class NotificationWebSocketListener(
-    private val client: OkHttpClient,
+    client: OkHttpClient,
     private val onNotificationReceived: (data: NotificationDto) -> Unit
 ) {
     private val request = Request.Builder()
-        .url("ws://${BuildConfig.APP_NETWORK}:8080/notifications")
+        .url("ws://${BuildConfig.APP_NETWORK}/notifications")
         .build()
 
     private val webSocket = client.newWebSocket(request, object : WebSocketListener() {
@@ -28,7 +27,11 @@ class NotificationWebSocketListener(
         override fun onMessage(webSocket: WebSocket, text: String) {
             Log.d("Notification", "onNotification WebSocket called")
             Log.d("Notification", "text: $text")
-            onNotificationReceived(Gson().fromJson(text, NotificationDto::class.java))
+            try {
+                onNotificationReceived(Gson().fromJson(text, NotificationDto::class.java))
+            } catch (e: Exception) {
+                Log.e("WebSocket", "Could not convert fromJson.", e)
+            }
             return
         }
 

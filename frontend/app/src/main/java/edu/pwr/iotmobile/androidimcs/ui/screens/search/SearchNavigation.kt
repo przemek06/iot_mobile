@@ -2,7 +2,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.search
 
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
-import edu.pwr.iotmobile.androidimcs.extensions.asEnum
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.asEnum
 import edu.pwr.iotmobile.androidimcs.ui.navigation.getArguments
 
 interface SearchNavigation {
@@ -24,6 +24,10 @@ interface SearchNavigation {
 
             override fun goBack() {
                 navController.popBackStack()
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    "userResultStatus",
+                    true
+                )
             }
         }
     }

@@ -2,7 +2,6 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.invitations
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +19,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.InvitationData
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
@@ -33,12 +31,9 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun InvitationsScreen(navigation: InvitationsNavigation) {
-
     val viewModel = koinViewModel<InvitationsViewModel>()
     val uiState by viewModel.uiState.collectAsState()
     val uiInteraction = InvitationsUiInteraction.default(viewModel)
-
-    viewModel.init()
 
     InvitationsScreenContent(
         uiState = uiState,
@@ -53,42 +48,42 @@ private fun InvitationsScreenContent(
     uiInteraction: InvitationsUiInteraction,
     navigation: InvitationsNavigation
 ) {
-
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         TopBar(text = stringResource(id = R.string.show_invitations)) {
             navigation.goBack()
         }
-        if(uiState.invitations.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(Dimensions.space22)
-            ) {
-                item {
-                    Text(
-                        text = stringResource(id = R.string.invitations_1),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    Dimensions.space22.HeightSpacer()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = Dimensions.space22)
+        ) {
+            if (uiState.invitations.isNotEmpty()) {
+                LazyColumn {
+                    item {
+                        Text(
+                            text = stringResource(id = R.string.invitations_1),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Dimensions.space22.HeightSpacer()
+                    }
+                    items(uiState.invitations) {
+                        InvitationCard(
+                            invitation = it,
+                            uiInteraction = uiInteraction
+                        )
+                        Dimensions.space22.HeightSpacer()
+                    }
                 }
-                items(uiState.invitations) {
-                    InvitationCard(
-                        invitation = it,
-                        uiInteraction = uiInteraction
-                    )
-                    Spacer(modifier = Modifier)
-                }
+            } else {
+                Text(
+                    text = stringResource(id = R.string.invitations_2),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
-        }
-        else {
-            Text(
-                text = stringResource(id = R.string.invitations_2),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onBackground
-            )
         }
     }
 }

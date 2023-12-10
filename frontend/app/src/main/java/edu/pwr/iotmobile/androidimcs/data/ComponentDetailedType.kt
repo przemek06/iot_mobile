@@ -13,7 +13,7 @@ enum class ComponentDetailedType(
     Email(ComponentType.TRIGGER, 1),
     Slack(ComponentType.TRIGGER, 1),
     Telegram(ComponentType.TRIGGER, 1),
-    LineGraph(ComponentType.OUTPUT, 2),
     Notification(ComponentType.TRIGGER, 1),
+    LineGraph(ComponentType.OUTPUT, 2),
     SpeedGraph(ComponentType.OUTPUT, 2)
 }

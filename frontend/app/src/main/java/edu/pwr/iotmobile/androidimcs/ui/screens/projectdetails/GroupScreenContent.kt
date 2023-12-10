@@ -144,10 +144,12 @@ private fun LazyItemScope.Member(
     user: UserInfoDto,
     role: UserProjectRole,
 ) {
-    when(role) {
-        UserProjectRole.ADMIN -> AdminMember(user = user)
-        UserProjectRole.EDITOR -> EditorMember(user = user)
-        else -> UserNameText(user = user)
+    EmailWrapper(user) {
+        when (role) {
+            UserProjectRole.ADMIN -> AdminMember(user = user)
+            UserProjectRole.EDITOR -> EditorMember(user = user)
+            else -> UserNameText(user = user)
+        }
     }
 }
 
@@ -180,4 +182,19 @@ private fun UserNameText(user: UserInfoDto) {
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onBackground
     )
+}
+
+@Composable
+private fun EmailWrapper(
+    user: UserInfoDto,
+    content: @Composable () -> Unit
+) {
+    Column {
+        content()
+        Text(
+            text = user.email,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
 }

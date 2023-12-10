@@ -2,7 +2,7 @@ package edu.pwr.iotmobile.androidimcs.data
 
 import edu.pwr.iotmobile.androidimcs.UserStore
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
-import edu.pwr.iotmobile.androidimcs.extensions.asEnum
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.asEnum
 
 data class User(
     val id: Int,

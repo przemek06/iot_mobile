@@ -117,7 +117,8 @@ private fun LoginScreenContent(
                     label = stringResource(id = data.label),
                     errorText = stringResource(id = data.errorMessage),
                     isError = data.isError,
-                    onValueChange = { uiInteraction.onTextChange(inputField.key, it) }
+                    onValueChange = { uiInteraction.onTextChange(inputField.key, it) },
+                    keyboardOptions = data.keyboardOptions
                 )
             }
             Dimensions.space18.HeightSpacer()

@@ -1,4 +1,4 @@
-package edu.pwr.iotmobile.androidimcs.extensions
+package edu.pwr.iotmobile.androidimcs.helpers.extensions
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource

@@ -17,8 +17,8 @@
     <string name="add_component">Add component</string>
     <string name="how_to_access">How to access?</string>
     <string name="how_to_access_1">How to access topic?</string>
-    <string name="how_to_access_2">To access a topic from your IoT device, append the topic name to the connection link of the project. Gain authorization by providing the connection string in your setup code.</string>
-    <string name="how_to_access_3">Connection string and link can be found by clicking the info icon next to the project name.</string>
+    <string name="how_to_access_2">To access a topic from your IoT device, use the connection key and topic name when creating connection with the WebSocket.</string>
+    <string name="how_to_access_3">The connection key can be found upon clicking the “Show access” button located on this screen.</string>
     <string name="delete_project">Delete project</string>
     <string name="show_access">Show access</string>
     <string name="dashboards">dashboards</string>
@@ -271,4 +271,7 @@
     <string name="s110">You can find the Connection key in Project details, under Show Access button.\nUse it in the code of your IoT device to start listening and sending messages through topics.</string>
     <string name="s111">You can now interact with the component on your mobile app, and observe how messages sent affect your IoT device and vice versa!</string>
     <string name="s112">Create your first project now!</string>
+    <string name="s113">Are you sure you want to leave this project (%s)?</string>
+    <string name="s114">You will lose access to all of the resources in this project.</string>
+    <string name="s115">An account with this email already exists.</string>
 </resources>

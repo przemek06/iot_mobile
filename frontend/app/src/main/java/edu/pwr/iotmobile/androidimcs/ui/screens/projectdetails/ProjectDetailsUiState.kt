@@ -23,6 +23,7 @@ data class ProjectDetailsUiState(
     val isDialogVisible: Boolean,
     val isAddDialogVisible: Boolean = false,
     val isDeleteProjectDialogVisible: Boolean = false,
+    val isLeaveProjectDialogVisible: Boolean = false,
     val inputFieldDashboard: InputFieldData,
     val projectData: ProjectData,
     val isLoading: Boolean = true,

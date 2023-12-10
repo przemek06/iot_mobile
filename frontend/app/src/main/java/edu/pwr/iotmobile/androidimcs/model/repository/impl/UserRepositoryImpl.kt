@@ -92,7 +92,7 @@ class UserRepositoryImpl(
         Log.d(TAG, "register result code: $resultCode")
         return when (resultCode) {
             200 -> RegisterUserResult.Success
-            400 -> RegisterUserResult.AccountExists
+            409 -> RegisterUserResult.AccountExists
             else -> RegisterUserResult.Failure
         }
     }
