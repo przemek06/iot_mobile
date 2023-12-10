@@ -13,7 +13,7 @@ import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
-import edu.pwr.iotmobile.androidimcs.extensions.asEnum
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.asEnum
 import java.time.LocalDateTime
 
 data class DashboardUiState(

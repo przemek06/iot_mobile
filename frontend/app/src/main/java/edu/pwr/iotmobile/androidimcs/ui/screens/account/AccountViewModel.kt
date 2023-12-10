@@ -10,7 +10,7 @@ import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
-import edu.pwr.iotmobile.androidimcs.service.ServiceManager
+import edu.pwr.iotmobile.androidimcs.model.service.ServiceManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

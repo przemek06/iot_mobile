@@ -30,7 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.model.listener.InvitationAlertWebSocketListener
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
-import edu.pwr.iotmobile.androidimcs.service.ServiceManager
+import edu.pwr.iotmobile.androidimcs.model.service.ServiceManager
 import edu.pwr.iotmobile.androidimcs.ui.navigation.BottomNavigationBar
 import edu.pwr.iotmobile.androidimcs.ui.navigation.Screen
 import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme

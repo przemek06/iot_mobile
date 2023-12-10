@@ -16,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
-import edu.pwr.iotmobile.androidimcs.extensions.conditional
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.conditional
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

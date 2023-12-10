@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.extensions.conditional
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.conditional
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 

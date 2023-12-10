@@ -1,4 +1,4 @@
-package edu.pwr.iotmobile.androidimcs.service
+package edu.pwr.iotmobile.androidimcs.model.service
 
 import android.app.NotificationManager
 import android.app.Service

@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import edu.pwr.iotmobile.androidimcs.extensions.conditional
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.conditional
 
 @Composable
 fun LoadingBox(

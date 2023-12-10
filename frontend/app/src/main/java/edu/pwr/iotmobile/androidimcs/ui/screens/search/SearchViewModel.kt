@@ -272,6 +272,7 @@ class SearchViewModel(
                     toast.toast("Successfully invited user.")
                     _uiState.update { it.copy(isDialogLoading = false) }
                     setDialogInvisible()
+                    updateList()
                     return@launch
                 }
                 toast.toast("Could not invite user.")
@@ -300,6 +301,7 @@ class SearchViewModel(
                     toast.toast("Successfully revoked access")
                     _uiState.update { it.copy(isDialogLoading = false) }
                     setDialogInvisible()
+                    updateList()
                     return@launch
                 }
                 toast.toast("Could not revoke access to user.")
