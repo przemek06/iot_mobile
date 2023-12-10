@@ -712,7 +712,7 @@ class AddComponentViewModel(
                 ),
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
-                    description = R.string.s421,
+                    description = R.string.s71,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),
@@ -732,6 +732,7 @@ class AddComponentViewModel(
                 ),
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
+                    description = R.string.s71,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),
@@ -751,6 +752,7 @@ class AddComponentViewModel(
                 ),
                 SettingType.Description to SettingData(
                     title = R.string.a_s52,
+                    description = R.string.s71,
                     inputFieldData = InputFieldData(
                         label = R.string.s34
                     ),
