@@ -125,6 +125,9 @@ private fun ActivateAccountScreenContent(
             InputField(
                 text = uiState.inputField.text,
                 label = stringResource(id = uiState.inputField.label),
+                errorText = stringResource(id = uiState.inputField.errorMessage),
+                isError = uiState.inputField.isError,
+                keyboardOptions = uiState.inputField.keyboardOptions,
                 onValueChange = { uiInteraction.onTextChange(text = it) }
             )
             Dimensions.space30.HeightSpacer()

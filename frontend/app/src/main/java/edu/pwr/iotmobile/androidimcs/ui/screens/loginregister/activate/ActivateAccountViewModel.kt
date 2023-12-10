@@ -1,8 +1,12 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate
 
 import android.util.Log
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 import edu.pwr.iotmobile.androidimcs.data.result.ActivateAccountResult
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
@@ -26,6 +30,18 @@ class ActivateAccountViewModel(
     fun init(email: String?) {
         if (email != _email) {
             _email = email
+
+            _uiState.update {
+                it.copy(
+                    inputField = InputFieldData(
+                        label = R.string.code,
+                        errorMessage = R.string.s5,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
+                )
+            }
         }
     }
 
