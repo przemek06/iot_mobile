@@ -12,8 +12,8 @@ interface DashboardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertDashboard(dashboard: DashboardEntity)
 
-    @Query("SELECT * FROM dashboards")
-    fun getAll(): List<DashboardEntity>
+    @Query("SELECT * FROM dashboards WHERE userId LIKE :userId")
+    fun getAllByUserId(userId: Int): List<DashboardEntity>
 
     @Query("SELECT * FROM dashboards WHERE dashboardId LIKE :id")
     fun getByDashboardId(id: Int): List<DashboardEntity>

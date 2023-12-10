@@ -2,9 +2,10 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserRole
-import edu.pwr.iotmobile.androidimcs.helpers.extensions.asEnum
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.asEnum
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
@@ -24,6 +25,8 @@ class MainScreenViewModel(
 
     private val _uiState = MutableStateFlow(MainScreenUiState())
     val uiState = _uiState.asStateFlow()
+
+    private var _user: User? = null
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
@@ -46,8 +49,9 @@ class MainScreenViewModel(
                     ) }
                     return@launch
                 }
+                _user = user
 
-                val dashboards = dashboardRepository.getLastAccessedDashboards().take(5).reversed()
+                val dashboards = dashboardRepository.getLastAccessedDashboardsByUserId(user.id).take(5).reversed()
 
                 _uiState.update { it.copy(
                     isInvitation = isInvitation,
@@ -64,9 +68,12 @@ class MainScreenViewModel(
     fun updateLastAccessed() {
         viewModelScope.launch(Dispatchers.Default) {
             kotlin.runCatching {
-                val dashboards = dashboardRepository.getLastAccessedDashboards().take(5).reversed()
-                _uiState.update {
-                    it.copy(dashboards = dashboards)
+                _user?.id?.let {
+                    val dashboards =
+                        dashboardRepository.getLastAccessedDashboardsByUserId(it).take(5).reversed()
+                    _uiState.update {
+                        it.copy(dashboards = dashboards)
+                    }
                 }
             }
         }

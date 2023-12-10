@@ -8,6 +8,6 @@ interface DashboardRepository {
     suspend fun createDashboard(dashboardDto: DashboardDto): CreateResult // 401 if not editor, 409 - if already exists
     suspend fun deleteDashboard(id: Int): Result<Unit>
     suspend fun getDashboardsByProjectId(projectId: Int): List<DashboardDto>
-    suspend fun getLastAccessedDashboards(): List<DashboardEntity>
+    suspend fun getLastAccessedDashboardsByUserId(userId: Int): List<DashboardEntity>
     suspend fun saveLastAccessedDashboard(dashboardEntity: DashboardEntity)
 }

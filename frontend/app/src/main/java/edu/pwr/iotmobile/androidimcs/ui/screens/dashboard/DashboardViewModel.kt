@@ -25,12 +25,14 @@ import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.MessageRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toComponentData
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData.Companion.toMessageDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -44,6 +46,7 @@ class DashboardViewModel(
     private val dashboardRepository: DashboardRepository,
     private val messageRepository: MessageRepository,
     private val projectRepository: ProjectRepository,
+    private val userRepository: UserRepository,
     private val client: OkHttpClient,
     val toast: Toast,
     val event: Event
@@ -77,12 +80,15 @@ class DashboardViewModel(
         // Save dashboard to last accessed
         projectId?.let {
             viewModelScope.launch(Dispatchers.IO) {
-                val entity = DashboardEntity(
-                    projectId = projectId,
-                    dashboardId = dashboardId,
-                    dashboardName = dashboardName,
-                )
                 try {
+                    val user = userRepository.getLoggedInUser().firstOrNull() ?: return@launch
+                    val entity = DashboardEntity(
+                        userId = user.id,
+                        projectId = projectId,
+                        dashboardId = dashboardId,
+                        dashboardName = dashboardName,
+                    )
+
                     dashboardRepository.saveLastAccessedDashboard(entity)
                 } catch (e: Exception) {
                     Log.e("LastAccessed", "Could not save dashboard $dashboardId to last accessed.", e)
