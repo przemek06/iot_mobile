@@ -19,7 +19,7 @@ interface ProjectRepository {
     suspend fun findAllPendingInvitationsForActiveUser(): List<InvitationDto>
     suspend fun acceptInvitation(id: Int): Result<InvitationDto>
     suspend fun rejectInvitation(id: Int): Result<InvitationDto>
-    suspend fun createInvitation(invitationDtoSend: InvitationDtoSend): Result<InvitationDto>
+    suspend fun createInvitation(invitationDtoSend: InvitationDtoSend): CreateResult
     suspend fun editProjectRole(projectRoleDto: ProjectRoleDto): Result<ProjectRoleDto>
     suspend fun getAllProjectRolesByProjectId(projectId: Int): List<ProjectRoleDto>
     suspend fun revokeAccess(
