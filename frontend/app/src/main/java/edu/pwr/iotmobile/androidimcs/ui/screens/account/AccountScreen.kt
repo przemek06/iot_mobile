@@ -208,7 +208,7 @@ private fun AccountScreenContent(
 }
 
 @Composable
-fun DisplayNameInputField(
+private fun DisplayNameInputField(
     uiState: AccountUiState,
     uiInteraction: AccountUiInteraction
 ) {
@@ -220,7 +220,7 @@ fun DisplayNameInputField(
 }
 
 @Composable
-fun AccountDeletionContent() {
+private fun AccountDeletionContent() {
     Text(
         text = stringResource(id = R.string.delete_account_desc),
         style = MaterialTheme.typography.bodyLarge,

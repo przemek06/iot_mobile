@@ -41,7 +41,10 @@ fun SearchScreen(navigation: SearchNavigation) {
     val uiInteraction = SearchUiInteraction.default(viewModel)
 
     LaunchedEffect(Unit) {
-        viewModel.init(navigation)
+        viewModel.init(
+            searchMode = navigation.mode,
+            projectId = navigation.projectId
+        )
     }
 
     val context = LocalContext.current
@@ -74,7 +77,7 @@ private fun SearchScreenContent(
 ) {
 
     if (uiState.isDialogVisible) {
-        val alternative = uiState.selectedUser?.let { !uiState.data.alternative(it) } == false
+        val alternative = uiState.selectedUser?.let { !uiState.data.isAlternative(it) } == false
         SimpleDialog(
             title = if (!alternative) { stringResource(
                     uiState.data.dialogTitle,
@@ -86,14 +89,8 @@ private fun SearchScreenContent(
             isLoading = uiState.isDialogLoading,
             onCloseDialog = { uiInteraction.setDialogInvisible() },
             onConfirm = {
-                if (!alternative) {
-                    uiState.selectedUser?.let {
-                        uiState.data.dialogButton2Function(it)
-                    }
-                } else {
-                    uiState.selectedUser?.let {
-                        uiState.data.dialogButton2FunctionAlternative(it)
-                    }
+                uiState.selectedUser?.let {
+                    uiState.data.dialogButtonFunction(it)
                 }
             }
         ) {
@@ -128,7 +125,7 @@ private fun SearchScreenContent(
             Dimensions.space10.HeightSpacer()
 
             SearchField(
-                text = uiState.searchInputFieldData,
+                text = uiState.searchedText,
                 modifier = Modifier.fillMaxWidth()
             ) { uiInteraction.onTextChange(it) }
 
@@ -139,14 +136,16 @@ private fun SearchScreenContent(
                     ActionOption(
                         user = it,
                         userProjectRole = UserProjectRole.VIEWER,
-                        buttonText = if (!uiState.data.alternative(it)) {
+                        buttonText = if (!uiState.data.isAlternative(it)) {
                             stringResource(uiState.data.buttonText)
                         } else {
                             stringResource(uiState.data.buttonTextAlternative)
                         }
                     ) {
                         uiInteraction.setSelectedUser(it)
-                        if (uiState.data.buttonFunction(it) == null)
+                        if (uiState.data.buttonFunction != null)
+                            uiState.data.buttonFunction.let { it1 -> it1(it) }
+                        else
                             uiInteraction.setDialogVisible()
                     }
                     Dimensions.space10.HeightSpacer()

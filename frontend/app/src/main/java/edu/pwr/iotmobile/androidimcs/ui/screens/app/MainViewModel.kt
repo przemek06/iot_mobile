@@ -2,6 +2,7 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.pwr.iotmobile.androidimcs.data.UserRole
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
@@ -27,7 +28,10 @@ class MainViewModel(
             kotlin.runCatching {
                 userRepository.getLoggedInUser().collect { user ->
                     _uiState.update {
-                        it.copy(isUserLoggedIn = user != null)
+                        it.copy(
+                            isUserLoggedIn = user != null,
+                            isUserAdmin = user?.role == UserRole.ADMIN_ROLE
+                        )
                     }
 
                     if (_uiState.value.isLoading) {

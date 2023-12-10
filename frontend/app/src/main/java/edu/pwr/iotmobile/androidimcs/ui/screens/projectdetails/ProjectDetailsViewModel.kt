@@ -93,9 +93,7 @@ class ProjectDetailsViewModel(
                     _userProjectRole = projectRole
 
                     val roles = projectRepository
-                        .findAllProjectRolesByProjectId(localProjectId)
-                        .getOrNull()
-                        ?: emptyList()
+                        .getAllProjectRolesByProjectId(localProjectId)
 
                     val projectData = projectRepository
                         .getProjectById(localProjectId)
@@ -226,11 +224,14 @@ class ProjectDetailsViewModel(
         viewModelScope.launch(Dispatchers.Default) {
             kotlin.runCatching {
                 topicRepository.deleteTopic(id)
-            }.onSuccess {
-                updateTopics()
+            }.onSuccess { result ->
+                if (result.isSuccess)
+                    updateTopics()
+                else
+                    toast.toast("Could not delete topic - check if it is used by any component.")
             }.onFailure {
-                Log.d(TAG, "Delete topic error")
-                toast.toast("Could not delete topic.")
+                Log.e(TAG, "Delete topic error", it)
+                toast.toast("Could not delete topic - check if it is used by any component.")
             }
             _uiState.update { it.copy(isDialogLoading = false) }
         }

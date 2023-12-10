@@ -67,6 +67,7 @@ class LoginViewModel(
                 when (result) {
                     LoginUserResult.Success -> event.event(LOGIN_SUCCESS_EVENT)
                     LoginUserResult.AccountInactive -> event.event(LOGIN_ACCOUNT_INACTIVE_EVENT)
+                    LoginUserResult.UserBanned -> toast.toast("You have been banned from using this service.")
                     LoginUserResult.Failure -> toast.toast("Email or password incorrect.")
                 }
             }.onFailure {

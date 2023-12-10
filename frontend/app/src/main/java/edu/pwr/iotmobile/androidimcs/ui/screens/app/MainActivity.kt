@@ -126,8 +126,9 @@ private fun AppContent(isInvitation: Boolean) {
     viewModel.toast.CollectToast(context)
 
     val startDestination =
-        if (uiState.isUserLoggedIn) Screen.Main.path
-        else Screen.Login.path
+        if (!uiState.isUserLoggedIn) Screen.Login.path
+        else if (uiState.isUserAdmin) Screen.Admin.path
+        else Screen.Main.path
 
     AnimatedVisibility(visible = !uiState.isLoading) {
         BottomNavigationBar(

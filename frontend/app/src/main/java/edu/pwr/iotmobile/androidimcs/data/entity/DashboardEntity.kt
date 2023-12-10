@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class DashboardEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val userId: Int,
     val dashboardId: Int,
     val projectId: Int,
     val dashboardName: String,

@@ -105,13 +105,16 @@ class ProjectRepositoryImpl(
             Result.failure(Exception("Rejecting invitation failed"))
     }
 
-    override suspend fun createInvitation(invitationDtoSend: InvitationDtoSend): Result<InvitationDto> {
+    override suspend fun createInvitation(invitationDtoSend: InvitationDtoSend): CreateResult {
         val result = remoteDataSource.createInvitation(invitationDtoSend)
-        val body = result.body()
-        return if (result.isSuccessful && body != null)
-            Result.success(body)
-        else
-            Result.failure(Exception("Create invitation failed"))
+        val code = result.code()
+        Log.d("ProjectRepo", "createInvitation result code: $code")
+        return when (result.code()) {
+            200 -> CreateResult.Success
+            401 -> CreateResult.NotAuthorized
+            409 -> CreateResult.AlreadyExists
+            else -> CreateResult.Failure
+        }
     }
 
     override suspend fun editProjectRole(projectRoleDto: ProjectRoleDto): Result<ProjectRoleDto> {
@@ -123,13 +126,13 @@ class ProjectRepositoryImpl(
             Result.failure(Exception("Editing project role failed"))
     }
 
-    override suspend fun findAllProjectRolesByProjectId(projectId: Int): Result<List<ProjectRoleDto>> {
+    override suspend fun getAllProjectRolesByProjectId(projectId: Int): List<ProjectRoleDto> {
         val result = remoteDataSource.findAllProjectRolesByProjectId(projectId)
         val body = result.body()
         return if (result.isSuccessful && body != null)
-            Result.success(body)
+            body
         else
-            Result.failure(Exception("Getting roles failed"))
+            emptyList()
     }
 
     override suspend fun revokeAccess(projectId: Int, userId: Int): Result<Unit> {

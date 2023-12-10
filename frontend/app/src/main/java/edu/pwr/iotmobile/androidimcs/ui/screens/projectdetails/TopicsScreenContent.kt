@@ -130,7 +130,10 @@ private fun DeleteTopicDialog(
             confirmButtonText = stringResource(id = R.string.yes),
             isLoading = uiState.isDialogLoading,
             onCloseDialog = onCloseDialog,
-            onConfirm = { uiInteraction.deleteTopic(topic.id) }
+            onConfirm = {
+                uiInteraction.deleteTopic(topic.id)
+                onCloseDialog()
+            }
         ) {
             Text(
                 text = stringResource(id = R.string.delete_account_desc2) + ".",

@@ -63,7 +63,11 @@ class UserRepositoryImpl(
 
                 LoginUserResult.Success
             }
+
+            401 -> LoginUserResult.UserBanned
+
             403 -> LoginUserResult.AccountInactive
+
             else -> LoginUserResult.Failure
         }
     }
@@ -120,13 +124,13 @@ class UserRepositoryImpl(
             Result.failure(Exception("Get user info failed"))
     }
 
-    override suspend fun getAllUserInfo(): Result<List<UserInfoDto>> {
+    override suspend fun getAllUserInfo(): List<UserInfoDto> {
         val response = remoteDataSource.getAllUserInfo()
         val body = response.body()
         return if (response.isSuccessful && body != null)
-            Result.success(body)
+            body
         else
-            Result.failure(Exception("Get all user info failed"))
+            emptyList()
     }
 
     override suspend fun verifyUser(code: String): ActivateAccountResult {
