@@ -141,7 +141,7 @@ class ProjectService(
 
     fun revokeAccess(projectId: Int, userId: Int): Boolean {
         val activeUserId = userService.getActiveUserId() ?: throw NoAuthenticationException()
-        if ((!isActiveUserProjectAdmin(projectId)) and (userId != activeUserId))
+        if (((!isActiveUserProjectAdmin(projectId)) && (userId != activeUserId)) || (isProjectOwner(userId, projectId)))
             throw NotAllowedException()
 
         val projectRole = projectRoleRepository.findByUserIdAndProjectId(userId, projectId)
