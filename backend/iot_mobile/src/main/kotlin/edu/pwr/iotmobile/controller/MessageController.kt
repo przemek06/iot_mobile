@@ -19,6 +19,11 @@ class MessageController(
         return ResponseEntity.ok(messageService.sendMessage(message))
     }
 
+    @PostMapping("/anon/messages/device")
+    fun sendMessageFromDevice(@RequestBody message: MessageDTO): ResponseEntity<MessageDTO> {
+        return ResponseEntity.ok(messageService.sendMessageFromDevice(message))
+    }
+
     @GetMapping("/user/messages/{dashboardId}/{n}")
     fun getLastMessagesForDashboard(
         @PathVariable dashboardId: Int,

@@ -1,5 +1,10 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package edu.pwr.iotmobile.androidimcs.ui.screens.projects
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,14 +16,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
+import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.Block
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -35,11 +46,23 @@ fun ProjectsScreen(
     val context = LocalContext.current
     viewModel.toast.CollectToast(context)
 
-    ProjectsScreenContent(
-        uiState = uiState,
-        uiInteraction = uiInteraction,
-        navigation = navigation
+    ErrorBox(
+        isVisible = uiState.isError,
+        onReturn = navigation::goBack
     )
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isError && !uiState.isLoading,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        ProjectsScreenContent(
+            uiState = uiState,
+            uiInteraction = uiInteraction,
+            navigation = navigation
+        )
+    }
 }
 
 @Composable
@@ -48,14 +71,23 @@ fun ProjectsScreenContent(
     uiInteraction: ProjectsUiInteraction,
     navigation: ProjectsNavigation
 ) {
+    val focusManager = LocalFocusManager.current
+    val keyboardFocus = KeyboardFocusController(
+        keyboardController = LocalSoftwareKeyboardController.current,
+        focusManager = focusManager
+    )
 
     if (uiState.isDialogVisible) {
         SimpleDialog(
             title = stringResource(R.string.add_new_project_dialog),
-            onCloseDialog = { uiInteraction.setDialogInvisible() },
-            onConfirm = {
-                uiInteraction.addNewProject(uiState.inputFiled.text)
+            isLoading = uiState.isDialogLoading,
+            onCloseDialog = {
+                keyboardFocus.clear()
                 uiInteraction.setDialogInvisible()
+            },
+            onConfirm = {
+                keyboardFocus.clear()
+                uiInteraction.addNewProject(uiState.inputFiled.text)
             }
         ) {
             Text(
@@ -110,6 +142,8 @@ private fun ProjectsInputField(
     InputField(
         text = uiState.inputFiled.text,
         label = stringResource(id = uiState.inputFiled.label),
+        isError = uiState.inputFiled.isError,
+        errorText = stringResource(id = uiState.inputFiled.errorMessage),
         onValueChange = { uiInteraction.onTextChange(it) }
     )
 }

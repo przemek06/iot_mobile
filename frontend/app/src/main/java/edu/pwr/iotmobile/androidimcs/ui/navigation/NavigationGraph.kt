@@ -1,10 +1,17 @@
 package edu.pwr.iotmobile.androidimcs.ui.navigation
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +29,8 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.DashboardScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.invitations.InvitationsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.invitations.InvitationsScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.learn.LearnScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.learn.LearnScreenNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateAccountScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordNavigation
@@ -31,6 +40,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreen
+import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreenNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsNavigation
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsScreen
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsNavigation
@@ -49,29 +59,31 @@ fun NavGraph(
         startDestination = startDestination,
         modifier = Modifier.padding(innerPadding)
     ) {
-        composable(Screen.Main.path) {
-            MainScreen()
+        slidingComposable(Screen.Main.path) {
+            MainScreen(
+                navigation = MainScreenNavigation.default(navController, it)
+            )
         }
 
-        composable(Screen.Projects.path) {
+        slidingComposable(Screen.Projects.path) {
             ProjectsScreen(
                 navigation = ProjectsNavigation.default(navController)
             )
         }
 
-        composable(Screen.Account.path) {
+        slidingComposable(Screen.Account.path) {
             AccountScreen(
                 navigation = AccountNavigation.default(navController)
             )
         }
 
-        composable(Screen.ChangePassword.path) {
+        slidingComposable(Screen.ChangePassword.path) {
             ChangePasswordScreen(
                 navigation = ChangePasswordNavigation.default(navController)
             )
         }
 
-        composable(Screen.ProjectDetails.path) { navBackStackEntry ->
+        slidingComposable(Screen.ProjectDetails.path) { navBackStackEntry ->
             ProjectDetailsScreen(
                 navigation = ProjectDetailsNavigation.default(
                     navController = navController,
@@ -80,32 +92,32 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.AddTopic.path) {
+        slidingComposable(Screen.AddTopic.path) {
             AddTopicScreen(navigation = AddTopicNavigation.default(
                 navController = navController,
                 navBackStackEntry = it
             ))
         }
 
-        composable(Screen.Login.path) {
+        slidingComposable(Screen.Login.path) {
             LoginScreen(
                 navigation = LoginNavigation.default(navController)
             )
         }
 
-        composable(Screen.Register.path) {
+        slidingComposable(Screen.Register.path) {
             RegisterScreen(
                 navigation = RegisterNavigation.default(navController)
             )
         }
 
-        composable(Screen.ForgotPassword.path) {
+        slidingComposable(Screen.ForgotPassword.path) {
             ForgotPasswordScreen(
                 navigation = ForgotPasswordNavigation.default(navController)
             )
         }
 
-        composable(Screen.ActivateAccount.path) {
+        slidingComposable(Screen.ActivateAccount.path) {
             ActivateAccountScreen(
                 navigation = ActivateAccountNavigation.default(
                     navController = navController,
@@ -114,11 +126,11 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.Admin.path) {
+        slidingComposable(Screen.Admin.path) {
             AdminScreen(navigation = AdminNavigation.default(navController))
         }
 
-        composable(Screen.Search.path) {
+        slidingComposable(Screen.Search.path) {
             SearchScreen(
                 navigation = SearchNavigation.default(
                     navController = navController,
@@ -127,7 +139,7 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.Dashboard.path) {
+        slidingComposable(Screen.Dashboard.path) {
             DashboardScreen(
                 navigation = DashboardNavigation.default(
                     navController = navController,
@@ -136,7 +148,7 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.AddComponent.path) {
+        slidingComposable(Screen.AddComponent.path) {
             AddComponentScreen(
                 navigation = AddComponentNavigation.default(
                     navController = navController,
@@ -144,15 +156,52 @@ fun NavGraph(
                 )
             )
         }
-        composable(Screen.Invitations.path) {
+
+        slidingComposable(Screen.Invitations.path) {
             InvitationsScreen(
                 navigation = InvitationsNavigation.default(navController)
             )
         }
-        composable(Screen.Invitations.path) {
-            InvitationsScreen(
-                navigation = InvitationsNavigation.default(navController)
+
+        slidingComposable(Screen.Learn.path) {
+            LearnScreen(
+                navigation = LearnScreenNavigation.default(navController)
             )
         }
+    }
+}
+
+private fun NavGraphBuilder.slidingComposable(
+    path: String,
+    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
+) {
+    composable(
+        route = path,
+        enterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700)
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700)
+            )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(700)
+            )
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(700)
+            )
+        }
+    ) {
+        content(this, it)
     }
 }

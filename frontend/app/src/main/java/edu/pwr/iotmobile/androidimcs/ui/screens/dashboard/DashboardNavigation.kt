@@ -13,7 +13,7 @@ interface DashboardNavigation {
     val dashboardId: Int?
     val dashboardName: String?
 
-    fun onReturn()
+    fun onReturn(isDashboardDeleted: Boolean = false)
     fun openAddComponentScreen(componentListDto: ComponentListDto)
 
     companion object {
@@ -28,8 +28,14 @@ interface DashboardNavigation {
             override val dashboardName: String?
                 get() = navBackStackEntry.getArguments().getOrNull(2)
 
-            override fun onReturn() {
+            override fun onReturn(isDashboardDeleted: Boolean) {
                 navController.popBackStack()
+                if (isDashboardDeleted) {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        "resultStatus",
+                        true
+                    )
+                }
             }
 
             override fun openAddComponentScreen(componentListDto: ComponentListDto) {

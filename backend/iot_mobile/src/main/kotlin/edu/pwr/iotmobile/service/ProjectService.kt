@@ -109,6 +109,12 @@ class ProjectService(
         return projectRepository.save(project).toDTO()
     }
 
+    fun findAllUsersByProjectIdNoSecurity(projectId: Int): List<UserInfoDTO> {
+        return projectRoleRepository
+            .findAllByProjectId(projectId)
+            .map { it.user.toUserInfoDTO() }
+    }
+
     fun findAllUsersByProjectId(projectId: Int): List<UserInfoDTO> {
         val projectUserList = projectRoleRepository.findAllByProjectId(projectId)
         val userIdList = projectUserList.map { it.user.id }
@@ -135,7 +141,7 @@ class ProjectService(
 
     fun revokeAccess(projectId: Int, userId: Int): Boolean {
         val activeUserId = userService.getActiveUserId() ?: throw NoAuthenticationException()
-        if ((!isActiveUserProjectAdmin(projectId)) and (userId != activeUserId))
+        if (((!isActiveUserProjectAdmin(projectId)) && (userId != activeUserId)) || (isProjectOwner(userId, projectId)))
             throw NotAllowedException()
 
         val projectRole = projectRoleRepository.findByUserIdAndProjectId(userId, projectId)

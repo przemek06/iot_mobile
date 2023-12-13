@@ -9,11 +9,12 @@ import edu.pwr.iotmobile.androidimcs.data.MenuOption
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.ActionDestinationDTO
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
-import edu.pwr.iotmobile.androidimcs.data.dto.EventSourceDTO
+import edu.pwr.iotmobile.androidimcs.data.dto.MessageDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toDto
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
-import edu.pwr.iotmobile.androidimcs.extensions.asEnum
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.asEnum
+import java.time.LocalDateTime
 
 data class DashboardUiState(
     val draggedComponentId: Int? = null,
@@ -21,6 +22,13 @@ data class DashboardUiState(
     val topics: List<Topic> = emptyList(),
     val menuOptionsList: List<MenuOption> = emptyList(),
     val userProjectRole: UserProjectRole? = null,
+    val isDeleteDashboardDialogVisible: Boolean = false,
+    val deleteComponentId: Int? = null,
+    val infoComponentId: Int? = null,
+    val isLoading: Boolean = true,
+    val isDialogLoading: Boolean = false,
+    val isError: Boolean = false,
+    val isEditMode: Boolean = false,
 )
 
 data class ComponentData(
@@ -30,38 +38,51 @@ data class ComponentData(
     val index: Int,
     val size: Int,
 
+    val currentValue: String?,
+    val currentValueReceivedAt: String?,
+    val graphData: List<Pair<LocalDateTime, Float>> = emptyList(),
+
     val absolutePosition: Offset = Offset.Zero,
-    val isFullLine: Boolean = false,
 
     val componentType: ComponentType,
-    val type: ComponentDetailedType,
+    val detailedType: ComponentDetailedType,
 
     val topic: Topic? = null,
 
-    val onSendValue: Any? = null,
-    val onSendAlternativeValue: Any? = null,
-    val maxValue: Any? = null,
-    val minValue: Any? = null,
+    val onSendValue: String? = null,
+    val onSendAlternativeValue: String? = null,
+    val maxValue: String? = null,
+    val minValue: String? = null,
 
     val actionDestinationDTO: ActionDestinationDTO? = null,
-    val eventSourceDTO: EventSourceDTO? = null
+    val pattern: String? = null
 ) {
     companion object {
-        fun ComponentDto.toComponentData(): ComponentData? {
+        fun ComponentDto.toComponentData(
+            currentValue: MessageDto? = null,
+            graphData: List<Pair<LocalDateTime, Float>> = emptyList()
+        ): ComponentData? {
+            val componentDetailedType = type.asEnum<ComponentDetailedType>() ?: return null
+            val componentType = componentType.asEnum<ComponentType>() ?: return null
+
             return ComponentData(
                 id = id ?: return null,
                 name = name ?: "",
                 index = index,
                 size = size,
-                componentType = componentType.asEnum<ComponentType>() ?: return null,
-                type = type.asEnum<ComponentDetailedType>() ?: return null,
+                height = if (componentDetailedType == ComponentDetailedType.SpeedGraph || componentDetailedType == ComponentDetailedType.LineGraph) 240.dp else 140.dp,// if (componentType == ComponentType.OUTPUT) 240.dp else 140.dp,
+                currentValue = currentValue?.message,
+                currentValueReceivedAt = currentValue?.tsSent,
+                graphData = graphData,
+                componentType = componentType,
+                detailedType = componentDetailedType,
                 topic = topic?.toTopic(),
                 onSendValue = onSendValue,
-                onSendAlternativeValue = onSendAlternativeValue,
+                onSendAlternativeValue = onSendAlternative,
                 maxValue = maxValue,
                 minValue = minValue,
                 actionDestinationDTO = actionDestinationDTO,
-                eventSourceDTO = eventSourceDTO
+                pattern = pattern
             )
         }
 
@@ -72,14 +93,23 @@ data class ComponentData(
                 index = index,
                 size = size,
                 componentType = componentType.name,
-                type = type.name,
+                type = detailedType.name,
                 topic = topic?.toDto(),
                 onSendValue = onSendValue.toString(),
-                onSendAlternativeValue = onSendAlternativeValue.toString(),
+                onSendAlternative = onSendAlternativeValue.toString(),
                 maxValue = maxValue.toString(),
                 minValue = minValue.toString(),
                 actionDestinationDTO = actionDestinationDTO,
-                eventSourceDTO = eventSourceDTO,
+                pattern = pattern
+            )
+        }
+
+        fun ComponentData.toMessageDto(value: String, connectionKey: String?): MessageDto? {
+            return MessageDto(
+                topic = topic?.toDto() ?: return null,
+                message = value,
+                connectionKey = connectionKey ?: return null,
+                tsSent = LocalDateTime.now().toString()
             )
         }
     }

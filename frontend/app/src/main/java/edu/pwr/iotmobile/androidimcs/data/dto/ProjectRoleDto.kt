@@ -1,7 +1,7 @@
 package edu.pwr.iotmobile.androidimcs.data.dto
 
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
-import edu.pwr.iotmobile.androidimcs.extensions.asEnum
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.asEnum
 
 data class ProjectRoleDto(
     val id: Int? = null,

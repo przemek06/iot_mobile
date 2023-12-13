@@ -2,6 +2,9 @@
 
 package edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +31,7 @@ import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.OrDivider
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
@@ -43,14 +47,22 @@ fun ForgotPasswordScreen(navigation: ForgotPasswordNavigation) {
     val context = LocalContext.current
     viewModel.toast.CollectToast(context)
 
-    if (uiState.isSuccess) {
-        ForgotPasswordSuccess(navigation)
-    } else {
-        ForgotPasswordScreenContent(
-            uiState = uiState,
-            uiInteraction = uiInteraction,
-            navigation = navigation
-        )
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isLoading,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        if (uiState.isSuccess) {
+            ForgotPasswordSuccess(navigation)
+        } else {
+            ForgotPasswordScreenContent(
+                uiState = uiState,
+                uiInteraction = uiInteraction,
+                navigation = navigation
+            )
+        }
     }
 }
 

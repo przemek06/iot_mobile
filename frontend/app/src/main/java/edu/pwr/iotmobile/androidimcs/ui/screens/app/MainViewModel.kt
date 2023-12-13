@@ -2,56 +2,47 @@ package edu.pwr.iotmobile.androidimcs.ui.screens.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import edu.pwr.iotmobile.androidimcs.data.dto.InvitationAlertDto
+import edu.pwr.iotmobile.androidimcs.data.UserRole
+import edu.pwr.iotmobile.androidimcs.helpers.event.Event
 import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
-import edu.pwr.iotmobile.androidimcs.model.listener.InvitationAlertWebSocketListener
+import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
 
 class MainViewModel(
     private val userRepository: UserRepository,
-    private val client: OkHttpClient,
-    val toast: Toast
+    private val projectRepository: ProjectRepository,
+    val toast: Toast,
+    val event: Event
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState = _uiState.asStateFlow()
 
-    private var invitationAlertWebSocketListener: InvitationAlertWebSocketListener? = null
-
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            userRepository.getLoggedInUser().collect { user ->
-                _uiState.update {
-                    it.copy(isUserLoggedIn = user != null)
+            kotlin.runCatching {
+                userRepository.getLoggedInUser().collect { user ->
+                    _uiState.update {
+                        it.copy(
+                            isUserLoggedIn = user != null,
+                            isUserAdmin = user?.role == UserRole.ADMIN_ROLE
+                        )
+                    }
+
+                    if (_uiState.value.isLoading) {
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
                 }
 
-                if (user != null) {
-                    // User has logged in
-                    invitationAlertWebSocketListener?.closeWebSocket()
-                    invitationAlertWebSocketListener = InvitationAlertWebSocketListener(
-                        client = client,
-                        onNewInvitation = { data -> onNewInvitation(data) }
-                    )
-                    // TODO: navigate to main screen
-                } else {
-                    // User has been logged out
-                    invitationAlertWebSocketListener?.closeWebSocket()
-                    // TODO: navigate to login screen
-                }
+                val invitations = projectRepository.findAllPendingInvitationsForActiveUser()
+                val isInvitation = invitations.isNotEmpty()
+                _uiState.update { it.copy(isInvitation = isInvitation) }
             }
-        }
-    }
-
-    private fun onNewInvitation(data: InvitationAlertDto) {
-        viewModelScope.launch {
-            // TODO: snackbar
-            toast.toast("You have received a new invitation!")
         }
     }
 }

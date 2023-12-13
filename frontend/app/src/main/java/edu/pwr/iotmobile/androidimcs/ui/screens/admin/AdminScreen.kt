@@ -14,11 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
-import edu.pwr.iotmobile.androidimcs.ui.screens.account.AccountDeletionContent
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
 import org.koin.androidx.compose.koinViewModel
@@ -28,19 +28,26 @@ fun AdminScreen(navigation: AdminNavigation) {
 
     val viewModel = koinViewModel<AdminViewModel>()
     val uiState by viewModel.uiState.collectAsState()
+    val uiInteraction = AdminUiInteraction.default(viewModel, navigation)
 
     LaunchedEffect(Unit) {
         viewModel.init(navigation)
     }
 
-    AdminScreenContent(uiState)
+    AdminScreenContent(
+        uiState = uiState,
+        uiInteraction = uiInteraction
+    )
 }
 
 @Composable
-fun AdminScreenContent(uiState: AdminUiState) {
-
+fun AdminScreenContent(
+    uiState: AdminUiState,
+    uiInteraction: AdminUiInteraction
+) {
     val isLogOutDialogVisible = remember { mutableStateOf(false) }
     val isDeleteAccountDialogVisible = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (isLogOutDialogVisible.value) {
         SimpleDialog(
@@ -48,7 +55,10 @@ fun AdminScreenContent(uiState: AdminUiState) {
             closeButtonText = stringResource(id = R.string.no),
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isLogOutDialogVisible.value = false },
-            onConfirm = { isLogOutDialogVisible.value = false }
+            onConfirm = {
+                uiInteraction.logout(context)
+                isLogOutDialogVisible.value = false
+            }
         )
     }
     if (isDeleteAccountDialogVisible.value) {
@@ -57,8 +67,17 @@ fun AdminScreenContent(uiState: AdminUiState) {
             closeButtonText = stringResource(id = R.string.no),
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isDeleteAccountDialogVisible.value = false },
-            onConfirm = { isDeleteAccountDialogVisible.value = false },
-            content = { AccountDeletionContent() }
+            onConfirm = {
+                uiInteraction.deleteAccount()
+                isDeleteAccountDialogVisible.value = false
+            },
+            content = {
+                Text(
+                    text = stringResource(id = R.string.delete_account_desc2),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
         )
     }
 

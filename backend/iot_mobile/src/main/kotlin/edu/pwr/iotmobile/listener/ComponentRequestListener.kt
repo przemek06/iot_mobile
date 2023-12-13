@@ -1,13 +1,14 @@
 package edu.pwr.iotmobile.listener
 
 import edu.pwr.iotmobile.dto.ComponentListDTO
+import edu.pwr.iotmobile.entities.TriggerComponent
+import edu.pwr.iotmobile.enums.EComponentType
+import edu.pwr.iotmobile.error.exception.InvalidStateException
+import edu.pwr.iotmobile.integration.IntegrationManager
 import edu.pwr.iotmobile.service.ComponentChangeService
 import edu.pwr.iotmobile.service.ComponentService
 import edu.pwr.iotmobile.service.DashboardService
-import edu.pwr.iotmobile.service.ProjectService
-import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.ProceedingJoinPoint
-import org.aspectj.lang.annotation.AfterReturning
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,28 +18,55 @@ import org.springframework.stereotype.Component
 
 @Aspect
 @Component
-class ComponentRequestListener
-{
+class ComponentRequestListener {
 
     @Autowired
     private lateinit var componentChangeService: ComponentChangeService
+
     @Autowired
     private lateinit var componentService: ComponentService
+
+    @Autowired
+    private lateinit var integrationManager: IntegrationManager
+
     @Autowired
     private lateinit var dashboardService: DashboardService
-    @Autowired
-    lateinit var projectService: ProjectService
 
-    @AfterReturning(
-        pointcut = "execution(* edu.pwr.iotmobile.controller.ComponentController.updateAll(..))",
-        returning = "response"
+    @Around(
+        "execution(* edu.pwr.iotmobile.controller.ComponentController.updateAll(..)) && args(componentListDTO)",
+        argNames = "componentListDTO"
     )
-    fun propagateChangesOnComponentAction(joinPoint: JoinPoint?, response: ResponseEntity<ComponentListDTO>) {
-        val dashboardId = response.body?.dashboardId ?: return
+    fun propagateChangesOnComponentAction(pjp: ProceedingJoinPoint, componentListDTO: ComponentListDTO) : ResponseEntity<*> {
+        val dashboardId = componentListDTO.dashboardId
+        val entities = componentService.findAllEntitiesByDashboardIdNoSecurity(dashboardId)
+        val oldComponentListDto = ComponentListDTO(dashboardId, componentService.entitiesToDTOs(entities))
 
-        val componentListDto = componentService.findAllByDashboardIdNoSecurity(dashboardId)
+        val result = pjp.proceed()
 
-        componentChangeService.processEntityChange(componentListDto)
+        if (result !is ResponseEntity<*>) throw InvalidStateException()
+
+        if (result.body !is ComponentListDTO) return result
+
+        val resultComponentListDTO = result.body as ComponentListDTO
+
+        val toDelete =
+            oldComponentListDto.components.filter { it.id !in resultComponentListDTO.components.map { it2 -> it2.id } }
+                .filter { it.componentType == EComponentType.TRIGGER }
+
+        val toAdd =
+            resultComponentListDTO.components.filter { it.id !in oldComponentListDto.components.map { it2 -> it2.id } }
+                .filter { it.componentType == EComponentType.TRIGGER }
+
+        var connectionKey = entities.map { it.dashboard.project.connectionKey }.distinct().firstOrNull()
+        if (connectionKey == null) {
+            connectionKey = dashboardService.findEntityById(dashboardId).project.connectionKey
+        }
+
+        toAdd.forEach { integrationManager.addIntegrationAction(it.toEntity(dashboardId) as TriggerComponent, connectionKey) }
+        toDelete.forEach { it.id?.let { it1 -> integrationManager.removeIntegrationAction(it1) } }
+
+        componentChangeService.processEntityChange(resultComponentListDTO)
+        return result
     }
 
     @Around(
@@ -50,10 +78,13 @@ class ComponentRequestListener
 
         val result = pjp.proceed()
 
-        if (result !is ResponseEntity<*>)
-            return
+        if (result !is ResponseEntity<*>) return
 
         if (result.statusCode == HttpStatus.OK) {
+            componentListDto.components
+                .filter { it.componentType == EComponentType.TRIGGER }
+                .forEach { it.id?.let { it1 -> integrationManager.removeIntegrationAction(it1) } }
+
             val toSend = ComponentListDTO(componentListDto.dashboardId, emptyList())
             componentChangeService.processEntityChange(toSend)
         }

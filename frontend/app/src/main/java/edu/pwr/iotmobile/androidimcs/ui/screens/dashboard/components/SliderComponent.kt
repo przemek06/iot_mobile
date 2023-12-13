@@ -7,10 +7,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import edu.pwr.iotmobile.androidimcs.ui.screens.dashboard.ComponentData
@@ -21,17 +17,18 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun LazyStaggeredGridItemScope.SliderComponent(
-    uiState: DashboardUiState,
     item: ComponentData,
+    uiState: DashboardUiState,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
 ) {
-    // TODO: get current value from other place than topic
-    val value = item.topic?.currentValue ?: item.onSendValue
+    val minValue = item.minValue?.toFloat()
+    val maxValue = item.maxValue?.toFloat()
 
     ComponentWrapper(
         item = item,
+        uiState = uiState,
         uiInteraction = uiInteraction,
         onPlaceItem = onPlaceItem,
         coroutineScope = coroutineScope
@@ -42,13 +39,13 @@ fun LazyStaggeredGridItemScope.SliderComponent(
             color = MaterialTheme.colorScheme.onBackground
         )
         Box(modifier = Modifier.fillMaxSize()) {
-            value?.let { value ->
-                var currentValue by remember { mutableFloatStateOf(value as Float) }
+            if (minValue != null && maxValue != null) {
                 Slider(
                     modifier = Modifier.align(Alignment.Center),
-                    value = currentValue,
-                    onValueChange = { currentValue = it } ,
-                    onValueChangeFinished = { uiInteraction.onComponentClick(item, currentValue) }
+                    value = item.currentValue?.toFloat() ?: minValue,
+                    valueRange = minValue..maxValue,
+                    onValueChange = { f -> uiInteraction.onLocalComponentValueChange(item, f) },
+                    onValueChangeFinished = { uiInteraction.onComponentClick(item, item.currentValue ?: item.minValue) }
                 )
             }
         }

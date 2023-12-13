@@ -17,14 +17,15 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun LazyStaggeredGridItemScope.ToggleComponent(
-    uiState: DashboardUiState,
     item: ComponentData,
+    uiState: DashboardUiState,
     uiInteraction: DashboardUiInteraction,
     onPlaceItem: () -> Unit,
     coroutineScope: CoroutineScope,
 ) {
     ComponentWrapper(
         item = item,
+        uiState = uiState,
         uiInteraction = uiInteraction,
         onPlaceItem = onPlaceItem,
         coroutineScope = coroutineScope
@@ -37,12 +38,11 @@ fun LazyStaggeredGridItemScope.ToggleComponent(
         Box(modifier = Modifier.fillMaxSize()) {
             Switch(
                 modifier = Modifier.align(Alignment.Center),
-                checked = item.onSendValue == item.topic?.currentValue,  // TODO: get current value from other place than topic
+                checked = item.onSendValue == item.currentValue,
                 onCheckedChange = {
-                    uiInteraction.onComponentClick(item, it)
+                    uiInteraction.onComponentClick(item, item.currentValue ?: item.onSendAlternativeValue)
                 }
             )
         }
-
     }
 }

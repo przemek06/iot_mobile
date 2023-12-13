@@ -23,14 +23,14 @@ services:
     container_name: rabbitmq
     hostname: rabbitmq
     restart: always
-    environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+    env_file:
+      - dev.env
     networks:
       - iot-mobile-backend-network
     expose:
       - "5672"
       - "15672"
+      
   iot-mobile-backend:
     build:
       context: ./backend/iot_mobile

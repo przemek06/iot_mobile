@@ -6,6 +6,7 @@ import edu.pwr.iotmobile.entities.Component
 import edu.pwr.iotmobile.entities.InputComponent
 import edu.pwr.iotmobile.entities.OutputComponent
 import edu.pwr.iotmobile.entities.TriggerComponent
+import edu.pwr.iotmobile.enums.EComponentType
 import edu.pwr.iotmobile.error.exception.InvalidStateException
 import edu.pwr.iotmobile.error.exception.NoAuthenticationException
 import edu.pwr.iotmobile.error.exception.NotAllowedException
@@ -30,8 +31,32 @@ class ComponentService(
             throw NotAllowedException()
         }
 
-        deleteAllInDashboard(componentListDTO.dashboardId)
-        val toSave = componentListDTO.toEntityList()
+        val existingComponents = componentRepository
+            .findAllByDashboardId(componentListDTO.dashboardId)
+
+        val newComponentIds = componentListDTO
+            .components
+            .mapNotNull { it.id }
+
+        val toDeleteIds = existingComponents
+            .filter { it.id !in newComponentIds }
+            .mapNotNull { it.id }
+
+        val toPreserve = existingComponents.filter { it.id in newComponentIds }
+        toPreserve.forEach {
+            it.index = componentListDTO.components
+                .find { it2 -> it2.id == it.id }
+                ?.index ?: throw InvalidStateException()
+        }
+
+        componentRepository.deleteAllById(toDeleteIds)
+
+        val toSave = componentListDTO
+            .toEntityList()
+            .filter { it.id == null }
+            .toMutableList()
+
+        toSave.addAll(toPreserve)
         val saved = componentRepository.saveAll(toSave)
 
         val savedDTO = entitiesToDTOs(saved)
@@ -39,8 +64,9 @@ class ComponentService(
         return ComponentListDTO(componentListDTO.dashboardId, savedDTO)
     }
 
-    fun deleteAllInDashboard(dashboardId: Int) {
-        componentRepository.deleteAllByDashboardId(dashboardId)
+    fun findAllTriggerComponents() : List<TriggerComponent> {
+        return componentRepository.findAll()
+            .filterIsInstance<TriggerComponent>()
     }
 
     fun findAllByDashboardId(dashboardId: Int): ComponentListDTO {
@@ -58,6 +84,10 @@ class ComponentService(
         return ComponentListDTO(dashboardId, savedDTO)
     }
 
+    fun findAllEntitiesByDashboardIdNoSecurity(dashboardId: Int) : List<Component> {
+        return componentRepository.findAllByDashboardId(dashboardId)
+    }
+
     fun findAllByDashboardIdNoSecurity(dashboardId: Int): ComponentListDTO {
         val entities = componentRepository.findAllByDashboardId(dashboardId)
 
@@ -66,7 +96,7 @@ class ComponentService(
         return ComponentListDTO(dashboardId, savedDTO)
     }
 
-    private fun entitiesToDTOs(entities: List<Component>): List<ComponentDTO> {
+    fun entitiesToDTOs(entities: List<Component>): List<ComponentDTO> {
         return entities.map {
             if (it is InputComponent) {
                 it.toDTO()
@@ -76,5 +106,12 @@ class ComponentService(
                 it.toDTO()
             } else throw InvalidStateException()
         }
+    }
+
+    fun findAllByDashboardProjectId(projectId: Int) : List<Component> {
+        return componentRepository.findAllByDashboardProjectId(projectId)
+    }
+    fun findAllByDashboardProjectCreatedById(userId: Int) : List<Component> {
+        return componentRepository.findAllByDashboardProjectCreatedById(userId)
     }
 }

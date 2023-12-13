@@ -5,10 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.MenuOption
+import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.data.dto.DashboardDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDeletedDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto.Companion.toUserProjectRole
+import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 import edu.pwr.iotmobile.androidimcs.data.ui.ProjectData.Companion.toProjectData
 import edu.pwr.iotmobile.androidimcs.data.ui.Topic.Companion.toTopic
 import edu.pwr.iotmobile.androidimcs.helpers.event.Event
@@ -17,10 +19,12 @@ import edu.pwr.iotmobile.androidimcs.model.listener.ProjectDeletedWebSocketListe
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.Dashboard.Companion.toDashboard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -31,6 +35,7 @@ class ProjectDetailsViewModel(
     private val dashboardRepository: DashboardRepository,
     private val topicRepository: TopicRepository,
     private val projectRepository: ProjectRepository,
+    private val userRepository: UserRepository,
     val toast: Toast,
     val event: Event,
     private val client: OkHttpClient
@@ -38,8 +43,8 @@ class ProjectDetailsViewModel(
     private val _uiState = MutableStateFlow(ProjectDetailsUiState.default())
     val uiState = _uiState.asStateFlow()
 
-    private var projectId: Int? = null
-    private var userProjectRole: UserProjectRole? = UserProjectRole.ADMIN
+    private var _projectId: Int? = null
+    private var _userProjectRole: UserProjectRole? = null
 
     private var projectDeletedListener: ProjectDeletedWebSocketListener? = null
 
@@ -49,11 +54,12 @@ class ProjectDetailsViewModel(
 
     fun init(navigation: ProjectDetailsNavigation) {
         // Only update UI if project id changed.
-        if (projectId == null || projectId != navigation.projectId) {
+        if (_projectId == null || _projectId != navigation.projectId) {
+            _uiState.update { it.copy(isLoading = true) }
 
             // Set private project id field
             val localProjectId = navigation.projectId ?: return
-            projectId = localProjectId
+            _projectId = localProjectId
 
             projectDeletedListener?.closeWebSocket()
             // Connect to project deleted listener
@@ -64,29 +70,74 @@ class ProjectDetailsViewModel(
             )
 
             viewModelScope.launch {
+                try {
+                    val projectUserInfo = projectRepository
+                        .getUserProjectRole(localProjectId)
+                        ?: return@launch
 
-                val projectUserInfo = projectRepository
-                    .getUserProjectRole(localProjectId)
-                    ?: return@launch
+                    val user = userRepository.getLoggedInUser().firstOrNull() ?: run {
+                        _uiState.update { it.copy(
+                            isError = true,
+                            isLoading = false
+                        ) }
+                        return@launch
+                    }
 
-                val projectRole = projectUserInfo.toUserProjectRole() ?: return@launch
-                userProjectRole = projectRole
+                    val projectRole = projectUserInfo.toUserProjectRole() ?: run {
+                        _uiState.update { it.copy(
+                            isError = true,
+                            isLoading = false
+                        ) }
+                        return@launch
+                    }
+                    _userProjectRole = projectRole
 
-                val projectData = projectRepository
-                    .getProjectById(localProjectId)
-                    ?.toProjectData()
-                    ?: return@launch
+                    val roles = projectRepository
+                        .getAllProjectRolesByProjectId(localProjectId)
 
-                _uiState.update {
-                    it.copy(
-                        user = projectUserInfo.user,
-                        userRoleDescriptionId = getUserRoleDescription(projectRole),
-                        userProjectRole = projectRole,
-                        userOptionsList = generateUserOptions(projectRole, navigation),
-                        menuOptionsList = generateMenuOptions(projectRole),
-                        dashboards = getDashboards(),
-                        projectData = projectData
-                    )
+                    val projectData = projectRepository
+                        .getProjectById(localProjectId)
+                        ?.toProjectData()
+                        ?: run {
+                            Log.d("ProjectDetails", "Failed to get project data")
+                            _uiState.update { it.copy(
+                                isError = true,
+                                isLoading = false
+                            ) }
+                            return@launch
+                        }
+
+                    if (navigation.startOnTopic) {
+                        updateTopics()
+                    }
+
+                    _uiState.update {
+                        it.copy(
+                            user = projectUserInfo.user,
+                            userRoleDescriptionId = getUserRoleDescription(projectRole),
+                            userProjectRole = projectRole,
+                            roles = roles,
+                            userOptionsList = generateUserOptions(projectRole,
+                                user,
+                                projectData.createdBy,
+                                navigation
+                            ).filterNotNull(),
+                            menuOptionsList = generateMenuOptions(projectRole),
+                            dashboards = getDashboards(),
+                            projectData = projectData,
+                            isLoading = false,
+                            isError = false,
+                            selectedTabIndex = if (navigation.startOnTopic)
+                                ProjectTab.Topics.index
+                            else ProjectTab.Dashboards.index
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e("ProjectDetails", "Error while loading screen.", e)
+                    _uiState.update { it.copy(
+                        isError = true,
+                        isLoading = false
+                    ) }
                 }
             }
         }
@@ -110,8 +161,28 @@ class ProjectDetailsViewModel(
         }
     }
 
+    fun toggleAddDashboardDialog() {
+        _uiState.update { it.copy(isAddDialogVisible = !it.isAddDialogVisible) }
+    }
+
     fun addDashboard(name: String) {
-        val localProjectId = projectId ?: return
+        val localProjectId = _projectId ?: run {
+            viewModelScope.launch { toast.toast("Operation failed.") }
+            return
+        }
+
+        if (name.isBlank()) {
+            _uiState.update {
+                it.copy(inputFieldDashboard = it.inputFieldDashboard.copy(
+                    isError = true,
+                    errorMessage = R.string.s62
+                ))
+            }
+            return
+        }
+
+        _uiState.update { it.copy(isDialogLoading = true) }
+
         viewModelScope.launch(Dispatchers.Default) {
             val dashboardDto = DashboardDto(
                 name = name,
@@ -119,44 +190,80 @@ class ProjectDetailsViewModel(
             )
             kotlin.runCatching {
                 dashboardRepository.createDashboard(dashboardDto)
-            }.onSuccess {
-                updateDashboards()
+            }.onSuccess { result ->
+                when (result) {
+                    CreateResult.Success -> {
+                        updateDashboards()
+                        _uiState.update { it.copy(
+                            isDialogLoading = false,
+                            isAddDialogVisible = false
+                        ) }
+                        return@launch
+                    }
+                    CreateResult.AlreadyExists ->
+                        _uiState.update {
+                            it.copy(
+                                inputFieldDashboard = it.inputFieldDashboard.copy(
+                                    isError = true,
+                                    errorMessage = R.string.s63
+                                )
+                            )
+                        }
+                    else -> toast.toast("Operation failed.")
+                }
             }.onFailure {
                 Log.d(TAG, "Add dashboard error")
+                toast.toast("Operation failed.")
             }
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
 
     fun deleteTopic(id: Int) {
+        _uiState.update { it.copy(isDialogLoading = true) }
         viewModelScope.launch(Dispatchers.Default) {
             kotlin.runCatching {
                 topicRepository.deleteTopic(id)
-            }.onSuccess {
-                updateTopics()
+            }.onSuccess { result ->
+                if (result.isSuccess)
+                    updateTopics()
+                else
+                    toast.toast("Could not delete topic - check if it is used by any component.")
             }.onFailure {
-                Log.d(TAG, "Delete topic error")
+                Log.e(TAG, "Delete topic error", it)
+                toast.toast("Could not delete topic - check if it is used by any component.")
             }
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
 
     fun regenerateConnectionKey() {
+        _uiState.update { it.copy(isDialogLoading = true) }
         viewModelScope.launch(Dispatchers.Default) {
-            val localProjectId = projectId ?: return@launch
+            val localProjectId = _projectId ?: return@launch
             kotlin.runCatching {
                 projectRepository.regenerateConnectionKey(localProjectId)
             }.onSuccess { result ->
                 if (result.isSuccess) {
                     result.getOrNull()?.let { projectDto ->
+                        val data = projectDto.toProjectData() ?: run {
+                            toast.toast("Could not regenerate key.")
+                            _uiState.update { it.copy(isDialogLoading = false) }
+                            return@launch
+                        }
                         _uiState.update {
-                            it.copy(projectData = projectDto.toProjectData() ?: return@launch)
+                            it.copy(projectData = data)
                         }
                     }
                 } else {
                     Log.d(TAG, "Regenerate key failed")
+                    toast.toast("Could not regenerate key.")
                 }
             }.onFailure {
                 Log.d(TAG, "Regenerate key error")
+                toast.toast("Could not regenerate key.")
             }
+            _uiState.update { it.copy(isDialogLoading = false) }
         }
     }
 
@@ -175,69 +282,162 @@ class ProjectDetailsViewModel(
     }
 
     private suspend fun getDashboards(): List<Dashboard> {
-        val localProjectId = projectId ?: return emptyList()
+        val localProjectId = _projectId ?: run {
+            _uiState.update { it.copy(isError = true) }
+            return emptyList()
+        }
+        _uiState.update { it.copy(isLoading = true) }
+
         kotlin.runCatching {
             dashboardRepository.getDashboardsByProjectId(localProjectId)
         }.onSuccess { dashboards ->
-            Log.d("null", "dashboards")
-            dashboards.forEach {
-                Log.d("null", it.toString())
-            }
+            _uiState.update { it.copy(
+                isLoading = false,
+                isError = false
+            ) }
             return dashboards.mapNotNull { it.toDashboard() }
         }.onFailure {
-            Log.d(TAG, "Get dashboards error")
-            return emptyList()
+            Log.e(TAG, "Get dashboards error", it)
         }
+        _uiState.update { it.copy(
+            isError = true,
+            isLoading = false
+        ) }
         return emptyList()
     }
 
-    private fun updateTopics() {
-        val localProjectId = projectId ?: return
+    fun updateTopics() {
+        val localProjectId = _projectId ?: run {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
+        _uiState.update { it.copy(isLoading = true) }
+
         viewModelScope.launch(Dispatchers.Default) {
             kotlin.runCatching {
                 topicRepository.getTopicsByProjectId(localProjectId)
             }.onSuccess { topics ->
-                Log.d("null", "topics")
-                topics.forEach {
-                    Log.d("null", it.toString())
-                }
                 _uiState.update { ui ->
-                    ui.copy(topics = topics.mapNotNull { it.toTopic() })
+                    ui.copy(
+                        topics = topics.mapNotNull { it.toTopic() },
+                        isLoading = false,
+                        isError = false
+                    )
                 }
-            }.onFailure {
-                Log.d(TAG, "Get topics error")
+            }.onFailure { e ->
+                Log.e(TAG, "Get topics error", e)
+                _uiState.update { it.copy(
+                    isError = true,
+                    isLoading = false
+                ) }
             }
         }
     }
 
-    private fun updateUsers() {
-        val localProjectId = projectId ?: return
+    fun updateUsers() {
+        val localProjectId = _projectId ?: run {
+            _uiState.update { it.copy(isError = true) }
+            return
+        }
+        _uiState.update { it.copy(isLoading = true) }
+
         viewModelScope.launch(Dispatchers.Default) {
             kotlin.runCatching {
                 projectRepository.getUsersByProjectId(localProjectId)
             }.onSuccess { users ->
-                Log.d("null", "users")
-                users.forEach {
-                    Log.d("null", it.toString())
-                }
                 _uiState.update { ui ->
-                    ui.copy(members = users)
+                    ui.copy(
+                        members = users,
+                        isLoading = false,
+                        isError = false
+                    )
                 }
-            }.onFailure {
-                Log.d(TAG, "Get users error")
+            }.onFailure { e ->
+                Log.e(TAG, "Get users error", e)
+                _uiState.update { it.copy(
+                    isError = true,
+                    isLoading = false
+                ) }
             }
         }
     }
 
-    private fun deleteProject() {
+    fun deleteProject() {
+        _uiState.update { it.copy(isDialogLoading = true) }
         viewModelScope.launch {
-            val localProjectId = projectId ?: return@launch
+            val localProjectId = _projectId ?: return@launch
             kotlin.runCatching {
                 projectRepository.deleteProject(localProjectId)
             }.onSuccess {
                 updateDashboards()
             }.onFailure {
-                Log.d(TAG, "Delete project error")
+                Log.d(TAG, "Failed to delete project.")
+            }
+            _uiState.update { it.copy(isDialogLoading = false) }
+        }
+    }
+
+    fun toggleDeleteProjectDialog() {
+        _uiState.update {
+            it.copy(isDeleteProjectDialogVisible = !it.isDeleteProjectDialogVisible)
+        }
+    }
+
+    fun onTextChangeDashboard(text: String) {
+        _uiState.update {
+            it.copy(inputFieldDashboard = it.inputFieldDashboard.copy(text = text))
+        }
+    }
+
+    fun toggleLeaveProjectDialog() {
+        _uiState.update {
+            it.copy(isLeaveProjectDialogVisible = !it.isLeaveProjectDialogVisible)
+        }
+    }
+
+    fun leaveGroup() {
+        _uiState.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            val projectId = _projectId ?: kotlin.run {
+                _uiState.update { it.copy(
+                    isError = true,
+                    isLoading = false
+                ) }
+                return@launch
+            }
+            try {
+                val userData = userRepository.getLoggedInUser().firstOrNull() ?: kotlin.run {
+                    _uiState.update { it.copy(
+                        isError = true,
+                        isLoading = false
+                    ) }
+                    return@launch
+                }
+                val result = projectRepository.revokeAccess(
+                    projectId = projectId,
+                    userId = userData.id
+                )
+                result.onSuccess {
+                    _uiState.update { it.copy(
+                        isError = false,
+                        isLoading = false
+                    ) }
+                    toast.toast("Successfully left project.")
+                    return@launch
+                }.onFailure {
+                    _uiState.update { it.copy(
+                        isError = true,
+                        isLoading = false
+                    ) }
+                    toast.toast("Operation failed.")
+                }
+            } catch (e: Exception) {
+                Log.e("ProjectDetails", "Error while leaving project.", e)
+                _uiState.update { it.copy(
+                    isError = true,
+                    isLoading = false
+                ) }
             }
         }
     }
@@ -250,6 +450,8 @@ class ProjectDetailsViewModel(
 
     private fun generateUserOptions(
         role: UserProjectRole,
+        user: User,
+        createdBy: Int,
         navigation: ProjectDetailsNavigation
     ) = when (role) {
         UserProjectRole.ADMIN -> listOf(
@@ -260,29 +462,37 @@ class ProjectDetailsViewModel(
             ),
             MenuOption(
                 titleId = R.string.edit_roles,
-                onClick = { /*TODO*/}
+                onClick = { navigation.openSearchEditRoles() }
             ),
             MenuOption(
                 titleId = R.string.revoke_access,
-                onClick = { /*TODO*/}
+                onClick = { navigation.openSearchRevokeAccess() }
             ),
             MenuOption(
                 titleId = R.string.add_admin,
-                onClick = { /*TODO*/}
-            )
+                onClick = { navigation.openSearchAddAdmin() }
+            ),
+            if (user.id == createdBy)
+                null
+            else
+                MenuOption(
+                    titleId = R.string.leave_group,
+                    isBold = true,
+                    onClick = { toggleLeaveProjectDialog() }
+                )
         )
         UserProjectRole.EDITOR -> listOf(
             MenuOption(
                 titleId = R.string.leave_group,
                 isBold = true,
-                onClick = { /*TODO*/}
+                onClick = { toggleLeaveProjectDialog() }
             )
         )
         UserProjectRole.VIEWER -> listOf(
             MenuOption(
                 titleId = R.string.leave_group,
                 isBold = true,
-                onClick = { /*TODO*/}
+                onClick = { toggleLeaveProjectDialog() }
             )
         )
     }
@@ -291,36 +501,10 @@ class ProjectDetailsViewModel(
         UserProjectRole.ADMIN -> listOf(
             MenuOption(
                 titleId = R.string.delete_project,
-                onClick = { deleteProject() }
+                onClick = { toggleDeleteProjectDialog() }
             )
         )
         else -> emptyList()
-    }
-
-    fun setDialogVisible() {
-        _uiState.update {
-            it.copy(isDialogVisible = true)
-        }
-    }
-    fun setDialogInvisible() {
-        _uiState.update {
-            it.copy(isDialogVisible = false)
-        }
-    }
-    fun setInfoVisible() {
-        _uiState.update {
-            it.copy(isInfoVisible = true)
-        }
-    }
-    fun setInfoInvisible() {
-        _uiState.update {
-            it.copy(isInfoVisible = false)
-        }
-    }
-    fun onTextChangeDashboard(text: String) {
-        _uiState.update {
-            it.copy(inputFieldDashboard = it.inputFieldDashboard.copy(text = text))
-        }
     }
 
     enum class ProjectTab(val labelId: Int, val index: Int) {
@@ -330,6 +514,6 @@ class ProjectDetailsViewModel(
     }
 
     companion object {
-        val PROJECT_DELETED_EVENT = "projectDeleted"
+        const val PROJECT_DELETED_EVENT = "projectDeleted"
     }
 }

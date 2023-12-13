@@ -16,21 +16,29 @@ import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserLocalDataSo
 import edu.pwr.iotmobile.androidimcs.model.datasource.local.impl.UserSessionLocalDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ComponentRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.DashboardRemoteDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.IntegrationRemoteDataSource
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.MessageRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ProjectRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.TopicRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.UserRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ComponentRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.DashboardRemoteDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.IntegrationRemoteDataSourceImpl
+import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.MessageRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.ProjectRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.TopicRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.impl.UserRemoteDataSourceImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.DashboardRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.IntegrationRepository
+import edu.pwr.iotmobile.androidimcs.model.repository.MessageRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.UserRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.ComponentRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.DashboardRepositoryImpl
+import edu.pwr.iotmobile.androidimcs.model.repository.impl.IntegrationRepositoryImpl
+import edu.pwr.iotmobile.androidimcs.model.repository.impl.MessageRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.ProjectRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.TopicRepositoryImpl
 import edu.pwr.iotmobile.androidimcs.model.repository.impl.UserRepositoryImpl
@@ -46,6 +54,7 @@ import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.activate.ActivateA
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.forgotpassword.ForgotPasswordViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.login.LoginViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.loginregister.register.RegisterViewModel
+import edu.pwr.iotmobile.androidimcs.ui.screens.main.MainScreenViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.projectdetails.ProjectDetailsViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.projects.ProjectsViewModel
 import edu.pwr.iotmobile.androidimcs.ui.screens.search.SearchViewModel
@@ -80,10 +89,13 @@ object AppKoin {
         singleOf(::DashboardRemoteDataSourceImpl) bind DashboardRemoteDataSource::class
         singleOf(::TopicRemoteDataSourceImpl) bind TopicRemoteDataSource::class
         singleOf(::ComponentRemoteDataSourceImpl) bind ComponentRemoteDataSource::class
+        singleOf(::MessageRemoteDataSourceImpl) bind MessageRemoteDataSource::class
+        singleOf(::IntegrationRemoteDataSourceImpl) bind IntegrationRemoteDataSource::class
 
         // Local
         singleOf(::UserSessionLocalDataSourceImpl) bind UserSessionLocalDataSource::class
         singleOf(::UserLocalDataSourceImpl) bind UserLocalDataSource::class
+        single { get<AppDatabase>().dashboardDao() }
     }
 
     // Module for repositories accessing data sources
@@ -93,6 +105,8 @@ object AppKoin {
         singleOf(::DashboardRepositoryImpl) bind DashboardRepository::class
         singleOf(::TopicRepositoryImpl) bind TopicRepository::class
         singleOf(::ComponentRepositoryImpl) bind ComponentRepository::class
+        singleOf(::MessageRepositoryImpl) bind MessageRepository::class
+        singleOf(::IntegrationRepositoryImpl) bind IntegrationRepository::class
     }
 
     // Module for view models
@@ -112,6 +126,7 @@ object AppKoin {
         viewModelOf(::MainViewModel)
         viewModelOf(::AddComponentViewModel)
         viewModelOf(::InvitationsViewModel)
+        viewModelOf(::MainScreenViewModel)
     }
 
     // Module for other singular classes

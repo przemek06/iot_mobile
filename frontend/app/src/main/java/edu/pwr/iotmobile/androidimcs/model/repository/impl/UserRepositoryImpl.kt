@@ -3,6 +3,7 @@ package edu.pwr.iotmobile.androidimcs.model.repository.impl
 import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.User
 import edu.pwr.iotmobile.androidimcs.data.User.Companion.toUser
+import edu.pwr.iotmobile.androidimcs.data.dto.EmailDto
 import edu.pwr.iotmobile.androidimcs.data.dto.PasswordBody
 import edu.pwr.iotmobile.androidimcs.data.dto.UserDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
@@ -62,7 +63,11 @@ class UserRepositoryImpl(
 
                 LoginUserResult.Success
             }
+
+            401 -> LoginUserResult.UserBanned
+
             403 -> LoginUserResult.AccountInactive
+
             else -> LoginUserResult.Failure
         }
     }
@@ -91,9 +96,18 @@ class UserRepositoryImpl(
         Log.d(TAG, "register result code: $resultCode")
         return when (resultCode) {
             200 -> RegisterUserResult.Success
-            400 -> RegisterUserResult.AccountExists
+            409 -> RegisterUserResult.AccountExists
             else -> RegisterUserResult.Failure
         }
+    }
+
+    override suspend fun resendVerificationCode(email: String): Result<Unit> {
+        val dto = EmailDto(address = email)
+        val response = remoteDataSource.resendVerificationCode(dto)
+        return if (response.isSuccessful)
+            Result.success(Unit)
+        else
+            Result.failure(Exception("Resend verification code failed"))
     }
 
     override suspend fun getLoggedInUser(): Flow<User?> =
@@ -110,13 +124,13 @@ class UserRepositoryImpl(
             Result.failure(Exception("Get user info failed"))
     }
 
-    override suspend fun getAllUserInfo(): Result<List<UserInfoDto>> {
+    override suspend fun getAllUserInfo(): List<UserInfoDto> {
         val response = remoteDataSource.getAllUserInfo()
         val body = response.body()
         return if (response.isSuccessful && body != null)
-            Result.success(body)
+            body
         else
-            Result.failure(Exception("Get all user info failed"))
+            emptyList()
     }
 
     override suspend fun verifyUser(code: String): ActivateAccountResult {

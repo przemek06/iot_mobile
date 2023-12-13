@@ -1,35 +1,63 @@
 package edu.pwr.iotmobile.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import edu.pwr.iotmobile.dto.MessageDTO
 import edu.pwr.iotmobile.dto.TopicMessagesDTO
-import edu.pwr.iotmobile.error.exception.NoAuthenticationException
-import edu.pwr.iotmobile.error.exception.NotAllowedException
-import edu.pwr.iotmobile.error.exception.QueueException
+import edu.pwr.iotmobile.error.exception.*
+import edu.pwr.iotmobile.rabbit.queue.QueueService
 import edu.pwr.iotmobile.repositories.MessageRepository
 import lombok.extern.slf4j.Slf4j
-import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Slf4j
 class MessageService (
-    val rabbitTemplate: RabbitTemplate,
     val messageRepository: MessageRepository,
     val userService: UserService,
     val dashboardService: DashboardService,
     val projectService: ProjectService,
-    val componentService: ComponentService
+    val componentService: ComponentService,
+    val topicService: TopicService,
+    val queueService: QueueService
 ){
+    private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
 
     /**
      * Send message to specified queue
      */
     @Transactional
     fun sendMessage(message: MessageDTO): MessageDTO {
-        try{
-            val saved = messageRepository.save(message.toEntity())
-            rabbitTemplate.convertAndSend(message.topic.name, message.topic.name, message.message)
+        val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
+        val topic = topicService.findTopic(message.topic.id ?: throw InvalidDataException())
+
+        if (!projectService.isInProject(userId, topic.project.id ?: throw InvalidStateException()))
+            throw NotAllowedException()
+
+        val saved = messageRepository.save(message.toEntity())
+        val messageStr = objectMapper.writeValueAsString(message)
+
+        try {
+            queueService.sendMessage(message.topic.uniqueName, messageStr, message.connectionKey)
+            return saved.toDTO()
+        } catch (_: Exception) {
+            throw QueueException()
+        }
+    }
+
+    @Transactional
+    fun sendMessageFromDevice(message: MessageDTO): MessageDTO {
+        val topic = topicService.findTopic(message.topic.id ?: throw InvalidDataException())
+
+        if (message.connectionKey != topic.project.connectionKey)
+            throw NotAllowedException()
+
+        val saved = messageRepository.save(message.toEntity())
+        val messageStr = objectMapper.writeValueAsString(message)
+
+        try {
+            queueService.sendMessage(message.topic.uniqueName, messageStr, message.connectionKey)
             return saved.toDTO()
         } catch (_: Exception) {
             throw QueueException()

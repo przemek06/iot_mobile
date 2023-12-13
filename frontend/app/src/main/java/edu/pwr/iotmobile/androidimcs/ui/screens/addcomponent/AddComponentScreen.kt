@@ -1,5 +1,12 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.addcomponent
 
+import android.content.ActivityNotFoundException
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,11 +30,12 @@ import androidx.compose.ui.unit.dp
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.AndroidIMCSTheme
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
-import edu.pwr.iotmobile.androidimcs.ui.theme.gray
 import org.koin.androidx.compose.koinViewModel
 
 private val BOTTOM_BAR_HEIGHT = 80.dp
@@ -42,13 +51,52 @@ fun AddComponentScreen(navigation: AddComponentNavigation) {
         viewModel.init(it)
     }
 
+    val webActivity = rememberLauncherForActivityResult(
+        contract = GetWebActivityResultContract(),
+        onResult = {
+            viewModel.handleUri()
+        }
+    )
+
+    LaunchedEffect(navigation.isTopicSuccess) {
+        viewModel.updateTopics()
+    }
+
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
-        navigation.onReturn()
+        when (it) {
+            AddComponentViewModel.ADD_COMPONENT_SUCCESS_EVENT ->
+                navigation.onReturn()
+
+            AddComponentViewModel.DISCORD_EVENT -> {
+                try {
+                    uiState.discordUrl?.let { url ->
+                        webActivity.launch(url)
+                    }
+                } catch (e: ActivityNotFoundException) {
+                    Log.e("Trigger", "Could not start the web activity", e)
+                    Toast.makeText(context, "Could not launch Discord", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            else -> { /*Nothing*/ }
+        }
     }
     viewModel.toast.CollectToast(context)
 
-    AddComponentScreenContent(uiState, uiInteraction, navigation)
+    ErrorBox(
+        isVisible = uiState.isError,
+        onReturn = navigation::onReturn
+    )
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isError && !uiState.isLoading,
+        enter = fadeIn(initialAlpha = 0.3f),
+        exit = fadeOut()
+    ) {
+        AddComponentScreenContent(uiState, uiInteraction, navigation)
+    }
 }
 
 @Composable
@@ -62,6 +110,7 @@ private fun AddComponentScreenContent(
             AddComponentPage.ChooseComponent -> ChooseComponentScreenContent(uiState, uiInteraction)
             AddComponentPage.ChooseTopic -> ChooseTopicScreenContent(uiState, uiInteraction, navigation)
             AddComponentPage.Settings -> SettingsScreenContent(uiState, uiInteraction)
+            AddComponentPage.Additional -> AdditionalScreenContent(uiState, uiInteraction)
         }
     }
 }
@@ -83,8 +132,12 @@ private fun NavigationWrapper(
                 onReturn = navigation::onReturn
             )
             Dimensions.space14.HeightSpacer()
-            Column(modifier = Modifier.padding(horizontal = Dimensions.space22)) {
+            Column(
+                modifier = Modifier
+                    .padding(start = Dimensions.space22, end = Dimensions.space22, bottom = BOTTOM_BAR_HEIGHT)
+            ) {
                 content()
+                Dimensions.space22.HeightSpacer()
             }
         }
         BottomNavigationBar(
@@ -107,7 +160,7 @@ private fun BottomNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(BOTTOM_BAR_HEIGHT)
-            .background(color = MaterialTheme.colorScheme.gray)
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
         Box(modifier = Modifier
             .fillMaxSize()

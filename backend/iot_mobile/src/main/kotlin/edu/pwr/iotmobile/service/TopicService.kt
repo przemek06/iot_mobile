@@ -1,13 +1,13 @@
 package edu.pwr.iotmobile.service
 
+import edu.pwr.iotmobile.dto.TopicConnectionDTO
 import edu.pwr.iotmobile.dto.TopicDTO
-import edu.pwr.iotmobile.error.exception.NoAuthenticationException
-import edu.pwr.iotmobile.error.exception.NotAllowedException
-import edu.pwr.iotmobile.error.exception.TopicAlreadyExistsException
-import edu.pwr.iotmobile.error.exception.TopicUsedException
+import edu.pwr.iotmobile.entities.Topic
+import edu.pwr.iotmobile.error.exception.*
 import edu.pwr.iotmobile.rabbit.queue.QueueService
 import edu.pwr.iotmobile.repositories.TopicRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TopicService(
@@ -16,6 +16,14 @@ class TopicService(
     val projectService: ProjectService,
     val queueService: QueueService
 ) {
+
+    fun findTopic(topicId: Int) : Topic {
+        return topicRepository
+            .findById(topicId)
+            .orElseThrow{ TopicNotFoundException() }
+
+    }
+
     fun createTopic(topic: TopicDTO) : TopicDTO {
         val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
         if (!projectService.isEditor(userId, topic.projectId))
@@ -24,12 +32,12 @@ class TopicService(
         if (topicRepository.existsByUniqueNameAndProjectId(topic.uniqueName, topic.projectId))
             throw TopicAlreadyExistsException()
 
-        queueService.addQueue(topic.name)
-
         val toSave = topic.toEntityOnCreation()
+        queueService.addExchange(toSave.uniqueName)
         return topicRepository.save(toSave).toDTO()
     }
 
+    @Transactional
     fun deleteTopic(topicId: Int) : Boolean {
         val userId = userService.getActiveUserId() ?: throw NoAuthenticationException()
         val topic = topicRepository.findById(topicId)
@@ -45,8 +53,8 @@ class TopicService(
         if (isTopicUsed(topicId))
             throw TopicUsedException()
 
-        queueService.forceDeleteQueue(topic.get().name)
         topicRepository.delete(topic.get())
+        queueService.forceDeleteExchange(topic.get().uniqueName)
 
         return true
     }
@@ -64,5 +72,19 @@ class TopicService(
 
     fun isTopicUsed(topicId: Int) : Boolean {
         return topicRepository.countTopicUsage(topicId) > 0
+    }
+
+    fun findAllByUniqueNames(uniqueNames: List<String>) : List<Topic> {
+        return topicRepository.findAllByUniqueNameIn(uniqueNames)
+    }
+
+    fun findByUniqueName(uniqueName: String) : Topic {
+        return topicRepository.findByUniqueName(uniqueName) ?: throw TopicNotFoundException()
+    }
+
+    fun findForDevice(topicConnectionDTO: TopicConnectionDTO) : TopicDTO {
+        val topic = findByUniqueName(topicConnectionDTO.uniqueName)
+        if (topic.project.connectionKey != topicConnectionDTO.connectionKey) throw NotAllowedException()
+        return topic.toDTO()
     }
 }

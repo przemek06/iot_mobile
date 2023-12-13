@@ -19,8 +19,7 @@ class InvitationAlertWebSocketHandler(
 
         @Throws(Exception::class)
         override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
-            val userId = userService.findUserByEmail(session.principal?.name ?: throw NoAuthenticationException())?.id
-                    ?: throw NoAuthenticationException()
+            val userId = userService.findUserIdByEmail(session.principal?.name ?: throw NoAuthenticationException())
 
             val subscription = invitationAlertService
                     .getInvitationFlow(userId)

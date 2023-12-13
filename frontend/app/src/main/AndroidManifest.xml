@@ -4,28 +4,50 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".app.MainApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_dog_cosmos"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_dog_cosmos"
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidIMCS"
         android:usesCleartextTraffic="true"
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="31">
+
+        <service
+            android:name=".model.service.NotificationService"
+            android:exported="false">
+        </service>
+
         <activity
             android:name=".ui.screens.app.MainActivity"
             android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:label="@string/app_name"
-            android:theme="@style/Theme.AndroidIMCS">
+            android:theme="@style/Theme.AndroidIMCS"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="imcs"
+                    android:scheme="app"
+                    android:pathPattern=".*"/>
             </intent-filter>
         </activity>
     </application>

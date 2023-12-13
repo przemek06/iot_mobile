@@ -1,5 +1,6 @@
 package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
+import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ComponentListDto
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ComponentRemoteDataSource
@@ -10,6 +11,8 @@ class ComponentRepositoryImpl(
 ) : ComponentRepository {
     override suspend fun updateComponentList(componentListDto: ComponentListDto): Result<Unit> {
         val result = remoteDataSource.updateComponentList(componentListDto)
+        Log.d("body", "body")
+        Log.d("body", result.body()?.toString() ?: "")
         return if (result.isSuccessful)
             Result.success(Unit)
         else

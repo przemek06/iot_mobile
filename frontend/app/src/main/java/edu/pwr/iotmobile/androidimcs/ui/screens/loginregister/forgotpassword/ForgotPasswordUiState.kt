@@ -5,7 +5,8 @@ import edu.pwr.iotmobile.androidimcs.data.InputFieldData
 data class ForgotPasswordUiState(
     val inputFields: Map<ForgotPasswordViewModel.InputFieldType, InputFieldData>,
     val isInputCode: Boolean,
-    val isSuccess: Boolean
+    val isSuccess: Boolean,
+    val isLoading: Boolean = false
 ) {
     companion object {
         fun default(

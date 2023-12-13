@@ -6,8 +6,9 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -17,11 +18,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -36,11 +39,15 @@ private val SCREENS_WITHOUT_BOTTOM_BAR = listOf(
     Screen.ChangePassword.path,
     Screen.AddComponent.path,
     Screen.AddTopic.path,
+    Screen.Dashboard.path,
+    Screen.Admin.path,
+    Screen.Learn.path
 )
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController,
-    startDestination: String
+    startDestination: String,
+    isInvitation: Boolean
 ) {
     val bottomNavItems = listOf(
         Screen.Main,
@@ -66,7 +73,7 @@ fun BottomNavigationBar(
                 enter = slideInVertically(initialOffsetY = { s -> s } ),
                 exit = slideOutVertically(targetOffsetY = { t -> t } )
             ) {
-                NavigationBar(modifier = Modifier.height(Dimensions.space60)) {
+                NavigationBar {
                     bottomNavItems.forEach { screen ->
                         val iconSize =
                             if (screen.path == Screen.Projects.path) Dimensions.space30
@@ -75,12 +82,14 @@ fun BottomNavigationBar(
                             modifier = Modifier.testTag(screen.tag),
                             icon = {
                                 if (screen.icon != null && screen.description != null)
-                                    Image(
-                                        modifier = Modifier.size(iconSize),
-                                        painter = painterResource(id = screen.icon),
-                                        contentDescription = stringResource(id = screen.description),
-                                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onBackground)
-                                    )
+                                    RedDotWrapper(isVisible = screen.path == Screen.Account.path && isInvitation) {
+                                        Image(
+                                            modifier = Modifier.size(iconSize),
+                                            painter = painterResource(id = screen.icon),
+                                            contentDescription = stringResource(id = screen.description),
+                                            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onBackground)
+                                        )
+                                    }
                             },
                             label = {
                                 screen.label?.let {
@@ -107,5 +116,30 @@ fun BottomNavigationBar(
             innerPadding = innerPadding,
             startDestination = startDestination
         )
+    }
+}
+
+@Composable
+private fun RedDotWrapper(
+    isVisible: Boolean,
+    content: @Composable () -> Unit
+) {
+    val red = MaterialTheme.colorScheme.error
+    if (isVisible) {
+        Box {
+            Box(modifier = Modifier.align(Alignment.Center)) {
+                content()
+            }
+            Canvas(
+                modifier = Modifier
+                    .size(4.dp)
+                    .align(Alignment.TopEnd),
+                onDraw = {
+                    drawCircle(color = red)
+                }
+            )
+        }
+    } else {
+        content()
     }
 }

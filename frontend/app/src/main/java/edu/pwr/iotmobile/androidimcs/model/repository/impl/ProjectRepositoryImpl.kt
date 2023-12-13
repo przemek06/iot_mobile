@@ -1,22 +1,28 @@
 package edu.pwr.iotmobile.androidimcs.model.repository.impl
 
+import android.util.Log
 import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDto
 import edu.pwr.iotmobile.androidimcs.data.dto.InvitationDtoSend
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectDto
 import edu.pwr.iotmobile.androidimcs.data.dto.ProjectRoleDto
 import edu.pwr.iotmobile.androidimcs.data.dto.UserInfoDto
+import edu.pwr.iotmobile.androidimcs.data.result.CreateResult
 import edu.pwr.iotmobile.androidimcs.model.datasource.remote.ProjectRemoteDataSource
 import edu.pwr.iotmobile.androidimcs.model.repository.ProjectRepository
 
 class ProjectRepositoryImpl(
     private val remoteDataSource: ProjectRemoteDataSource
 ) : ProjectRepository {
-    override suspend fun createProject(projectDto: ProjectDto): Result<Unit> {
+    override suspend fun createProject(projectDto: ProjectDto): CreateResult {
         val result = remoteDataSource.createProject(projectDto)
-        return if (result.isSuccessful)
-            Result.success(Unit)
-        else
-            Result.failure(Exception("Create project failed"))
+        val code = result.code()
+        Log.d("ProjectRepo", "createDashboard result code: $code")
+        return when (code) {
+            200 -> CreateResult.Success
+            401 -> CreateResult.NotAuthorized
+            409 -> CreateResult.AlreadyExists
+            else -> CreateResult.Failure
+        }
     }
 
     override suspend fun regenerateConnectionKey(projectId: Int): Result<ProjectDto> {
@@ -99,12 +105,57 @@ class ProjectRepositoryImpl(
             Result.failure(Exception("Rejecting invitation failed"))
     }
 
-    override suspend fun createInvitation(invitationDtoSend: InvitationDtoSend): Result<InvitationDto> {
+    override suspend fun createInvitation(invitationDtoSend: InvitationDtoSend): CreateResult {
         val result = remoteDataSource.createInvitation(invitationDtoSend)
+        val code = result.code()
+        Log.d("ProjectRepo", "createInvitation result code: $code")
+        return when (result.code()) {
+            200 -> CreateResult.Success
+            401 -> CreateResult.NotAuthorized
+            409 -> CreateResult.AlreadyExists
+            else -> CreateResult.Failure
+        }
+    }
+
+    override suspend fun editProjectRole(projectRoleDto: ProjectRoleDto): Result<ProjectRoleDto> {
+        val result = remoteDataSource.editProjectRole(projectRoleDto)
         val body = result.body()
         return if (result.isSuccessful && body != null)
             Result.success(body)
         else
-            Result.failure(Exception("Create invitation failed"))
+            Result.failure(Exception("Editing project role failed"))
+    }
+
+    override suspend fun getAllProjectRolesByProjectId(projectId: Int): List<ProjectRoleDto> {
+        val result = remoteDataSource.findAllProjectRolesByProjectId(projectId)
+        val body = result.body()
+        return if (result.isSuccessful && body != null)
+            body
+        else
+            emptyList()
+    }
+
+    override suspend fun revokeAccess(projectId: Int, userId: Int): Result<Unit> {
+        val result = remoteDataSource.revokeAccess(
+            projectId = projectId,
+            userId = userId
+        )
+        val body = result.body()
+        return if (result.isSuccessful && body != null)
+            Result.success(body)
+        else
+            Result.failure(Exception("Revoke access failed"))
+    }
+
+    override suspend fun addProjectAdmin(projectId: Int, userId: Int): Result<ProjectRoleDto> {
+        val result = remoteDataSource.addProjectAdmin(
+            projectId = projectId,
+            userId = userId
+        )
+        val body = result.body()
+        return if (result.isSuccessful && body != null)
+            Result.success(body)
+        else
+            Result.failure(Exception("Adding admin failed"))
     }
 }

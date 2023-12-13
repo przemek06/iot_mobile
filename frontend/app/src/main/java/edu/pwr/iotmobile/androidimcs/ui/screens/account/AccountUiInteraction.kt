@@ -1,11 +1,16 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.account
 
+import android.content.Context
+
 interface AccountUiInteraction {
 
     fun setDisplayName(displayName: String)
     fun deleteAccount(navigation: AccountNavigation)
     fun onTextChange(text: String)
-    fun logout(navigation: AccountNavigation)
+    fun logout(
+        navigation: AccountNavigation,
+        context: Context
+    )
 
     companion object {
         fun default(
@@ -21,8 +26,11 @@ interface AccountUiInteraction {
                 viewModel.onTextChange(text = text)
             }
 
-            override fun logout(navigation: AccountNavigation) {
-                viewModel.logout(navigation)
+            override fun logout(
+                navigation: AccountNavigation,
+                context: Context
+            ) {
+                viewModel.logout(navigation, context)
             }
         }
     }

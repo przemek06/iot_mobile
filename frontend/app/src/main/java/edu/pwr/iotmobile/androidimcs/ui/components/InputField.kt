@@ -2,6 +2,7 @@
 
 package edu.pwr.iotmobile.androidimcs.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
@@ -15,13 +16,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
-import edu.pwr.iotmobile.androidimcs.extensions.conditional
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.conditional
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InputField(
+    modifier: Modifier = Modifier,
     text: String,
     label: String,
     width: Dp? = null,
+    isSingleLine: Boolean = true,
     isError: Boolean = false,
     errorText: String = "Error",
     trailingIcon: @Composable () -> Unit = {},
@@ -31,16 +35,16 @@ fun InputField(
     onValueChange: (v: String) -> Unit
 ) {
     Column(
-        modifier = Modifier.conditional(width != null) {
+        modifier = modifier.conditional(width != null) {
             width?.let { width(it) } ?: run { this }
         }
     ) {
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             value = text,
             onValueChange = { onValueChange(it) },
             label = { Text(label) },
-            singleLine = true,
+            singleLine = isSingleLine,
             trailingIcon = trailingIcon,
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,

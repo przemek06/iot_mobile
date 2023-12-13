@@ -1,14 +1,14 @@
 package edu.pwr.iotmobile.androidimcs.ui.screens.account
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,23 +21,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
-import edu.pwr.iotmobile.androidimcs.data.StatData
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
 import edu.pwr.iotmobile.androidimcs.ui.components.Option
 import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
-import edu.pwr.iotmobile.androidimcs.ui.theme.WidthSpacer
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AccountScreen(navigation: AccountNavigation) {
-
     val viewModel = koinViewModel<AccountViewModel>()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -45,11 +45,26 @@ fun AccountScreen(navigation: AccountNavigation) {
         viewModel.init(navigation)
     }
 
-    AccountScreenContent(
-        uiState = uiState,
-        uiInteraction = AccountUiInteraction.default(viewModel),
-        navigation = navigation
+    val context = LocalContext.current
+    viewModel.toast.CollectToast(context)
+
+    ErrorBox(
+        isVisible = uiState.isError,
+        onReturn = navigation::onReturn
     )
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isError && !uiState.isLoading,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        AccountScreenContent(
+            uiState = uiState,
+            uiInteraction = AccountUiInteraction.default(viewModel),
+            navigation = navigation
+        )
+    }
 }
 
 @Composable
@@ -61,6 +76,7 @@ private fun AccountScreenContent(
     val isDisplayNameDialogVisible = remember { mutableStateOf(false) }
     val isLogOutDialogVisible = remember { mutableStateOf(false) }
     val isDeleteAccountDialogVisible = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (isDisplayNameDialogVisible.value) {
         SimpleDialog(
@@ -80,7 +96,7 @@ private fun AccountScreenContent(
             confirmButtonText = stringResource(id = R.string.yes),
             onCloseDialog = { isLogOutDialogVisible.value = false },
             onConfirm = {
-                uiInteraction.logout(navigation)
+                uiInteraction.logout(navigation, context)
                 isLogOutDialogVisible.value = false
             }
         )
@@ -192,7 +208,7 @@ private fun AccountScreenContent(
 }
 
 @Composable
-fun DisplayNameInputField(
+private fun DisplayNameInputField(
     uiState: AccountUiState,
     uiInteraction: AccountUiInteraction
 ) {
@@ -204,7 +220,7 @@ fun DisplayNameInputField(
 }
 
 @Composable
-fun AccountDeletionContent() {
+private fun AccountDeletionContent() {
     Text(
         text = stringResource(id = R.string.delete_account_desc),
         style = MaterialTheme.typography.bodyLarge,

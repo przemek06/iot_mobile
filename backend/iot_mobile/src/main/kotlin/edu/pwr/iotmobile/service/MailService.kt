@@ -20,7 +20,7 @@ class MailService(private val templateEngine: TemplateEngine, private val mailSe
         return templateEngine.process(htmlTemplate, context)
     }
 
-    private fun sendHtmlMail(subject: String, address: String, html: String) {
+    fun sendHtmlMail(subject: String, address: String, html: String) {
         val simpleMailMessage: MimeMessage = mailSender.createMimeMessage()
         simpleMailMessage.subject = subject
         val helper = MimeMessageHelper(simpleMailMessage, false)
@@ -29,14 +29,14 @@ class MailService(private val templateEngine: TemplateEngine, private val mailSe
         mailSender.send(simpleMailMessage)
     }
 
-    fun sendPlainTextMail(subject: String, address: String, content: String) {
-        val simpleMailMessage: MimeMessage = mailSender.createMimeMessage()
-        simpleMailMessage.subject = subject
-        val helper = MimeMessageHelper(simpleMailMessage, false)
-        helper.setTo(address)
-        helper.setText(content, false)
-        mailSender.send(simpleMailMessage)
-    }
+//    fun sendPlainTextMail(subject: String, address: String, content: String) {
+//        val simpleMailMessage: MimeMessage = mailSender.createMimeMessage()
+//        simpleMailMessage.subject = subject
+//        val helper = MimeMessageHelper(simpleMailMessage, false)
+//        helper.setTo(address)
+//        helper.setText(content, false)
+//        mailSender.send(simpleMailMessage)
+//    }
 
     @Async
     fun sendUserVerificationMail(user: User, code: String) {

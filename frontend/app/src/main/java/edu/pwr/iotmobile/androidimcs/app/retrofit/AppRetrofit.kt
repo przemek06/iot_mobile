@@ -12,9 +12,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 object AppRetrofit {
-    private val BASE_URL = "http://${BuildConfig.APP_NETWORK}:8080/"
+    private val BASE_URL = "http://${BuildConfig.APP_NETWORK}/"
 
     fun create(
         cookiesInterceptor: AddCookiesInterceptor
@@ -22,6 +23,9 @@ object AppRetrofit {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         val client = OkHttpClient.Builder()
+            .connectTimeout(0, TimeUnit.SECONDS)
+            .writeTimeout(0, TimeUnit.SECONDS)
+            .readTimeout(0, TimeUnit.SECONDS)
             .addInterceptor(cookiesInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()

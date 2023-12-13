@@ -1,4 +1,4 @@
-package edu.pwr.iotmobile.androidimcs.extensions
+package edu.pwr.iotmobile.androidimcs.helpers.extensions
 
 import android.util.Log
 

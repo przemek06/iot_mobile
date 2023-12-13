@@ -11,7 +11,7 @@ class KeyboardFocusController(
     private val focusManager: FocusManager
 ) {
     fun clear() {
-        keyboardController?.hide()
         focusManager.clearFocus()
+        keyboardController?.hide()
     }
 }

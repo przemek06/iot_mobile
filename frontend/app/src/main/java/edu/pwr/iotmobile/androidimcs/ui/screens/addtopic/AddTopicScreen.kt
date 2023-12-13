@@ -1,5 +1,9 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package edu.pwr.iotmobile.androidimcs.ui.screens.addtopic
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,12 +17,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.TopicDataType
-import edu.pwr.iotmobile.androidimcs.extensions.firstUppercaseRestLowercase
+import edu.pwr.iotmobile.androidimcs.helpers.extensions.firstUppercaseRestLowercase
+import edu.pwr.iotmobile.androidimcs.helpers.KeyboardFocusController
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.InputField
 import edu.pwr.iotmobile.androidimcs.ui.components.RadioButtonWithText
@@ -53,7 +61,21 @@ private fun AddTopicScreenContent(
     uiState: AddTopicUiState,
     uiInteraction: AddTopicUiInteraction
 ) {
-    Column(Modifier.fillMaxSize()) {
+    // Used to clear focus and hide keyboard when clicked outside input fields
+    val focusManager = LocalFocusManager.current
+    val keyboardFocus = KeyboardFocusController(
+        keyboardController = LocalSoftwareKeyboardController.current,
+        focusManager = focusManager
+    )
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .clickable(interactionSource = MutableInteractionSource(), indication = null) {
+                keyboardFocus.clear()
+                uiInteraction.checkInputFieldData()
+            }
+    ) {
         TopBar(text = stringResource(R.string.add_topic)) {
             navigation.goBack()
         }
@@ -82,7 +104,9 @@ private fun AddTopicScreenContent(
                     Dimensions.space18.HeightSpacer()
                     InputField(
                         text = it.value.inputFieldData.text,
-                        label = stringResource(it.value.inputFieldData.label)
+                        label = stringResource(it.value.inputFieldData.label),
+                        isError = it.value.inputFieldData.isError,
+                        errorText = stringResource(it.value.inputFieldData.errorMessage)
                     ) { text ->
                         uiInteraction.onTextChange(
                             type = it.key,
@@ -116,6 +140,7 @@ private fun AddTopicScreenContent(
                     ButtonCommon(
                         modifier = Modifier.align(Alignment.Center),
                         text = stringResource(id = R.string.confirm),
+                        isDisabled = uiState.isLoading,
                         width = Dimensions.buttonWidth
                     ) { uiInteraction.addTopic(projectId = navigation.projectId) }
                 }

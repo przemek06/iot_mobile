@@ -37,7 +37,10 @@ import edu.pwr.iotmobile.androidimcs.R
 import edu.pwr.iotmobile.androidimcs.data.UserProjectRole
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommon
 import edu.pwr.iotmobile.androidimcs.ui.components.ButtonCommonType
+import edu.pwr.iotmobile.androidimcs.ui.components.ErrorBox
 import edu.pwr.iotmobile.androidimcs.ui.components.InfoDialog
+import edu.pwr.iotmobile.androidimcs.ui.components.LoadingBox
+import edu.pwr.iotmobile.androidimcs.ui.components.SimpleDialog
 import edu.pwr.iotmobile.androidimcs.ui.components.TopBar
 import edu.pwr.iotmobile.androidimcs.ui.theme.Dimensions
 import edu.pwr.iotmobile.androidimcs.ui.theme.HeightSpacer
@@ -54,17 +57,36 @@ fun ProjectDetailsScreen(
         viewModel.init(navigation)
     }
 
+    LaunchedEffect(navigation.isTopicSuccess) {
+        viewModel.updateTopics()
+    }
+    LaunchedEffect(navigation.isUserListSuccess) {
+        viewModel.updateUsers()
+    }
+
     val context = LocalContext.current
     viewModel.event.CollectEvent(context) {
         navigation.onReturn()
     }
     viewModel.toast.CollectToast(context)
 
-    ProjectDetailsScreenContent(
-        uiState = uiState,
-        uiInteraction = ProjectDetailsUiInteraction.default(viewModel),
-        navigation = navigation
+    ErrorBox(
+        isVisible = uiState.isError,
+        onReturn = navigation::onReturn
     )
+    LoadingBox(isVisible = uiState.isLoading)
+
+    AnimatedVisibility(
+        visible = !uiState.isError && !uiState.isLoading,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        ProjectDetailsScreenContent(
+            uiState = uiState,
+            uiInteraction = ProjectDetailsUiInteraction.default(viewModel),
+            navigation = navigation
+        )
+    }
 }
 
 @Composable
@@ -77,8 +99,17 @@ private fun ProjectDetailsScreenContent(
     ShowAccessDialog(
         isVisible = isAccessDialogVisible,
         connectionString = uiState.projectData.connectionKey ?: "",
+        uiState = uiState,
         uiInteraction =  uiInteraction,
         onCloseDialog = { isAccessDialogVisible = false }
+    )
+    DeleteProjectDialog(
+        uiState = uiState,
+        uiInteraction = uiInteraction
+    )
+    LeaveProjectDialog(
+        uiState = uiState,
+        uiInteraction = uiInteraction
     )
 
     Column {
@@ -125,7 +156,6 @@ private fun ProjectDetailsScreenContent(
                     )
                 }
             }
-            Dimensions.space22.HeightSpacer()
 
             TabContent(uiState, uiInteraction, navigation)
         }
@@ -146,7 +176,7 @@ private fun TabContent(
             TopicsScreenContent(uiState, uiInteraction, navigation)
         }
         AnimatedVisibilityTabContainer(visible = uiState.selectedTabIndex == 2) {
-            GroupScreenContent(uiState, uiInteraction)
+            GroupScreenContent(uiState)
         }
     }
 }
@@ -166,9 +196,62 @@ private fun AnimatedVisibilityTabContainer(
 }
 
 @Composable
+private fun DeleteProjectDialog(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction,
+) {
+    if (uiState.isDeleteProjectDialogVisible) {
+        SimpleDialog(
+            title = stringResource(id = R.string.s61, uiState.projectData.name),
+            confirmButtonText = stringResource(id = R.string.yes),
+            closeButtonText = stringResource(id = R.string.no),
+            onCloseDialog = { uiInteraction.toggleDeleteProjectDialog() },
+            isLoading = uiState.isDialogLoading,
+            onConfirm = { uiInteraction.deleteProject() }
+        ) {
+            Text(
+                text = stringResource(id = R.string.delete_account_desc),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Dimensions.space10
+            Text(
+                text = stringResource(id = R.string.delete_account_desc2) + ".",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+}
+
+@Composable
+private fun LeaveProjectDialog(
+    uiState: ProjectDetailsUiState,
+    uiInteraction: ProjectDetailsUiInteraction,
+) {
+    if (uiState.isLeaveProjectDialogVisible) {
+        SimpleDialog(
+            title = stringResource(id = R.string.s113, uiState.projectData.name),
+            confirmButtonText = stringResource(id = R.string.yes),
+            closeButtonText = stringResource(id = R.string.no),
+            onCloseDialog = { uiInteraction.toggleLeaveProjectDialog() },
+            isLoading = uiState.isDialogLoading,
+            onConfirm = { uiInteraction.leaveGroup() }
+        ) {
+            Text(
+                text = stringResource(id = R.string.s114),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+}
+
+@Composable
 private fun ShowAccessDialog(
     isVisible: Boolean,
     connectionString: String,
+    uiState: ProjectDetailsUiState,
     uiInteraction: ProjectDetailsUiInteraction,
     onCloseDialog: () -> Unit
 ) {
@@ -187,13 +270,15 @@ private fun ShowAccessDialog(
                         clipboardManager.setText(AnnotatedString(text = connectionString))
                     }
                 )
-                Dimensions.space10.HeightSpacer()
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    ButtonCommon(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = stringResource(id = R.string.s46),
-                        onClick = uiInteraction::regenerateConnectionKey
-                    )
+                if (uiState.userProjectRole == UserProjectRole.ADMIN) {
+                    Dimensions.space10.HeightSpacer()
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        ButtonCommon(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = stringResource(id = R.string.s46),
+                            onClick = uiInteraction::regenerateConnectionKey
+                        )
+                    }
                 }
                 Dimensions.space22.HeightSpacer()
                 Text(

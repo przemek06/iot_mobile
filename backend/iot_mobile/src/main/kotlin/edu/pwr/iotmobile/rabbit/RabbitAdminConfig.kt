@@ -15,15 +15,15 @@ import org.springframework.context.annotation.Scope
 @Configuration
 class RabbitAdminConfig(
 
-    @Value("\${rabbit.username}")
+    @Value("\${rabbit.username:guest}")
     val username: String,
-    @Value("\${rabbit.password}")
+    @Value("\${rabbit.password:guest}")
     val password: String,
-    @Value("\${rabbit.virtualHost}")
+    @Value("\${rabbit.virtualHost:/}")
     val virtualHost: String,
-    @Value("\${rabbit.host}")
+    @Value("\${rabbit.host:rabbitmq}")
     val host: String,
-    @Value("\${rabbit.port}")
+    @Value("\${rabbit.port:5672}")
     val port: Int
 ) {
 
