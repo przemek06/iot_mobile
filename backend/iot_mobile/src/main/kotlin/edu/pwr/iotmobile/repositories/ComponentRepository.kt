@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ComponentRepository : JpaRepository<Component, Int> {
-
+    
     fun deleteAllByDashboardId(dashboardId: Int)
     fun findAllByDashboardId(dashboardId: Int): List<Component>
     fun findAllByDashboardProjectId(projectId: Int) : List<Component>
