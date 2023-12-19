@@ -17,22 +17,17 @@ class MessageReceivedWebSocketListener(
     onMessageReceived: (data: MessageDto) -> Unit
 ) {
     private val request = Request.Builder()
-        .url("ws://${BuildConfig.APP_NETWORK}/messages") // Replace with your server URL and WebSocket endpoint
+        .url("ws://${BuildConfig.APP_NETWORK}/messages")
         .build()
 
     private val webSocket = client.newWebSocket(request, object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            // WebSocket connection is established
-            // You can send the "dashboardId" here
             Log.d("mess", "opened webSocket")
             Log.d("mess", "sending: " + topicNames.distinct().joinToString(","))
             webSocket.send(topicNames.distinct().joinToString(","))
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            // Handle incoming messages from the server
-            // You will receive an infinite stream of messages here
-            // Update your UI or perform any other necessary tasks
             Log.d("WebSocket", "Message received")
             Log.d("WebSocket", text)
             try {

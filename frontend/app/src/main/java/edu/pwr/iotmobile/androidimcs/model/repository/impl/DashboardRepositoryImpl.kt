@@ -12,7 +12,7 @@ private const val TAG = "DashboardRepo"
 
 class DashboardRepositoryImpl(
     private val remoteDataSource: DashboardRemoteDataSource,
-    private val localDataSource: DashboardDao
+    private val localDataSource: DashboardDao,
 ) : DashboardRepository {
     override suspend fun createDashboard(dashboardDto: DashboardDto): CreateResult {
         val result = remoteDataSource.createDashboard(dashboardDto)

@@ -20,20 +20,15 @@ class ProjectDeletedWebSocketListener(
     onProjectDeleted: (data: ProjectDeletedDto) -> Unit
 ) {
     private val request = Request.Builder()
-        .url("ws://${BuildConfig.APP_NETWORK}/projectDeleted") // Replace with your server URL and WebSocket endpoint
+        .url("ws://${BuildConfig.APP_NETWORK}/projectDeleted")
         .build()
 
     private val webSocket = client.newWebSocket(request, object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            // WebSocket connection is established
-            // You can send the "dashboardId" here
             webSocket.send(projectId.toString())
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            // Handle incoming messages from the server
-            // You will receive an infinite stream of messages here
-            // Update your UI or perform any other necessary tasks
             try {
                 val obj = Gson().fromJson(text, ProjectDeletedDto::class.java)
                 onProjectDeleted(obj)

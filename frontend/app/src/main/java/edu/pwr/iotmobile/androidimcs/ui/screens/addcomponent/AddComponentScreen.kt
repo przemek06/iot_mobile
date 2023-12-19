@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -122,7 +123,7 @@ private fun NavigationWrapper(
     navigation: AddComponentNavigation,
     content: @Composable () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().testTag("navWrapper")) {
         Column(modifier = Modifier
             .fillMaxSize()
             .align(Alignment.TopStart)

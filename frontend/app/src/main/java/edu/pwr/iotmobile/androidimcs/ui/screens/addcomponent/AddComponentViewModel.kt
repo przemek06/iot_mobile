@@ -31,6 +31,7 @@ import edu.pwr.iotmobile.androidimcs.helpers.toast.Toast
 import edu.pwr.iotmobile.androidimcs.model.repository.ComponentRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.IntegrationRepository
 import edu.pwr.iotmobile.androidimcs.model.repository.TopicRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,7 +44,8 @@ class AddComponentViewModel(
     private val componentRepository: ComponentRepository,
     private val integrationRepository: IntegrationRepository,
     val event: Event,
-    val toast: Toast
+    val toast: Toast,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AddComponentUiState())
     val uiState = _uiState.asStateFlow()
@@ -56,7 +58,7 @@ class AddComponentViewModel(
             _uiState.update { it.copy(isLoading = true) }
             _projectId = projectId
 
-            viewModelScope.launch(Dispatchers.Default) {
+            viewModelScope.launch(dispatcher) {
                 _uiState.update {
                     it.copy(
                         inputComponents = generateInputComponents(),
@@ -398,7 +400,7 @@ class AddComponentViewModel(
 
     private fun onConfirmComponent(scopeID: ScopeID) {
         _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(dispatcher) {
             val data = getComponentDtoData() ?: run {
                 toast.toast(FAILURE_TOAST_MESSAGE)
                 _uiState.update { it.copy(isLoading = false) }

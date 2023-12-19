@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,7 +36,7 @@ fun ChooseComponentScreenContent(
     uiInteraction: AddComponentUiInteraction
 ) {
     LazyVerticalGrid(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().testTag("ChooseComponentContent"),
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.space30),
         verticalArrangement = Arrangement.spacedBy(Dimensions.space14)
@@ -121,7 +122,8 @@ private fun ComponentItem(
         modifier = Modifier
             .height(120.dp)
             .clip(CardDefaults.shape)
-            .clickable { uiInteraction.onChooseComponent(data) },
+            .clickable { uiInteraction.onChooseComponent(data) }
+            .testTag("componentChoiceItem"),
         border = BorderStroke(width = borderWidth, color = borderColor),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor,
